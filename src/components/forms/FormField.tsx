@@ -1,0 +1,53 @@
+/**
+ * Componente reutilizable para campos de formulario
+ */
+
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+
+export interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  helperText?: string;
+}
+
+export function FormField({ label, error, helperText, className, id, ...props }: FormFieldProps) {
+  const fieldId = id || `field-${props.name}`;
+
+  return (
+    <div className="space-y-2">
+      {label && (
+        <label htmlFor={fieldId} className="text-sm font-medium text-foreground block">
+          {label}
+        </label>
+      )}
+      <Input
+        id={fieldId}
+        className={cn(error && "border-destructive", className)}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${fieldId}-error` : undefined}
+        {...props}
+      />
+      {error && (
+        <div id={`${fieldId}-error`} className="flex items-start gap-1.5 text-sm text-destructive">
+          <svg
+            className="h-4 w-4 shrink-0 mt-0.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span className="flex-1">{error}</span>
+        </div>
+      )}
+      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
+    </div>
+  );
+}

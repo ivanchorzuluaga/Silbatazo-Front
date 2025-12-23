@@ -1,10 +1,30 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App";
 
-createRoot(document.getElementById('root')!).render(
+// Inicializar el tema antes de renderizar
+function initializeTheme() {
+  const theme = localStorage.getItem("theme") || "system";
+  const root = document.documentElement;
+
+  root.classList.remove("light", "dark");
+
+  if (theme === "system") {
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+    root.classList.add(systemTheme);
+  } else {
+    root.classList.add(theme);
+  }
+}
+
+// Inicializar tema inmediatamente
+initializeTheme();
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <App />
-  </StrictMode>,
-)
+  </StrictMode>
+);
