@@ -82,8 +82,47 @@ export const authService = {
 
   /**
    * Cerrar sesión
+   * Invalida el refresh token en el servidor y limpia el localStorage
    */
-  logout() {
+  async logout(): Promise<void> {
+    const accessToken = this.getAccessToken();
+    const refreshToken = this.getRefreshToken();
+
+    // Si hay tokens, intentar invalidarlos en el servidor
+    if (accessToken && refreshToken) {
+      try {
+        await authEndpoints.logout(accessToken, refreshToken);
+      } catch (error) {
+        // Si falla la llamada al servidor, continuar con la limpieza local
+        // Esto asegura que el usuario pueda cerrar sesión incluso si hay problemas de red
+        console.warn("Error al invalidar token en el servidor:", error);
+      }
+    }
+
+    // Limpiar localStorage siempre (incluso si falló la llamada al servidor)
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.USER);
+  },
+
+  /**
+   * Cerrar todas las sesiones del usuario
+   * Invalida todos los refresh tokens del usuario en el servidor
+   */
+  async logoutAll(): Promise<void> {
+    const accessToken = this.getAccessToken();
+
+    // Si hay token, intentar invalidar todas las sesiones en el servidor
+    if (accessToken) {
+      try {
+        await authEndpoints.logoutAll(accessToken);
+      } catch (error) {
+        // Si falla la llamada al servidor, continuar con la limpieza local
+        console.warn("Error al invalidar todas las sesiones en el servidor:", error);
+      }
+    }
+
+    // Limpiar localStorage siempre
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.USER);

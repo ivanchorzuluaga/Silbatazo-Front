@@ -1,15 +1,15 @@
 /**
- * Página de dashboard después del login
- * Muestra información del usuario y botón de cerrar sesión
+ * Dashboard específico para Clientes
+ * Muestra información y funcionalidades relevantes para clientes
  */
 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { ROUTES, USER_ROLES } from "@/lib/constants";
+import { ROUTES } from "@/lib/constants";
 
-export function DashboardPage() {
+export function ClienteDashboardPage() {
   const { user, logout, logoutAll } = useAuth();
   const navigate = useNavigate();
 
@@ -19,7 +19,6 @@ export function DashboardPage() {
       navigate(ROUTES.HOME);
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
-      // Aún así, redirigir al home si falla
       navigate(ROUTES.HOME);
     }
   };
@@ -34,21 +33,7 @@ export function DashboardPage() {
       navigate(ROUTES.HOME);
     } catch (error) {
       console.error("Error al cerrar todas las sesiones:", error);
-      // Aún así, redirigir al home si falla
       navigate(ROUTES.HOME);
-    }
-  };
-
-  const getRoleLabel = (role?: string) => {
-    switch (role) {
-      case USER_ROLES.CLIENTE:
-        return "Cliente";
-      case USER_ROLES.ARBITRO:
-        return "Árbitro";
-      case USER_ROLES.ADMIN:
-        return "Administrador";
-      default:
-        return "Usuario";
     }
   };
 
@@ -61,8 +46,10 @@ export function DashboardPage() {
 
       <div className="w-full max-w-md space-y-6 rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
         <div className="space-y-2 text-center">
-          <h1 className="text-xl sm:text-2xl font-bold">Dashboard</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Bienvenido a tu panel</p>
+          <h1 className="text-xl sm:text-2xl font-bold">Dashboard - Cliente</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Bienvenido, {user?.username || "Cliente"}
+          </p>
         </div>
 
         <div className="space-y-4">
@@ -73,17 +60,23 @@ export function DashboardPage() {
               <p className="text-lg font-semibold">{user?.username || "N/A"}</p>
             </div>
 
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Tipo de usuario</p>
-              <p className="text-lg font-semibold">{getRoleLabel(user?.role)}</p>
-            </div>
-
             {user?.email && (
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Email</p>
                 <p className="text-lg font-semibold">{user.email}</p>
               </div>
             )}
+          </div>
+
+          {/* Funcionalidades para clientes */}
+          <div className="space-y-2 rounded-md border bg-muted/30 p-4">
+            <h2 className="text-sm font-semibold mb-2">Funcionalidades</h2>
+            <p className="text-sm text-muted-foreground">
+              Aquí podrás buscar árbitros, solicitar partidos, realizar pagos y calificar servicios.
+            </p>
+            <p className="text-xs text-muted-foreground mt-2 italic">
+              (Próximamente en Fase 3)
+            </p>
           </div>
 
           {/* Botones de cerrar sesión */}
@@ -108,3 +101,4 @@ export function DashboardPage() {
     </div>
   );
 }
+

@@ -1,17 +1,34 @@
 /**
  * Componente para proteger rutas que requieren autenticación
+ * Opcionalmente puede validar roles específicos
  */
 
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { ROUTES } from "@/lib/constants";
+import { ROUTES, type UserRole } from "@/lib/constants";
+import { hasRoleAccess, getDashboardRoute } from "@/lib/routing";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  /**
+   * Roles permitidos para acceder a esta ruta
+   * Si no se especifica, cualquier usuario autenticado puede acceder
+   */
+  allowedRoles?: UserRole[];
+  /**
+   * Si es true, redirige al dashboard del usuario si no tiene el rol correcto
+   * Si es false, redirige al login
+   * Por defecto: true
+   */
+  redirectToDashboard?: boolean;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+export function ProtectedRoute({
+  children,
+  allowedRoles,
+  redirectToDashboard = true,
+}: ProtectedRouteProps) {
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
     return (
@@ -25,6 +42,17 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to={ROUTES.LOGIN} replace />;
   }
 
+  // Si hay restricciones de rol, verificar acceso
+  if (allowedRoles && allowedRoles.length > 0) {
+    if (!hasRoleAccess(user?.role, allowedRoles)) {
+      // Si no tiene acceso, redirigir al dashboard del usuario o al login
+      if (redirectToDashboard && user?.role) {
+        const dashboardRoute = getDashboardRoute(user.role);
+        return <Navigate to={dashboardRoute} replace />;
+      }
+      return <Navigate to={ROUTES.LOGIN} replace />;
+    }
+  }
+
   return <>{children}</>;
 }
-

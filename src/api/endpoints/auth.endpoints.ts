@@ -49,6 +49,25 @@ export const authEndpoints = {
     return authenticatedApiClient<TestResponse>("/api/users/test/", accessToken);
   },
 
+  /**
+   * Cerrar sesión (invalida el refresh token)
+   */
+  async logout(accessToken: string, refreshToken: string): Promise<{ message: string }> {
+    return authenticatedApiClient<{ message: string }>("/api/users/logout/", accessToken, {
+      method: "POST",
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+  },
+
+  /**
+   * Cerrar todas las sesiones del usuario
+   */
+  async logoutAll(accessToken: string): Promise<{ message: string }> {
+    return authenticatedApiClient<{ message: string }>("/api/users/logout/all/", accessToken, {
+      method: "POST",
+    });
+  },
+
   // TODO: Reactivar cuando se implemente Google OAuth
   // /**
   //  * Autenticación con Google OAuth2

@@ -58,23 +58,23 @@ async function apiClient<T>(endpoint: string, options: RequestInit = {}): Promis
         const text = await response.text().catch(() => "");
         errorData = { message: text || "Error en la solicitud" };
       }
-      
+
       // Construir mensaje de error más descriptivo
       let errorMessage = "Error en la solicitud";
-      
+
       if (errorData.detail) {
         errorMessage = errorData.detail;
       } else if (errorData.message) {
         errorMessage = errorData.message;
-      } else if (typeof errorData === 'object') {
+      } else if (typeof errorData === "object") {
         // Si hay errores de campo, construir mensaje
         const fieldMessages: string[] = [];
         Object.keys(errorData).forEach((key) => {
-          if (key !== 'detail' && key !== 'message') {
+          if (key !== "detail" && key !== "message") {
             const value = errorData[key];
             if (Array.isArray(value) && value.length > 0) {
               fieldMessages.push(`${key}: ${String(value[0])}`);
-            } else if (typeof value === 'string') {
+            } else if (typeof value === "string") {
               fieldMessages.push(value);
             }
           }
@@ -83,12 +83,8 @@ async function apiClient<T>(endpoint: string, options: RequestInit = {}): Promis
           errorMessage = fieldMessages.join(". ");
         }
       }
-      
-      throw new ApiException(
-        errorMessage,
-        response.status,
-        errorData
-      );
+
+      throw new ApiException(errorMessage, response.status, errorData);
     }
 
     // Si la respuesta está vacía, retornar null

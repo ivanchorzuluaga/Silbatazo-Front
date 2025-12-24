@@ -8,17 +8,19 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthDialog } from "../components/AuthDialog";
 import { ROUTES } from "@/lib/constants";
+import { getDashboardRoute } from "@/lib/routing";
 
 export function LoginPage() {
   const [authDialogOpen, setAuthDialogOpen] = useState(true);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   const handleDialogClose = (open: boolean) => {
     setAuthDialogOpen(open);
-    // Si se cierra y el usuario está autenticado, redirigir al dashboard
-    if (!open && isAuthenticated) {
-      navigate(ROUTES.DASHBOARD);
+    // Si se cierra y el usuario está autenticado, redirigir al dashboard según su rol
+    if (!open && isAuthenticated && user?.role) {
+      const dashboardRoute = getDashboardRoute(user.role);
+      navigate(dashboardRoute);
     }
     // Si se cierra sin autenticar, redirigir a home
     if (!open && !isAuthenticated) {
@@ -27,7 +29,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4 safe-area-inset">
       <div className="w-full max-w-md">
         <AuthDialog
           open={authDialogOpen}

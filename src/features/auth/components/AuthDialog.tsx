@@ -20,7 +20,8 @@ import { useLogin } from "../hooks/useLogin";
 import { useRegister } from "../hooks/useRegister";
 import { useAuth } from "@/hooks/useAuth";
 import { validations } from "@/lib/validations";
-import { USER_ROLES, ROUTES, type UserRole } from "@/lib/constants";
+import { USER_ROLES, type UserRole } from "@/lib/constants";
+import { getDashboardRoute } from "@/lib/routing";
 
 interface AuthDialogProps {
   open: boolean;
@@ -121,22 +122,24 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
     }
 
     try {
+      let authResponse;
+
       if (isLogin) {
         // Modo login
-        const response = await login({ username, password });
+        authResponse = await login({ username, password });
         // Actualizar el estado de autenticación con los tokens y datos del usuario del backend
         setAuth(
-          response.tokens.access,
-          response.tokens.refresh,
-          response.user.role,
-          response.user.username,
-          response.user.email
+          authResponse.tokens.access,
+          authResponse.tokens.refresh,
+          authResponse.user.role,
+          authResponse.user.username,
+          authResponse.user.email
         );
       } else {
         // Modo registro
         // Asegurar que el rol no sea admin (los admins no se registran)
         const registerRole = userRole === USER_ROLES.ADMIN ? USER_ROLES.CLIENTE : userRole;
-        const response = await register({
+        authResponse = await register({
           username,
           email: email || undefined,
           password,
@@ -147,20 +150,21 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
         });
         // Actualizar el estado de autenticación con los tokens y datos del usuario
         setAuth(
-          response.tokens.access,
-          response.tokens.refresh,
-          response.user.role,
-          response.user.username,
-          response.user.email
+          authResponse.tokens.access,
+          authResponse.tokens.refresh,
+          authResponse.user.role,
+          authResponse.user.username,
+          authResponse.user.email
         );
       }
 
       // Cerrar el dialog
       onOpenChange(false);
 
-      // Redirigir al dashboard después de un pequeño delay para asegurar que el estado se actualice
+      // Redirigir al dashboard según el rol del usuario
+      const dashboardRoute = getDashboardRoute(authResponse.user.role as UserRole);
       setTimeout(() => {
-        navigate(ROUTES.DASHBOARD);
+        navigate(dashboardRoute);
       }, 100);
     } catch (err) {
       console.error("Error en autenticación:", err);
