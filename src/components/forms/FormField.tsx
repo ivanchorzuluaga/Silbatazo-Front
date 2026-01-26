@@ -9,25 +9,57 @@ export interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputEleme
   label?: string;
   error?: string;
   helperText?: string;
+  multiline?: boolean;
+  rows?: number;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
 }
 
-export function FormField({ label, error, helperText, className, id, ...props }: FormFieldProps) {
+export function FormField({
+  label,
+  error,
+  helperText,
+  className,
+  id,
+  multiline,
+  rows = 4,
+  leftIcon,
+  rightIcon,
+  ...props
+}: FormFieldProps) {
   const fieldId = id || `field-${props.name}`;
 
   return (
     <div className="space-y-2">
       {label && (
-        <label htmlFor={fieldId} className="text-sm font-medium text-foreground block">
+        <label htmlFor={fieldId} className="text-sm font-semibold text-foreground block">
           {label}
         </label>
       )}
-      <Input
-        id={fieldId}
-        className={cn(error && "border-destructive", className)}
-        aria-invalid={!!error}
-        aria-describedby={error ? `${fieldId}-error` : undefined}
-        {...props}
-      />
+      {multiline ? (
+        <textarea
+          id={fieldId}
+          rows={rows}
+          className={cn(
+            "flex w-full rounded-lg border-2 border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 transition-ios",
+            error && "border-destructive",
+            className
+          )}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${fieldId}-error` : undefined}
+          {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+        />
+      ) : (
+        <Input
+          id={fieldId}
+          className={cn(error && "border-destructive", className)}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${fieldId}-error` : undefined}
+          leftIcon={leftIcon}
+          rightIcon={rightIcon}
+          {...props}
+        />
+      )}
       {error && (
         <div id={`${fieldId}-error`} className="flex items-start gap-1.5 text-sm text-destructive">
           <svg

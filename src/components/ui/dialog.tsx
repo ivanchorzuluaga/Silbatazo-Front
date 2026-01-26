@@ -55,33 +55,37 @@ const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivEleme
   );
 };
 
-const DialogTitle = React.forwardRef<
-  HTMLHeadingElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => {
-  return (
-    <h2
-      ref={ref}
-      className={cn("text-lg font-semibold leading-none tracking-tight", className)}
-      {...props}
-    />
-  );
-});
+const DialogTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
+  ({ className, ...props }, ref) => {
+    return (
+      <h2
+        ref={ref}
+        className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+        {...props}
+      />
+    );
+  }
+);
 DialogTitle.displayName = "DialogTitle";
 
 const DialogDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => {
-  return (
-    <p
-      ref={ref}
-      className={cn("text-sm text-muted-foreground", className)}
-      {...props}
-    />
-  );
+  return <p ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />;
 });
 DialogDescription.displayName = "DialogDescription";
 
-export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription };
+const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+  return (
+    <div
+      className={cn(
+        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6",
+        className
+      )}
+      {...props}
+    />
+  );
+};
 
+export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter };

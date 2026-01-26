@@ -4,3 +4,7 @@ export * from "./dialog";
 export * from "./select";
 export * from "./slide-panel";
 export * from "./alert";
+export * from "./card";
+export * from "./badge";
+export * from "./avatar";
+export * from "./skeleton";

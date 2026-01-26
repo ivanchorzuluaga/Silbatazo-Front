@@ -10,6 +10,7 @@ import type {
   TestResponse,
   AuthResponse,
 } from "../types";
+import type { User, UserUpdateData } from "@/features/auth/types/auth.types";
 
 export const authEndpoints = {
   /**
@@ -65,6 +66,23 @@ export const authEndpoints = {
   async logoutAll(accessToken: string): Promise<{ message: string }> {
     return authenticatedApiClient<{ message: string }>("/api/users/logout/all/", accessToken, {
       method: "POST",
+    });
+  },
+
+  /**
+   * Obtener perfil del usuario autenticado
+   */
+  async getProfile(accessToken: string): Promise<User> {
+    return authenticatedApiClient<User>("/api/users/profile/", accessToken);
+  },
+
+  /**
+   * Actualizar perfil del usuario autenticado
+   */
+  async updateProfile(accessToken: string, data: UserUpdateData): Promise<User> {
+    return authenticatedApiClient<User>("/api/users/profile/", accessToken, {
+      method: "PATCH",
+      body: JSON.stringify(data),
     });
   },
 

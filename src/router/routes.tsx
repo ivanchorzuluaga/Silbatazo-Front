@@ -5,9 +5,30 @@
 import { createBrowserRouter } from "react-router-dom";
 import { HomePage } from "@/features/auth/pages/HomePage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
-import { ClienteDashboardPage } from "@/features/auth/pages/ClienteDashboardPage";
-import { ArbitroDashboardPage } from "@/features/auth/pages/ArbitroDashboardPage";
-import { AdminDashboardPage } from "@/features/auth/pages/AdminDashboardPage";
+import { ClienteDashboardPage } from "@/features/cliente/pages/ClienteDashboardPage";
+import { ArbitroDashboardPage } from "@/features/arbitro/pages/ArbitroDashboardPage";
+import { AdminDashboardPage } from "@/features/admin/pages/AdminDashboardPage";
+import { PerfilArbitroPage } from "@/features/arbitro/pages/PerfilArbitroPage";
+import { ArbitrosListPage } from "@/features/marketplace/pages/ArbitrosListPage";
+import { ArbitroDetailPage } from "@/features/marketplace/pages/ArbitroDetailPage";
+import { VerificacionArbitrosPage } from "@/features/admin/pages/VerificacionArbitrosPage";
+import { VerificarArbitroDetailPage } from "@/features/admin/pages/VerificarArbitroDetailPage";
+import { GestionArbitrosPage } from "@/features/admin/pages/GestionArbitrosPage";
+import { GestionPartidosPage } from "@/features/admin/pages/GestionPartidosPage";
+import { CategoriasPage } from "@/features/admin/pages/CategoriasPage";
+import { AsignacionPartidosPage } from "@/features/admin/pages/AsignacionPartidosPage";
+import { PagosPendientesPage } from "@/features/admin/pages/PagosPendientesPage";
+import { RetirosPage } from "@/features/admin/pages/RetirosPage";
+import { PartidosListPage } from "@/features/partidos/pages/PartidosListPage";
+import { PartidoCreatePage } from "@/features/partidos/pages/PartidoCreatePage";
+import { PartidoDetailPage } from "@/features/partidos/pages/PartidoDetailPage";
+import { PagoPartidoPage } from "@/features/partidos/pages/PagoPartidoPage";
+import { BilleteraPage } from "@/features/arbitro/pages/BilleteraPage";
+import { 
+  TerminosCondicionesPage, 
+  PoliticaPrivacidadPage, 
+  PoliticaReembolsoPage 
+} from "@/features/legal";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { DashboardRedirect } from "./DashboardRedirect";
 import { ROUTES, USER_ROLES } from "@/lib/constants";
@@ -16,6 +37,27 @@ export const router = createBrowserRouter([
   {
     path: ROUTES.HOME,
     element: <HomePage />,
+    errorElement: (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Error al cargar la página</h1>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded"
+          >
+            Recargar
+          </button>
+        </div>
+      </div>
+    ),
+  },
+  {
+    path: ROUTES.ARBITROS,
+    element: <ArbitrosListPage />,
+  },
+  {
+    path: ROUTES.ARBITRO_DETALLE,
+    element: <ArbitroDetailPage />,
   },
   {
     path: ROUTES.LOGIN,
@@ -52,6 +94,24 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+  // Perfil de árbitro
+  {
+    path: ROUTES.ARBITRO_PERFIL,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ARBITRO]}>
+        <PerfilArbitroPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Billetera de árbitro
+  {
+    path: ROUTES.ARBITRO_BILLETERA,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ARBITRO]}>
+        <BilleteraPage />
+      </ProtectedRoute>
+    ),
+  },
   // Dashboard específico para administradores
   {
     path: ROUTES.ADMIN_DASHBOARD,
@@ -60,5 +120,116 @@ export const router = createBrowserRouter([
         <AdminDashboardPage />
       </ProtectedRoute>
     ),
+  },
+  // Panel de verificación de árbitros (admin)
+  {
+    path: ROUTES.ADMIN_VERIFICACION,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+        <VerificacionArbitrosPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.ADMIN_VERIFICAR_ARBITRO,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+        <VerificarArbitroDetailPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Gestión completa de árbitros (admin)
+  {
+    path: ROUTES.ADMIN_GESTION_ARBITROS,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+        <GestionArbitrosPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Gestión de partidos (admin)
+  {
+    path: ROUTES.ADMIN_GESTION_PARTIDOS,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+        <GestionPartidosPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Gestión de categorías (admin)
+  {
+    path: ROUTES.ADMIN_CATEGORIAS,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+        <CategoriasPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Asignación de árbitros a partidos (admin)
+  {
+    path: ROUTES.ADMIN_ASIGNACION_PARTIDOS,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+        <AsignacionPartidosPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Gestión de retiros (admin)
+  {
+    path: ROUTES.ADMIN_RETIROS,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+        <RetirosPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Partidos - Lista (requiere autenticación)
+  {
+    path: ROUTES.PARTIDOS,
+    element: (
+      <ProtectedRoute>
+        <PartidosListPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Partidos - Crear (solo clientes)
+  {
+    path: ROUTES.PARTIDOS_CREAR,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.CLIENTE]}>
+        <PartidoCreatePage />
+      </ProtectedRoute>
+    ),
+  },
+  // Partidos - Detalle (requiere autenticación)
+  {
+    path: ROUTES.PARTIDO_DETALLE,
+    element: (
+      <ProtectedRoute>
+        <PartidoDetailPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Partidos - Pago (solo clientes)
+  {
+    path: ROUTES.PARTIDO_PAGO,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.CLIENTE]}>
+        <PagoPartidoPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Páginas legales (públicas)
+  {
+    path: ROUTES.TERMINOS,
+    element: <TerminosCondicionesPage />,
+  },
+  {
+    path: ROUTES.PRIVACIDAD,
+    element: <PoliticaPrivacidadPage />,
+  },
+  {
+    path: ROUTES.REEMBOLSO,
+    element: <PoliticaReembolsoPage />,
   },
 ]);

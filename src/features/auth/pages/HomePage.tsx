@@ -1,87 +1,69 @@
 /**
- * Página principal de la aplicación
- * Muestra el nombre, imagen y botón de login
+ * Landing Page - Página principal de la aplicación
+ * Muestra el mismo contenido para todos los usuarios
+ * El Header se encarga de mostrar el botón apropiado según autenticación
  */
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { AuthDialog } from "../components/AuthDialog";
-import { APP_NAME, ROUTES } from "@/lib/constants";
-import { getDashboardRoute } from "@/lib/routing";
+import { useState, useEffect } from "react";
+import { Header, Hero, Features, HowItWorks, Footer, RefereesPreview } from "@/components/marketplace";
+import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
 export function HomePage() {
-  const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
+  const [arbitrosDestacados, setArbitrosDestacados] = useState<Arbitro[]>([]);
+  const [isLoadingArbitros, setIsLoadingArbitros] = useState(false);
 
-  const handleLoginClick = () => {
-    if (isAuthenticated && user?.role) {
-      const dashboardRoute = getDashboardRoute(user.role);
-      navigate(dashboardRoute);
-    } else {
-      setAuthDialogOpen(true);
-    }
-  };
+  // Scroll al inicio al cargar la página
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Cargar árbitros destacados
+  useEffect(() => {
+    const cargarArbitrosDestacados = async () => {
+      setIsLoadingArbitros(true);
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+        const token = localStorage.getItem("access_token");
+        const headers: HeadersInit = {
+          "Content-Type": "application/json",
+        };
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+
+        const queryParams = new URLSearchParams();
+        queryParams.append("ordering", "-created_at");
+
+        const response = await fetch(
+          `${API_URL}/api/arbitros/?${queryParams.toString()}`,
+          { headers }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const arbitros = Array.isArray(data) ? data.slice(0, 4) : [];
+          setArbitrosDestacados(arbitros);
+        }
+      } catch (err) {
+        console.error("Error al cargar árbitros destacados:", err);
+      } finally {
+        setIsLoadingArbitros(false);
+      }
+    };
+
+    cargarArbitrosDestacados();
+  }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted p-4 safe-area-inset">
-      {/* Toggle de tema en la esquina superior derecha */}
-      <div className="absolute top-4 right-4 safe-area-top safe-area-right">
-        <ThemeToggle />
-      </div>
-
-      <div className="flex flex-col items-center gap-6 sm:gap-8 text-center px-4">
-        {/* Logo/Imagen */}
-        <div className="flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-full bg-primary/10">
-          <svg
-            className="h-12 w-12 sm:h-16 sm:w-16 text-primary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-
-        {/* Nombre de la aplicación */}
-        <div className="space-y-2">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">{APP_NAME}</h1>
-          <p className="text-base sm:text-lg text-muted-foreground">
-            Plataforma de arbitraje deportivo
-          </p>
-        </div>
-
-        {/* Botón de Login */}
-        <Button
-          onClick={handleLoginClick}
-          size="lg"
-          className="w-full sm:w-auto sm:min-w-[200px] touch-manipulation"
-        >
-          {isAuthenticated ? "Ir al Dashboard" : "Iniciar Sesión"}
-        </Button>
-      </div>
-
-      {/* Dialog de autenticación */}
-      <AuthDialog
-        open={authDialogOpen}
-        onOpenChange={(open) => {
-          setAuthDialogOpen(open);
-          // Si se cierra y el usuario está autenticado, redirigir según su rol
-          if (!open && isAuthenticated && user?.role) {
-            const dashboardRoute = getDashboardRoute(user.role);
-            navigate(dashboardRoute);
-          }
-        }}
-      />
-    </div>
+    <main className="min-h-screen">
+      <Header />
+      <Hero />
+      <Features />
+      {!isLoadingArbitros && arbitrosDestacados.length > 0 && (
+        <RefereesPreview arbitros={arbitrosDestacados} />
+      )}
+      <HowItWorks />
+      <Footer />
+    </main>
   );
 }
-

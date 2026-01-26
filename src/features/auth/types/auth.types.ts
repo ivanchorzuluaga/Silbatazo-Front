@@ -6,7 +6,16 @@ export interface User {
   id: number;
   username: string;
   email?: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
   role?: "cliente" | "arbitro" | "admin";
+}
+
+export interface UserUpdateData {
+  email?: string;
+  first_name?: string;
+  last_name?: string;
 }
 
 export interface AuthState {
@@ -14,4 +23,3 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
 }
-

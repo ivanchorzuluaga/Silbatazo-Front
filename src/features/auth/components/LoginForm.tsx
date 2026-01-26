@@ -45,10 +45,16 @@ export function LoginForm() {
     }
 
     try {
-      const tokens = await login({ username, password });
-      // Actualizar el estado de autenticación con los tokens recibidos
-      // El rol se obtendrá del backend en el futuro
-      setAuth(tokens.access, tokens.refresh);
+      const authResponse = await login({ username, password });
+      // Actualizar el estado de autenticación con los tokens y datos del usuario del backend
+      setAuth(
+        authResponse.tokens.access,
+        authResponse.tokens.refresh,
+        authResponse.user.role,
+        authResponse.user.username,
+        authResponse.user.email,
+        authResponse.user.id
+      );
     } catch (err) {
       // El error ya está manejado por el hook
       console.error("Error en login:", err);

@@ -5,6 +5,7 @@
 
 import { authEndpoints } from "@/api/endpoints";
 import type { LoginCredentials, RegisterCredentials } from "@/api/types";
+import type { User, UserUpdateData } from "../types/auth.types";
 import { STORAGE_KEYS } from "@/lib/constants";
 import { ApiException } from "@/api/client";
 import { extractErrorMessage } from "@/lib/error-utils";
@@ -147,5 +148,39 @@ export const authService = {
    */
   isAuthenticated(): boolean {
     return !!this.getAccessToken();
+  },
+
+  /**
+   * Obtener perfil del usuario autenticado
+   */
+  async getProfile(): Promise<User> {
+    const token = this.getAccessToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await authEndpoints.getProfile(token);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al obtener perfil");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
+   * Actualizar perfil del usuario autenticado
+   */
+  async updateProfile(data: UserUpdateData): Promise<User> {
+    const token = this.getAccessToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await authEndpoints.updateProfile(token, data);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al actualizar perfil");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
   },
 };

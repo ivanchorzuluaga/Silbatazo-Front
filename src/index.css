@@ -20,46 +20,90 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Tipografía iOS-style */
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  letter-spacing: -0.01em;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  
+  /* Border radius más generosos tipo iOS */
+  --radius: 1rem;
+  
+  /* ============================================
+     PALETA DE COLORES SILBATAZO
+     Variables base - Cambiar aquí para actualizar toda la app
+     ============================================ */
+  
+  /* Colores base de marca */
+  --color-white: oklch(1 0 0); /* Blanco */
+  --color-black: oklch(0.15 0 0); /* Negro */
+  --color-gold: oklch(0.75 0.15 85); /* Dorado */
+  --color-blue-energetic: oklch(0.55 0.2 240); /* Azul energético */
+  --color-red-ferrari: oklch(0.55 0.25 25); /* Rojo Ferrari */
+  --color-green-soft: oklch(0.7 0.12 145); /* Verde suave */
+  
+  /* Colores derivados para modo claro */
+  --background: var(--color-white);
+  --foreground: var(--color-black);
+  --card: var(--color-white);
+  --card-foreground: var(--color-black);
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-black);
+  
+  /* Primary: Azul energético (color principal de marca) */
+  --primary: var(--color-blue-energetic);
+  --primary-foreground: var(--color-white);
+  
+  /* Secondary: Dorado (color secundario) */
+  --secondary: var(--color-gold);
+  --secondary-foreground: var(--color-black);
+  
+  /* Muted: Gris suave */
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  
+  /* Accent: Dorado para acentos */
+  --accent: var(--color-gold);
+  --accent-foreground: var(--color-black);
+  
+  /* Success: Verde suave */
+  --success: var(--color-green-soft);
+  --success-foreground: var(--color-white);
+  
+  /* Destructive: Rojo Ferrari */
+  --destructive: var(--color-red-ferrari);
+  --destructive-foreground: var(--color-white);
+  
+  /* Warning: Dorado */
+  --warning: var(--color-gold);
+  --warning-foreground: var(--color-black);
+  
+  /* Borders y inputs */
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.98 0 0);
+  --ring: var(--color-blue-energetic);
+  
+  /* Charts usando colores de marca */
+  --chart-1: var(--color-blue-energetic);
+  --chart-2: var(--color-gold);
+  --chart-3: var(--color-red-ferrari);
+  --chart-4: var(--color-green-soft);
+  --chart-5: oklch(0.6 0.15 60);
+  
+  /* Sidebar */
+  --sidebar: var(--color-white);
+  --sidebar-foreground: var(--color-black);
+  --sidebar-primary: var(--color-blue-energetic);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-accent: oklch(0.96 0 0);
+  --sidebar-accent-foreground: var(--color-black);
+  --sidebar-border: oklch(0.9 0 0);
+  --sidebar-ring: var(--color-blue-energetic);
 }
 
 body {
@@ -71,13 +115,13 @@ body {
 }
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  --radius-sm: calc(var(--radius) - 8px); /* 8px */
+  --radius-md: calc(var(--radius) - 4px); /* 12px */
+  --radius-lg: var(--radius); /* 16px */
+  --radius-xl: calc(var(--radius) + 4px); /* 20px */
+  --radius-2xl: calc(var(--radius) + 8px); /* 24px */
+  --radius-3xl: calc(var(--radius) + 12px); /* 28px */
+  --radius-4xl: calc(var(--radius) + 16px); /* 32px */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -92,7 +136,12 @@ body {
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -112,37 +161,63 @@ body {
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Modo oscuro usando colores de marca */
+  --background: var(--color-black);
+  --foreground: var(--color-white);
+  --card: oklch(0.2 0 0);
+  --card-foreground: var(--color-white);
+  --popover: oklch(0.2 0 0);
+  --popover-foreground: var(--color-white);
+  
+  /* Primary: Azul energético más brillante en oscuro */
+  --primary: oklch(0.65 0.22 240);
+  --primary-foreground: var(--color-white);
+  
+  /* Secondary: Dorado más suave en oscuro */
+  --secondary: oklch(0.4 0.12 85);
+  --secondary-foreground: var(--color-white);
+  
+  /* Muted: Gris oscuro */
+  --muted: oklch(0.25 0 0);
+  --muted-foreground: oklch(0.7 0 0);
+  
+  /* Accent: Dorado más suave */
+  --accent: oklch(0.5 0.12 85);
+  --accent-foreground: var(--color-white);
+  
+  /* Success: Verde suave más brillante */
+  --success: oklch(0.65 0.15 145);
+  --success-foreground: var(--color-white);
+  
+  /* Destructive: Rojo Ferrari más brillante */
+  --destructive: oklch(0.65 0.28 25);
+  --destructive-foreground: var(--color-white);
+  
+  /* Warning: Dorado */
+  --warning: oklch(0.5 0.12 85);
+  --warning-foreground: var(--color-white);
+  
+  /* Borders e inputs */
+  --border: oklch(0.3 0 0);
+  --input: oklch(0.25 0 0);
+  --ring: oklch(0.65 0.22 240);
+  
+  /* Charts con colores de marca más vibrantes */
+  --chart-1: oklch(0.65 0.22 240);
+  --chart-2: oklch(0.5 0.12 85);
+  --chart-3: oklch(0.65 0.28 25);
+  --chart-4: oklch(0.65 0.15 145);
+  --chart-5: oklch(0.6 0.15 60);
+  
+  /* Sidebar */
+  --sidebar: oklch(0.18 0 0);
+  --sidebar-foreground: var(--color-white);
+  --sidebar-primary: oklch(0.65 0.22 240);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-accent: oklch(0.25 0 0);
+  --sidebar-accent-foreground: var(--color-white);
+  --sidebar-border: oklch(0.3 0 0);
+  --sidebar-ring: oklch(0.65 0.22 240);
 }
 
 @layer base {
@@ -151,20 +226,45 @@ body {
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-feature-settings: "kern" 1, "liga" 1;
   }
 
-  /* Asegurar que los colores sean visibles */
+  /* Tipografía mejorada tipo iOS */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    @apply text-foreground;
+    @apply text-foreground font-semibold;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  h1 {
+    @apply text-3xl sm:text-4xl;
+    font-weight: 700;
+  }
+
+  h2 {
+    @apply text-2xl sm:text-3xl;
+    font-weight: 600;
+  }
+
+  h3 {
+    @apply text-xl sm:text-2xl;
+    font-weight: 600;
   }
 
   p {
     @apply text-foreground;
+    line-height: 1.6;
+  }
+
+  /* Mejorar legibilidad */
+  small {
+    @apply text-sm text-muted-foreground;
+    line-height: 1.5;
   }
 }
 
@@ -197,5 +297,129 @@ body {
   .touch-manipulation {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Sombras tipo iOS (múltiples capas) */
+  .shadow-ios {
+    box-shadow: 
+      0 1px 3px rgba(0, 0, 0, 0.1),
+      0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+
+  .shadow-ios-md {
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+
+  .shadow-ios-lg {
+    box-shadow: 
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+
+  .shadow-ios-xl {
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Glassmorphism sutil */
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .dark .glass {
+    background: rgba(30, 30, 30, 0.7);
+  }
+
+  /* Transiciones suaves tipo iOS */
+  .transition-ios {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-ios-slow {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Border radius más generosos */
+  .rounded-ios {
+    border-radius: 1rem;
+  }
+
+  .rounded-ios-lg {
+    border-radius: 1.25rem;
+  }
+
+  .rounded-ios-xl {
+    border-radius: 1.5rem;
+  }
+
+  /* Colores de utilidad */
+  .text-warning {
+    color: var(--warning);
+  }
+
+  .text-success {
+    color: var(--success);
+  }
+
+  .text-gold {
+    color: var(--color-gold);
+  }
+
+  .text-blue-energetic {
+    color: var(--color-blue-energetic);
+  }
+
+  .text-red-ferrari {
+    color: var(--color-red-ferrari);
+  }
+
+  .text-green-soft {
+    color: var(--color-green-soft);
+  }
+
+  /* Backgrounds de marca */
+  .bg-gold {
+    background-color: var(--color-gold);
+  }
+
+  .bg-blue-energetic {
+    background-color: var(--color-blue-energetic);
+  }
+
+  .bg-red-ferrari {
+    background-color: var(--color-red-ferrari);
+  }
+
+  .bg-green-soft {
+    background-color: var(--color-green-soft);
+  }
+
+  /* Backgrounds con opacidad para usar con /10, /20, etc */
+  .bg-gold\/10 {
+    background-color: color-mix(in oklch, var(--color-gold) 10%, transparent);
+  }
+
+  .bg-blue-energetic\/10 {
+    background-color: color-mix(in oklch, var(--color-blue-energetic) 10%, transparent);
+  }
+
+  .bg-green-soft\/10 {
+    background-color: color-mix(in oklch, var(--color-green-soft) 10%, transparent);
+  }
+
+  .bg-gold\/20 {
+    background-color: color-mix(in oklch, var(--color-gold) 20%, transparent);
+  }
+
+  .bg-blue-energetic\/20 {
+    background-color: color-mix(in oklch, var(--color-blue-energetic) 20%, transparent);
   }
 }

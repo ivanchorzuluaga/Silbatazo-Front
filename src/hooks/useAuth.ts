@@ -19,7 +19,8 @@ interface UseAuthReturn {
     refreshToken: string,
     role?: User["role"],
     username?: string,
-    email?: string
+    email?: string,
+    userId?: number
   ) => void;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
@@ -62,13 +63,14 @@ export function useAuth(): UseAuthReturn {
     refreshToken: string,
     role?: User["role"],
     username?: string,
-    email?: string
+    email?: string,
+    userId?: number
   ) => {
     localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
     localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
     // Crear usuario con la información recibida del backend
     const tempUser: User = {
-      id: 0,
+      id: userId || 0,
       username: username || "user",
       role: role,
       email: email,

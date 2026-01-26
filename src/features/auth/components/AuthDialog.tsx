@@ -3,8 +3,8 @@
  * Permite seleccionar tipo de usuario y autenticarse
  */
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   SlidePanel,
   SlidePanelContent,
@@ -16,12 +16,16 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormField } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useLogin } from "../hooks/useLogin";
 import { useRegister } from "../hooks/useRegister";
 import { useAuth } from "@/hooks/useAuth";
 import { validations } from "@/lib/validations";
 import { USER_ROLES, type UserRole } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
+import logoImage from "@/assets/Silbatazo-bordes.png";
+import { LogIn, UserPlus, Mail, User, Lock, Users, X, Shield, Star, ArrowRight, CheckCircle } from "lucide-react";
 
 interface AuthDialogProps {
   open: boolean;
@@ -31,6 +35,8 @@ interface AuthDialogProps {
 
 export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps) {
   const [isLogin, setIsLogin] = useState(true);
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -133,7 +139,8 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
           authResponse.tokens.refresh,
           authResponse.user.role,
           authResponse.user.username,
-          authResponse.user.email
+          authResponse.user.email,
+          authResponse.user.id
         );
       } else {
         // Modo registro
@@ -154,17 +161,22 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
           authResponse.tokens.refresh,
           authResponse.user.role,
           authResponse.user.username,
-          authResponse.user.email
+          authResponse.user.email,
+          authResponse.user.id
         );
       }
 
       // Cerrar el dialog
       onOpenChange(false);
 
-      // Redirigir al dashboard según el rol del usuario
-      const dashboardRoute = getDashboardRoute(authResponse.user.role as UserRole);
+      // Redirigir según redirectTo si existe, sino al dashboard según el rol
       setTimeout(() => {
-        navigate(dashboardRoute);
+        if (redirectTo) {
+          navigate(redirectTo);
+        } else {
+          const dashboardRoute = getDashboardRoute(authResponse.user.role as UserRole);
+          navigate(dashboardRoute);
+        }
       }, 100);
     } catch (err) {
       console.error("Error en autenticación:", err);
@@ -189,38 +201,40 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
 
   return (
     <SlidePanel open={open} onOpenChange={onOpenChange}>
-      <SlidePanelContent>
-        <SlidePanelHeader>
+      <SlidePanelContent className="w-full sm:max-w-md">
+        <SlidePanelHeader className="pb-4">
           <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <SlidePanelTitle className="text-2xl font-semibold mb-1.5">
+            <div className="flex items-start gap-4 flex-1">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-ios shrink-0 p-2">
+                <img
+                  src={logoImage}
+                  alt="Silbatazo Logo"
+                  className="h-full w-full object-contain"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <SlidePanelTitle className="text-2xl sm:text-3xl font-bold mb-2">
                 {isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
               </SlidePanelTitle>
-              <SlidePanelDescription className="text-sm text-muted-foreground">
+                <SlidePanelDescription className="text-base">
                 {isLogin
                   ? "Ingresa tus credenciales para continuar"
-                  : "Completa el formulario para crear tu cuenta"}
+                    : "Completa el formulario para comenzar"}
               </SlidePanelDescription>
+              </div>
             </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => onOpenChange(false)}
-              className="h-8 w-8"
+              className="h-9 w-9 shrink-0"
             >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <X className="h-5 w-5" />
             </Button>
           </div>
         </SlidePanelHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5 p-6">
+        <form onSubmit={handleSubmit} className="space-y-5 px-6 pb-6">
           {!isLogin && (
             <FormField
               label="Email"
@@ -237,6 +251,7 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
               disabled={isLoading}
               autoComplete="email"
               required
+              leftIcon={<Mail className="h-4 w-4" />}
             />
           )}
 
@@ -254,6 +269,7 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
             disabled={isLoading}
             autoComplete="username"
             required
+            leftIcon={<User className="h-4 w-4" />}
           />
 
           <FormField
@@ -271,9 +287,11 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
             disabled={isLoading}
             autoComplete={isLogin ? "current-password" : "new-password"}
             required
+            leftIcon={<Lock className="h-4 w-4" />}
           />
 
           {!isLogin && (
+            <>
             <FormField
               label="Confirmar Contraseña"
               name="password_confirm"
@@ -289,50 +307,116 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
               disabled={isLoading}
               autoComplete="new-password"
               required
+                leftIcon={<Lock className="h-4 w-4" />}
             />
+            </>
           )}
 
-          {!isLogin && showRoleSelector && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Tipo de Usuario</label>
-              <Select
-                value={userRole}
-                onChange={(e) => {
-                  setUserRole(e.target.value as UserRole);
-                  if (fieldErrors.role) {
-                    setFieldErrors((prev) => ({ ...prev, role: undefined }));
-                  }
-                }}
-                disabled={isLoading}
-                required
-              >
-                <option value={USER_ROLES.CLIENTE}>Cliente</option>
-                <option value={USER_ROLES.ARBITRO}>Árbitro</option>
-              </Select>
-              {fieldErrors.role && (
-                <div className="flex items-start gap-1.5 text-sm text-destructive">
-                  <svg
-                    className="h-4 w-4 shrink-0 mt-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
+{!isLogin && showRoleSelector && (
+            <Card variant="outlined" className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/10">
+              <div className="space-y-4">
+                <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <Users className="h-4 w-4 text-primary" />
+                  ¿Quién eres?
+                </label>
+                
+                <div className="grid gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setUserRole(USER_ROLES.CLIENTE)}
+                    className={`relative p-4 rounded-lg border-2 transition-all duration-200 ${
+                      userRole === USER_ROLES.CLIENTE
+                        ? 'border-primary bg-primary/10 shadow-md'
+                        : 'border-border bg-card hover:border-primary/50 hover:bg-primary/5'
+                    }`}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <span>{fieldErrors.role}</span>
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg ${
+                        userRole === USER_ROLES.CLIENTE ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                      }`}>
+                        <User className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <h3 className="font-semibold text-foreground">Cliente</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Organizo partidos y necesito árbitros
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Badge variant="secondary" className="text-xs">
+                            <Star className="h-3 w-3 mr-1" />
+                            Popular
+                          </Badge>
+                        </div>
+                      </div>
+                      {userRole === USER_ROLES.CLIENTE && (
+                        <div className="absolute top-2 right-2">
+                          <div className="w-2 h-2 bg-primary rounded-full" />
+                        </div>
+                      )}
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setUserRole(USER_ROLES.ARBITRO)}
+                    className={`relative p-4 rounded-lg border-2 transition-all duration-200 ${
+                      userRole === USER_ROLES.ARBITRO
+                        ? 'border-primary bg-primary/10 shadow-md'
+                        : 'border-border bg-card hover:border-primary/50 hover:bg-primary/5'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg ${
+                        userRole === USER_ROLES.ARBITRO ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                      }`}>
+                        <Shield className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <h3 className="font-semibold text-foreground">Árbitro</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Ofrezco mis servicios como árbitro
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Badge variant="outline" className="text-xs">
+                            <Shield className="h-3 w-3 mr-1" />
+                            Certificado
+                          </Badge>
+                        </div>
+                      </div>
+                      {userRole === USER_ROLES.ARBITRO && (
+                        <div className="absolute top-2 right-2">
+                          <div className="w-2 h-2 bg-primary rounded-full" />
+                        </div>
+                      )}
+                    </div>
+                  </button>
                 </div>
-              )}
-            </div>
+
+                {fieldErrors.role && (
+                  <div className="flex items-start gap-1.5 text-sm text-destructive bg-destructive/10 p-3 rounded-lg">
+                    <svg
+                      className="h-4 w-4 shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span>{fieldErrors.role}</span>
+                  </div>
+                )}
+              </div>
+            </Card>
           )}
 
           {error && (
-            <Alert variant="destructive" className="mb-2">
+            <Alert variant="destructive" className="border-2">
               <div className="flex items-start gap-3">
                 <div className="shrink-0 mt-0.5">
                   <svg
@@ -351,7 +435,7 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <AlertDescription className="text-sm leading-relaxed font-normal">
+                  <AlertDescription className="text-sm leading-relaxed font-medium">
                     {error}
                   </AlertDescription>
                 </div>
@@ -361,42 +445,98 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
                     clearLoginError();
                     clearRegisterError();
                   }}
-                  className="shrink-0 text-destructive/60 hover:text-destructive transition-colors p-1 rounded-md hover:bg-destructive/10 -mt-1 -mr-1"
+                  className="shrink-0 text-destructive/60 hover:text-destructive transition-colors p-1 rounded-md hover:bg-destructive/10"
                   aria-label="Cerrar alerta"
                 >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <X className="h-4 w-4" />
                 </button>
               </div>
             </Alert>
           )}
 
-          <div className="flex flex-col gap-3 pt-2">
-            <Button type="submit" disabled={isLoading} className="w-full" size="lg">
-              {isLoading
-                ? isLogin
-                  ? "Iniciando sesión..."
-                  : "Creando cuenta..."
-                : isLogin
-                ? "Iniciar Sesión"
-                : "Crear Cuenta"}
+          <div className="flex flex-col gap-4 pt-6">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3"
+              size="lg"
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-3">
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                  {isLogin ? "Iniciando sesión..." : "Creando cuenta..."}
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  {isLogin ? (
+                    <>
+                      <LogIn className="h-5 w-5" />
+                      Iniciar Sesión
+                      <ArrowRight className="h-4 w-4 ml-1" />
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="h-5 w-5" />
+                      Crear Cuenta
+                      <ArrowRight className="h-4 w-4 ml-1" />
+                    </>
+                  )}
+                </span>
+              )}
             </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border/50" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-background px-3 text-muted-foreground font-medium">o continúa con</span>
+              </div>
+            </div>
 
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={toggleMode}
               disabled={isLoading}
-              className="w-full"
+              className="w-full border-2 hover:bg-primary/5 hover:border-primary transition-all duration-200 group"
+              size="lg"
             >
-              {isLogin ? "¿No tienes cuenta? Crear una" : "¿Ya tienes cuenta? Iniciar sesión"}
+              <span className="flex items-center gap-2">
+                {isLogin ? (
+                  <>
+                    <UserPlus className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
+                    <span>¿No tienes cuenta? <span className="font-semibold text-primary">Crear una</span></span>
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
+                    <span>¿Ya tienes cuenta? <span className="font-semibold text-primary">Iniciar sesión</span></span>
+                  </>
+                )}
+              </span>
             </Button>
+
+            {/* Benefits section */}
+            {!isLogin && (
+              <div className="mt-4 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/10">
+                <p className="text-xs font-medium text-muted-foreground mb-2">✨ Beneficios de registrarte:</p>
+                <div className="grid grid-cols-1 gap-1 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                    <span>Acceso a árbitros certificados</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                    <span>Reservas instantáneas</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                    <span>Soporte 24/7</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </form>
       </SlidePanelContent>
