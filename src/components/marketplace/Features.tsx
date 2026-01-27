@@ -61,8 +61,13 @@ const stats = [
 
 export function Features() {
   return (
-    <section className="py-24 bg-gradient-to-b from-card to-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-24 bg-background relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-grid-primary/5 [mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.3))]" />
+      <div className="absolute top-0 left-0 h-96 w-96 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-0 h-96 w-96 bg-primary/10 rounded-full blur-3xl" />
+      
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium text-primary mb-6">

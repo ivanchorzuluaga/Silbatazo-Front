@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FormField } from "@/components/forms";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { validations } from "@/lib/validations";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import logoImage from "@/assets/Silbatazo-bordes.png";
 import { User, Lock, LogIn, ArrowLeft, Shield, AlertCircle } from "lucide-react";
 
@@ -108,14 +109,15 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Back to home button */}
-      <div className="absolute top-4 left-4 z-50">
+      {/* Top navigation bar */}
+      <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
         <Button variant="ghost" size="sm" asChild className="bg-background/80 backdrop-blur-sm">
           <Link to={ROUTES.HOME}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver al inicio
           </Link>
         </Button>
+        <ThemeToggle className="bg-background/80 backdrop-blur-sm" />
       </div>
 
       {/* Left side - Logo (Desktop only) */}

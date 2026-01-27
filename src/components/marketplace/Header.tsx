@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { SlidePanel, SlidePanelContent, SlidePanelHeader, SlidePanelTitle } from "@/components/ui/slide-panel";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { ROUTES, APP_NAME } from "@/lib/constants";
 import { useAuth } from "@/hooks/useAuth";
-import { Menu, X, Users, Clock, Mail, Shield, User, ArrowRight, LogOut } from "lucide-react";
+import { Menu, Users, Clock, Mail, Shield, User, ArrowRight, LogOut } from "lucide-react";
 
 export function Header() {
   const { isAuthenticated, logout } = useAuth();
@@ -86,6 +87,9 @@ export function Header() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Theme Toggle - Desktop */}
+            <ThemeToggle className="hidden sm:flex" />
+
             {isAuthenticated ? (
               <Button variant="ghost" size="sm" className="hidden sm:flex" asChild>
                 <Link to={ROUTES.DASHBOARD}>
@@ -102,7 +106,8 @@ export function Header() {
             <Button size="sm" className="shadow-md hover:shadow-lg transition-all duration-300" asChild>
               <Link to={ROUTES.ARBITROS}>
                 <Users className="w-4 h-4 mr-2" />
-                Reservar Árbitro
+                <span className="hidden sm:inline">Reservar Árbitro</span>
+                <span className="sm:hidden">Reservar</span>
                 <ArrowRight className="w-3 h-3 ml-1" />
               </Link>
             </Button>
@@ -153,6 +158,14 @@ export function Header() {
                         </div>
                       </button>
                     ))}
+                  </div>
+
+                  {/* Theme Toggle - Mobile */}
+                  <div className="border-t pt-6">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                      <span className="text-sm font-medium">Modo oscuro</span>
+                      <ThemeToggle size="sm" />
+                    </div>
                   </div>
 
                   {/* Auth Section */}

@@ -58,11 +58,11 @@ export function HomePage() {
     <main className="min-h-screen">
       <Header />
       <Hero />
-      <Features />
+      <HowItWorks />
       {!isLoadingArbitros && arbitrosDestacados.length > 0 && (
         <RefereesPreview arbitros={arbitrosDestacados} />
       )}
-      <HowItWorks />
+      <Features />
       <Footer />
     </main>
   );

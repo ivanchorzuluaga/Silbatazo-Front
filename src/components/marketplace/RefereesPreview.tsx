@@ -16,18 +16,23 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
   const arbitrosPreview = arbitros.slice(0, 4);
 
   return (
-    <section id="arbitros-destacados" className="py-24 bg-gradient-to-b from-transparent to-primary/5 scroll-mt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="arbitros-destacados" className="py-24 bg-gradient-to-b from-primary via-primary/50 to-background relative overflow-hidden scroll-mt-20">
+      {/* Background decoration para transición suave */}
+      <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(180deg,rgba(255,255,255,0.2),transparent)]" />
+      <div className="absolute top-0 left-1/4 h-96 w-96 bg-black/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-1/4 h-96 w-96 bg-primary/10 rounded-full blur-3xl" />
+      
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-12">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Shield className="h-6 w-6 text-primary" />
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">Árbitros Destacados</h2>
+              <Shield className="h-6 w-6 text-black" />
+              <h2 className="text-3xl sm:text-4xl font-bold text-black">Árbitros Destacados</h2>
             </div>
-            <p className="text-muted-foreground text-lg">Profesionales certificados y con excelente reputación</p>
+            <p className="text-black/70 text-lg">Profesionales certificados y con excelente reputación</p>
           </div>
-          <Button size="lg" className="group shadow-md hover:shadow-lg transition-all duration-300" asChild>
+          <Button size="lg" className="group shadow-md hover:shadow-lg transition-all duration-300 bg-black text-white hover:bg-black/90" asChild>
             <Link to={ROUTES.ARBITROS}>
               Ver todos los árbitros
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />

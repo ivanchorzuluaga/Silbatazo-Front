@@ -36,74 +36,92 @@
   
   /* ============================================
      PALETA DE COLORES SILBATAZO
-     Variables base - Cambiar aquí para actualizar toda la app
+     Diseño deportivo, moderno y profesional
      ============================================ */
   
   /* Colores base de marca */
-  --color-white: oklch(1 0 0); /* Blanco */
-  --color-black: oklch(0.15 0 0); /* Negro */
-  --color-gold: oklch(0.75 0.15 85); /* Dorado */
-  --color-blue-energetic: oklch(0.55 0.2 240); /* Azul energético */
-  --color-red-ferrari: oklch(0.55 0.25 25); /* Rojo Ferrari */
-  --color-green-soft: oklch(0.7 0.12 145); /* Verde suave */
+  --color-white: oklch(0.995 0 0);
+  --color-black: oklch(0.13 0.02 260);
   
-  /* Colores derivados para modo claro */
-  --background: var(--color-white);
+  /* Verde Esmeralda - El campo, la energía deportiva */
+  --color-emerald: oklch(0.72 0.17 162);
+  --color-emerald-dark: oklch(0.55 0.15 162);
+  --color-emerald-light: oklch(0.92 0.05 162);
+  
+  /* Azul Índigo - Autoridad, confianza, profesionalismo */
+  --color-indigo: oklch(0.50 0.18 264);
+  --color-indigo-dark: oklch(0.35 0.15 264);
+  --color-indigo-light: oklch(0.92 0.03 264);
+  
+  /* Ámbar/Dorado - Premium, silbatos, excelencia */
+  --color-amber: oklch(0.80 0.16 75);
+  --color-amber-dark: oklch(0.65 0.18 55);
+  
+  /* Colores semánticos */
+  --color-red: oklch(0.60 0.22 25);
+  --color-green-success: oklch(0.72 0.15 155);
+  
+  /* ============================================
+     MODO CLARO - Limpio, fresco, profesional
+     ============================================ */
+  
+  /* Fondos */
+  --background: oklch(0.985 0.002 260);
   --foreground: var(--color-black);
   --card: var(--color-white);
   --card-foreground: var(--color-black);
   --popover: var(--color-white);
   --popover-foreground: var(--color-black);
   
-  /* Primary: Azul energético (color principal de marca) */
-  --primary: var(--color-blue-energetic);
+  /* Primary: Verde Esmeralda - Acción principal, CTAs */
+  --primary: var(--color-emerald);
   --primary-foreground: var(--color-white);
   
-  /* Secondary: Dorado (color secundario) */
-  --secondary: var(--color-gold);
-  --secondary-foreground: var(--color-black);
+  /* Secondary: Índigo suave - Acciones secundarias */
+  --secondary: var(--color-indigo-light);
+  --secondary-foreground: var(--color-indigo);
   
-  /* Muted: Gris suave */
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.5 0 0);
+  /* Muted: Gris con toque frío */
+  --muted: oklch(0.955 0.005 260);
+  --muted-foreground: oklch(0.45 0.02 260);
   
-  /* Accent: Dorado para acentos */
-  --accent: var(--color-gold);
+  /* Accent: Ámbar - Destacados, badges, notificaciones */
+  --accent: var(--color-amber);
   --accent-foreground: var(--color-black);
   
-  /* Success: Verde suave */
-  --success: var(--color-green-soft);
+  /* Success: Verde claro */
+  --success: var(--color-green-success);
   --success-foreground: var(--color-white);
   
-  /* Destructive: Rojo Ferrari */
-  --destructive: var(--color-red-ferrari);
+  /* Destructive: Rojo */
+  --destructive: var(--color-red);
   --destructive-foreground: var(--color-white);
   
-  /* Warning: Dorado */
-  --warning: var(--color-gold);
+  /* Warning: Ámbar */
+  --warning: var(--color-amber);
   --warning-foreground: var(--color-black);
   
-  /* Borders y inputs */
-  --border: oklch(0.9 0 0);
-  --input: oklch(0.98 0 0);
-  --ring: var(--color-blue-energetic);
+  /* Borders e inputs - Sutiles con toque de color */
+  --border: oklch(0.90 0.01 260);
+  --input: oklch(0.97 0.005 260);
+  --ring: var(--color-emerald);
   
-  /* Charts usando colores de marca */
-  --chart-1: var(--color-blue-energetic);
-  --chart-2: var(--color-gold);
-  --chart-3: var(--color-red-ferrari);
-  --chart-4: var(--color-green-soft);
-  --chart-5: oklch(0.6 0.15 60);
+  /* Charts - Paleta variada y armónica */
+  --chart-1: var(--color-emerald);
+  --chart-2: var(--color-indigo);
+  --chart-3: var(--color-amber);
+  --chart-4: oklch(0.65 0.15 330);
+  --chart-5: oklch(0.70 0.12 200);
   
-  /* Sidebar */
+  /* Sidebar - Elegante con el color de marca */
   --sidebar: var(--color-white);
   --sidebar-foreground: var(--color-black);
-  --sidebar-primary: var(--color-blue-energetic);
+  --sidebar-primary: var(--color-emerald);
   --sidebar-primary-foreground: var(--color-white);
-  --sidebar-accent: oklch(0.96 0 0);
-  --sidebar-accent-foreground: var(--color-black);
-  --sidebar-border: oklch(0.9 0 0);
-  --sidebar-ring: var(--color-blue-energetic);
+  --sidebar-accent: var(--color-emerald-light);
+  --sidebar-accent-foreground: var(--color-emerald-dark);
+  --sidebar-border: oklch(0.92 0.01 162);
+  --sidebar-ring: var(--color-emerald);
 }
 
 body {
@@ -161,63 +179,67 @@ body {
 }
 
 .dark {
-  /* Modo oscuro usando colores de marca */
-  --background: var(--color-black);
-  --foreground: var(--color-white);
-  --card: oklch(0.2 0 0);
-  --card-foreground: var(--color-white);
-  --popover: oklch(0.2 0 0);
-  --popover-foreground: var(--color-white);
+  /* ============================================
+     MODO OSCURO - Elegante, inmersivo
+     ============================================ */
   
-  /* Primary: Azul energético más brillante en oscuro */
-  --primary: oklch(0.65 0.22 240);
-  --primary-foreground: var(--color-white);
+  /* Fondos - Negro con sutil tono azulado */
+  --background: oklch(0.14 0.015 260);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.18 0.015 260);
+  --card-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.18 0.015 260);
+  --popover-foreground: oklch(0.95 0 0);
   
-  /* Secondary: Dorado más suave en oscuro */
-  --secondary: oklch(0.4 0.12 85);
-  --secondary-foreground: var(--color-white);
+  /* Primary: Verde Esmeralda más luminoso */
+  --primary: oklch(0.75 0.18 162);
+  --primary-foreground: oklch(0.15 0.02 162);
   
-  /* Muted: Gris oscuro */
-  --muted: oklch(0.25 0 0);
-  --muted-foreground: oklch(0.7 0 0);
+  /* Secondary: Índigo suave */
+  --secondary: oklch(0.25 0.05 264);
+  --secondary-foreground: oklch(0.80 0.08 264);
   
-  /* Accent: Dorado más suave */
-  --accent: oklch(0.5 0.12 85);
-  --accent-foreground: var(--color-white);
+  /* Muted: Gris oscuro con tono */
+  --muted: oklch(0.22 0.01 260);
+  --muted-foreground: oklch(0.65 0.01 260);
   
-  /* Success: Verde suave más brillante */
-  --success: oklch(0.65 0.15 145);
-  --success-foreground: var(--color-white);
+  /* Accent: Ámbar vibrante */
+  --accent: oklch(0.78 0.16 75);
+  --accent-foreground: oklch(0.15 0.02 75);
   
-  /* Destructive: Rojo Ferrari más brillante */
-  --destructive: oklch(0.65 0.28 25);
+  /* Success: Verde más brillante */
+  --success: oklch(0.75 0.16 155);
+  --success-foreground: oklch(0.15 0 155);
+  
+  /* Destructive: Rojo más brillante */
+  --destructive: oklch(0.68 0.22 25);
   --destructive-foreground: var(--color-white);
   
-  /* Warning: Dorado */
-  --warning: oklch(0.5 0.12 85);
-  --warning-foreground: var(--color-white);
+  /* Warning: Ámbar */
+  --warning: oklch(0.78 0.16 75);
+  --warning-foreground: oklch(0.15 0.02 75);
   
   /* Borders e inputs */
-  --border: oklch(0.3 0 0);
-  --input: oklch(0.25 0 0);
-  --ring: oklch(0.65 0.22 240);
+  --border: oklch(0.28 0.015 260);
+  --input: oklch(0.22 0.01 260);
+  --ring: oklch(0.75 0.18 162);
   
-  /* Charts con colores de marca más vibrantes */
-  --chart-1: oklch(0.65 0.22 240);
-  --chart-2: oklch(0.5 0.12 85);
-  --chart-3: oklch(0.65 0.28 25);
-  --chart-4: oklch(0.65 0.15 145);
-  --chart-5: oklch(0.6 0.15 60);
+  /* Charts - Colores vibrantes para modo oscuro */
+  --chart-1: oklch(0.75 0.18 162);
+  --chart-2: oklch(0.65 0.18 264);
+  --chart-3: oklch(0.78 0.16 75);
+  --chart-4: oklch(0.70 0.15 330);
+  --chart-5: oklch(0.72 0.12 200);
   
-  /* Sidebar */
-  --sidebar: oklch(0.18 0 0);
-  --sidebar-foreground: var(--color-white);
-  --sidebar-primary: oklch(0.65 0.22 240);
-  --sidebar-primary-foreground: var(--color-white);
-  --sidebar-accent: oklch(0.25 0 0);
-  --sidebar-accent-foreground: var(--color-white);
-  --sidebar-border: oklch(0.3 0 0);
-  --sidebar-ring: oklch(0.65 0.22 240);
+  /* Sidebar - Oscuro elegante */
+  --sidebar: oklch(0.12 0.015 260);
+  --sidebar-foreground: oklch(0.92 0 0);
+  --sidebar-primary: oklch(0.75 0.18 162);
+  --sidebar-primary-foreground: oklch(0.15 0.02 162);
+  --sidebar-accent: oklch(0.20 0.03 162);
+  --sidebar-accent-foreground: oklch(0.80 0.10 162);
+  --sidebar-border: oklch(0.25 0.015 260);
+  --sidebar-ring: oklch(0.75 0.18 162);
 }
 
 @layer base {
@@ -360,7 +382,7 @@ body {
     border-radius: 1.5rem;
   }
 
-  /* Colores de utilidad */
+  /* Colores de utilidad - Semánticos */
   .text-warning {
     color: var(--warning);
   }
@@ -369,57 +391,63 @@ body {
     color: var(--success);
   }
 
-  .text-gold {
-    color: var(--color-gold);
+  /* Colores de marca */
+  .text-emerald {
+    color: var(--color-emerald);
   }
 
-  .text-blue-energetic {
-    color: var(--color-blue-energetic);
+  .text-indigo {
+    color: var(--color-indigo);
   }
 
-  .text-red-ferrari {
-    color: var(--color-red-ferrari);
-  }
-
-  .text-green-soft {
-    color: var(--color-green-soft);
+  .text-amber {
+    color: var(--color-amber);
   }
 
   /* Backgrounds de marca */
-  .bg-gold {
-    background-color: var(--color-gold);
+  .bg-emerald {
+    background-color: var(--color-emerald);
   }
 
-  .bg-blue-energetic {
-    background-color: var(--color-blue-energetic);
+  .bg-indigo {
+    background-color: var(--color-indigo);
   }
 
-  .bg-red-ferrari {
-    background-color: var(--color-red-ferrari);
+  .bg-amber {
+    background-color: var(--color-amber);
   }
 
-  .bg-green-soft {
-    background-color: var(--color-green-soft);
+  /* Backgrounds con opacidad */
+  .bg-emerald\/10 {
+    background-color: color-mix(in oklch, var(--color-emerald) 10%, transparent);
   }
 
-  /* Backgrounds con opacidad para usar con /10, /20, etc */
-  .bg-gold\/10 {
-    background-color: color-mix(in oklch, var(--color-gold) 10%, transparent);
+  .bg-emerald\/20 {
+    background-color: color-mix(in oklch, var(--color-emerald) 20%, transparent);
   }
 
-  .bg-blue-energetic\/10 {
-    background-color: color-mix(in oklch, var(--color-blue-energetic) 10%, transparent);
+  .bg-indigo\/10 {
+    background-color: color-mix(in oklch, var(--color-indigo) 10%, transparent);
   }
 
-  .bg-green-soft\/10 {
-    background-color: color-mix(in oklch, var(--color-green-soft) 10%, transparent);
+  .bg-indigo\/20 {
+    background-color: color-mix(in oklch, var(--color-indigo) 20%, transparent);
   }
 
-  .bg-gold\/20 {
-    background-color: color-mix(in oklch, var(--color-gold) 20%, transparent);
+  .bg-amber\/10 {
+    background-color: color-mix(in oklch, var(--color-amber) 10%, transparent);
   }
 
-  .bg-blue-energetic\/20 {
-    background-color: color-mix(in oklch, var(--color-blue-energetic) 20%, transparent);
+  .bg-amber\/20 {
+    background-color: color-mix(in oklch, var(--color-amber) 20%, transparent);
+  }
+
+  /* Gradientes de marca */
+  .gradient-emerald {
+    background: linear-gradient(135deg, var(--color-emerald) 0%, var(--color-emerald-dark) 100%);
+  }
+
+  .gradient-brand {
+    background: linear-gradient(135deg, var(--color-emerald) 0%, var(--color-indigo) 100%);
   }
 }
