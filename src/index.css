@@ -451,3 +451,29 @@ body {
     background: linear-gradient(135deg, var(--color-emerald) 0%, var(--color-indigo) 100%);
   }
 }
+
+/* ============================================
+   AUTOFILL STYLES - Login inputs
+   Previene que el navegador cambie los colores
+   ============================================ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: white;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 20px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================
+   SCROLLBAR HIDE - Para sliders horizontales
+   ============================================ */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

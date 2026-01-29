@@ -1,26 +1,14 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { SlidePanel, SlidePanelContent, SlidePanelHeader, SlidePanelTitle } from "@/components/ui/slide-panel";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ROUTES, APP_NAME } from "@/lib/constants";
 import { useAuth } from "@/hooks/useAuth";
-import { Menu, Users, Clock, Mail, Shield, User, ArrowRight, LogOut } from "lucide-react";
+import { Menu, Users, Clock, Mail, Shield, User, ArrowRight, X } from "lucide-react";
 
 export function Header() {
-  const { isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setMobileMenuOpen(false);
-      navigate(ROUTES.HOME);
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-    }
-  };
 
   const navigationItems = [
     { icon: Users, label: "Árbitros", href: "#arbitros-destacados", isScroll: true },
@@ -87,27 +75,42 @@ export function Header() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Theme Toggle - Desktop */}
-            <ThemeToggle className="hidden sm:flex" />
+            {/* Theme Toggle - Siempre visible */}
+            <ThemeToggle />
 
+            {/* Auth Button - Siempre visible */}
             {isAuthenticated ? (
-              <Button variant="ghost" size="sm" className="hidden sm:flex" asChild>
-                <Link to={ROUTES.DASHBOARD}>
-                  <User className="w-4 h-4 mr-2" />
-                  Mi Dashboard
-                </Link>
-              </Button>
+              <>
+                <Button variant="ghost" size="sm" className="hidden sm:flex" asChild>
+                  <Link to={ROUTES.DASHBOARD}>
+                    <User className="w-4 h-4 mr-2" />
+                    Mi Dashboard
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="icon" className="sm:hidden h-9 w-9" asChild>
+                  <Link to={ROUTES.DASHBOARD}>
+                    <User className="w-4 h-4" />
+                  </Link>
+                </Button>
+              </>
             ) : (
-              <Button variant="ghost" size="sm" className="hidden sm:flex" asChild>
-                <Link to={ROUTES.LOGIN}>Iniciar Sesión</Link>
-              </Button>
+              <>
+                <Button variant="ghost" size="sm" className="hidden sm:flex" asChild>
+                  <Link to={ROUTES.LOGIN}>Iniciar Sesión</Link>
+                </Button>
+                <Button variant="ghost" size="icon" className="sm:hidden h-9 w-9" asChild>
+                  <Link to={ROUTES.LOGIN}>
+                    <User className="w-4 h-4" />
+                  </Link>
+                </Button>
+              </>
             )}
             
-            <Button size="sm" className="shadow-md hover:shadow-lg transition-all duration-300" asChild>
+            {/* Reservar - Solo desktop */}
+            <Button size="sm" className="hidden sm:flex shadow-md hover:shadow-lg transition-all duration-300" asChild>
               <Link to={ROUTES.ARBITROS}>
                 <Users className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Reservar Árbitro</span>
-                <span className="sm:hidden">Reservar</span>
+                Reservar Árbitro
                 <ArrowRight className="w-3 h-3 ml-1" />
               </Link>
             </Button>
@@ -121,102 +124,79 @@ export function Header() {
             >
               <Menu className="h-5 w-5" />
             </Button>
-
-            <SlidePanel open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SlidePanelContent className="w-80 sm:w-96">
-                <SlidePanelHeader className="pb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center">
-                      <Shield className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <SlidePanelTitle className="text-lg">{APP_NAME}</SlidePanelTitle>
-                      <p className="text-sm text-muted-foreground">Tu arbitro de confianza</p>
-                    </div>
-                  </div>
-                </SlidePanelHeader>
-                
-                <div className="space-y-6">
-                  {/* Navigation Items */}
-                  <div className="space-y-2">
-                    {navigationItems.map((item) => (
-                      <button
-                        key={item.label}
-                        onClick={() => handleScrollTo(item.href)}
-                        className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-accent/50 transition-colors group cursor-pointer"
-                      >
-                        <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                          <item.icon className="w-5 h-5 text-primary" />
-                        </div>
-                        <div className="text-left">
-                          <p className="font-medium">{item.label}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {item.label === "Árbitros" && "Explora árbitros disponibles"}
-                            {item.label === "Cómo Funciona" && "Aprende el proceso"}
-                            {item.label === "Contacto" && "Habla con nosotros"}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Theme Toggle - Mobile */}
-                  <div className="border-t pt-6">
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                      <span className="text-sm font-medium">Modo oscuro</span>
-                      <ThemeToggle size="sm" />
-                    </div>
-                  </div>
-
-                  {/* Auth Section */}
-                  <div className="border-t pt-6 space-y-3">
-                    {isAuthenticated ? (
-                      <>
-                        <Button variant="outline" className="w-full justify-start" asChild>
-                          <Link to={ROUTES.DASHBOARD} onClick={() => setMobileMenuOpen(false)}>
-                            <User className="w-4 h-4 mr-3" />
-                            Mi Dashboard
-                          </Link>
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={handleLogout}
-                        >
-                          <LogOut className="w-4 h-4 mr-3" />
-                          Cerrar Sesión
-                        </Button>
-                      </>
-                    ) : (
-                      <Button className="w-full" asChild>
-                        <Link to={ROUTES.LOGIN} onClick={() => setMobileMenuOpen(false)}>
-                          <User className="w-4 h-4 mr-3" />
-                          Iniciar Sesión
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-
-                  {/* CTA */}
-                  <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg p-4 border border-primary/10">
-                    <h3 className="font-semibold mb-2">¿Necesitas un árbitro ya?</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Reserva en minutos con árbitros certificados
-                    </p>
-                    <Button className="w-full" asChild>
-                      <Link to={ROUTES.ARBITROS} onClick={() => setMobileMenuOpen(false)}>
-                        <Users className="w-4 h-4 mr-2" />
-                        Reservar Ahora
-                        <ArrowRight className="w-3 h-3 ml-1" />
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </SlidePanelContent>
-            </SlidePanel>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop oscuro */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+
+          {/* Panel del menú */}
+          <div className="absolute top-0 left-0 right-0 bg-background border-b-2 border-primary/30 shadow-2xl animate-in slide-in-from-top duration-300">
+            {/* Header del menú */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center shadow-lg">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="font-bold text-lg">{APP_NAME}</p>
+                  <p className="text-xs text-muted-foreground">Navegación</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 rounded-full hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Navigation Items - Solo scroll links */}
+            <div className="p-4 space-y-2">
+              {navigationItems.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => handleScrollTo(item.href)}
+                  className="w-full flex items-center gap-4 p-4 rounded-xl bg-muted/50 hover:bg-primary/10 hover:border-primary/30 border border-transparent transition-all duration-200 group"
+                >
+                  <div className="p-2.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                    <item.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className="font-semibold text-foreground">{item.label}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {item.label === "Árbitros" && "Ver árbitros destacados"}
+                      {item.label === "Cómo Funciona" && "Aprende el proceso"}
+                      {item.label === "Contacto" && "Habla con nosotros"}
+                    </p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                </button>
+              ))}
+            </div>
+
+            {/* Footer con CTA */}
+            <div className="p-4 pt-2 border-t border-border">
+              <Button className="w-full h-12 text-base shadow-lg" asChild>
+                <Link to={ROUTES.ARBITROS} onClick={() => setMobileMenuOpen(false)}>
+                  <Users className="w-5 h-5 mr-2" />
+                  Reservar Árbitro
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

@@ -40,8 +40,8 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
           </Button>
         </div>
 
-        {/* Referee Cards Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Referee Cards - Slider en móvil, Grid en desktop */}
+        <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible pb-4 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory sm:snap-none scrollbar-hide">
           {arbitrosPreview.map((arbitro) => {
             const rating = arbitro.calificacion_promedio || 0;
             const nombre = arbitro.full_name || arbitro.username;
@@ -64,7 +64,7 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
               <Link 
                 key={arbitro.id} 
                 to={getArbitroDetailRoute(arbitro.id)} 
-                className="group block"
+                className="group block shrink-0 w-[280px] sm:w-auto snap-center sm:snap-align-none"
               >
                 <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card hover:shadow-xl transition-all duration-300 hover:border-primary/20">
                   {/* Image */}
@@ -144,18 +144,18 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
         </div>
 
         {/* Trust indicators */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-6 p-6 bg-card border border-border/50 rounded-xl shadow-sm">
+        <div className="mt-12 sm:mt-16 flex justify-center">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 p-4 sm:p-6 bg-card border border-border/50 rounded-xl shadow-sm">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-green-500" />
               <span className="text-sm font-medium">Verificados</span>
             </div>
-            <div className="w-px h-6 bg-border" />
+            <div className="hidden sm:block w-px h-6 bg-border" />
             <div className="flex items-center gap-2">
               <Star className="h-5 w-5 text-yellow-500" />
               <span className="text-sm font-medium">Calificados</span>
             </div>
-            <div className="w-px h-6 bg-border" />
+            <div className="hidden sm:block w-px h-6 bg-border" />
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-blue-500" />
               <span className="text-sm font-medium">Certificados</span>

@@ -1,6 +1,6 @@
 /**
  * Página de login
- * Componente de página centrado con formulario moderno
+ * Diseño moderno con logo de fondo y formulario glassmorphism
  */
 
 import { useState, useEffect } from "react";
@@ -10,13 +10,9 @@ import { useLogin } from "../hooks/useLogin";
 import { ROUTES, APP_NAME } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FormField } from "@/components/forms";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { validations } from "@/lib/validations";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import logoImage from "@/assets/Silbatazo-bordes.png";
-import { User, Lock, LogIn, ArrowLeft, Shield, AlertCircle } from "lucide-react";
+import { User, Lock, LogIn, ArrowLeft, AlertCircle } from "lucide-react";
 
 export function LoginPage() {
   const { isAuthenticated, user, login: setAuth } = useAuth();
@@ -31,12 +27,7 @@ export function LoginPage() {
     password?: string;
   }>({});
 
-  const {
-    login,
-    isLoading,
-    error,
-    clearError,
-  } = useLogin();
+  const { login, isLoading, error, clearError } = useLogin();
 
   // Scroll al inicio al cargar la página
   useEffect(() => {
@@ -82,7 +73,7 @@ export function LoginPage() {
 
     try {
       const authResponse = await login({ username, password });
-      
+
       // Actualizar el estado de autenticación
       setAuth(
         authResponse.tokens.access,
@@ -90,7 +81,7 @@ export function LoginPage() {
         authResponse.user.role,
         authResponse.user.username,
         authResponse.user.email,
-        authResponse.user.id
+        authResponse.user.id,
       );
 
       // Redirigir
@@ -108,137 +99,121 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen relative flex items-center justify-center overflow-hidden">
+      {/* Fondo con gradiente oscuro */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-black" />
+
+      {/* Efectos de luz decorativos */}
+      <div className="absolute top-0 left-1/4 h-96 w-96 bg-primary/30 rounded-full blur-[128px]" />
+      <div className="absolute bottom-0 right-1/4 h-96 w-96 bg-primary/20 rounded-full blur-[128px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 bg-emerald-500/10 rounded-full blur-[100px]" />
+
       {/* Top navigation bar */}
-      <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
-        <Button variant="ghost" size="sm" asChild className="bg-background/80 backdrop-blur-sm">
+      <div className="absolute top-4 left-4 z-50">
+        <Button
+          variant="ghost"
+          size="sm"
+          asChild
+          className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 hover:text-white"
+        >
           <Link to={ROUTES.HOME}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver al inicio
           </Link>
         </Button>
-        <ThemeToggle className="bg-background/80 backdrop-blur-sm" />
       </div>
 
-      {/* Left side - Logo (Desktop only) */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-950 via-black to-gray-900 relative overflow-hidden items-center justify-center p-12">
-        {/* Background decoration */}
-        <div className="absolute inset-0 bg-grid-white/5" />
-        <div className="absolute top-0 right-0 h-96 w-96 bg-primary/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-96 w-96 bg-primary/10 rounded-full blur-3xl" />
-        
-        {/* Logo container */}
-        <div className="relative z-10 flex flex-col items-center gap-8">
-          <div className="relative group">
-            <div className="absolute inset-0 bg-white/20 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-300" />
+      {/* Contenedor principal con logo a la izquierda y form a la derecha */}
+      <div className="relative z-10 w-full max-w-5xl mx-4 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
+        {/* Logo a la izquierda - Solo visible en desktop */}
+        <div className="hidden md:flex items-center justify-center opacity-40">
+          <img
+            src={logoImage}
+            alt=""
+            className="w-[400px] h-[400px] lg:w-[500px] lg:h-[500px] object-contain"
+          />
+        </div>
+
+        {/* Formulario */}
+        <div className="w-full max-w-md">
+        {/* Card glassmorphism */}
+        <div className="relative rounded-3xl border border-white/10 shadow-2xl p-6 md:p-10 overflow-hidden">
+          {/* Logo de fondo dentro de la card - Solo visible en móvil */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none md:hidden">
             <img
               src={logoImage}
-              alt={`${APP_NAME} Logo`}
-              className="relative h-64 w-64 object-contain drop-shadow-2xl"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const fallback = target.parentElement?.querySelector('.logo-fallback') as HTMLElement;
-                if (fallback) fallback.style.display = 'flex';
-              }}
+              alt=""
+              className="w-64 h-64 object-contain opacity-15"
             />
-            <div className="relative h-64 w-64 flex items-center justify-center logo-fallback hidden">
-              <Shield className="w-48 h-48 text-white drop-shadow-2xl" />
-            </div>
           </div>
-          
-          <div className="text-center space-y-3">
-            <h1 className="text-4xl font-bold text-white drop-shadow-lg">
-              {APP_NAME}
-            </h1>
-            <p className="text-xl text-white/90 max-w-md">
-              Tus Arbitros de Confianza.
-            </p>
+
+          {/* Contenido del formulario */}
+          <div className="relative z-10">
+          {/* Título */}
+          <div className="text-center mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg mb-1">Bienvenido</h1>
+            <p className="text-sm md:text-base text-white/90 drop-shadow-md">Ingresa tus credenciales para continuar</p>
           </div>
-        </div>
-      </div>
 
-      {/* Right side - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-4 lg:p-12 bg-gradient-to-br from-background via-background to-primary/5 relative">
-        {/* Background decoration for mobile */}
-        <div className="absolute inset-0 bg-grid-white/5 lg:hidden" />
-        <div className="absolute top-0 right-0 h-96 w-96 bg-primary/10 rounded-full blur-3xl lg:hidden" />
-        <div className="absolute bottom-0 left-0 h-96 w-96 bg-secondary/20 rounded-full blur-3xl lg:hidden" />
-        
-        <Card className="relative w-full max-w-md shadow-2xl border-2 bg-card/95 backdrop-blur-sm">
-          <CardHeader className="space-y-6 pb-6 pt-8">
-            {/* Logo for mobile */}
-            <div className="flex justify-center lg:hidden">
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300" />
-                <img
-                  src={logoImage}
-                  alt={`${APP_NAME} Logo`}
-                  className="relative h-32 w-32 object-contain drop-shadow-lg"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const fallback = target.parentElement?.querySelector('.logo-fallback-mobile') as HTMLElement;
-                    if (fallback) fallback.style.display = 'flex';
-                  }}
-                />
-                <div className="relative h-32 w-32 flex items-center justify-center logo-fallback-mobile hidden">
-                  <Shield className="w-24 h-24 text-primary drop-shadow-lg" />
-                </div>
-              </div>
-            </div>
-
-            {/* Title */}
-            <div className="text-center space-y-2">
-              <CardTitle className="text-3xl font-bold">Iniciar Sesión</CardTitle>
-              <CardDescription className="text-base">
-                Ingresa tus credenciales para continuar
-              </CardDescription>
-            </div>
-          </CardHeader>
-
-          <CardContent className="space-y-6 pb-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Formulario */}
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
             {/* Usuario */}
-            <FormField
-              label="Usuario"
-              name="username"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-                if (fieldErrors.username) {
-                  setFieldErrors((prev) => ({ ...prev, username: undefined }));
-                }
-                clearError();
-              }}
-              error={fieldErrors.username}
-              disabled={isLoading}
-              autoComplete="username"
-              required
-              leftIcon={<User className="h-4 w-4" />}
-              placeholder="Tu nombre de usuario"
-            />
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white drop-shadow-md">Usuario</label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70">
+                  <User className="h-5 w-5" />
+                </div>
+                <input
+                  type="text"
+                  name="username"
+                  value={username}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    if (fieldErrors.username) {
+                      setFieldErrors((prev) => ({ ...prev, username: undefined }));
+                    }
+                    clearError();
+                  }}
+                  placeholder="Tu nombre de usuario"
+                  disabled={isLoading}
+                  autoComplete="username"
+                  className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"
+                />
+              </div>
+              {fieldErrors.username && (
+                <p className="text-sm text-red-400 font-medium drop-shadow-md">{fieldErrors.username}</p>
+              )}
+            </div>
 
             {/* Contraseña */}
-            <FormField
-              label="Contraseña"
-              name="password"
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (fieldErrors.password) {
-                  setFieldErrors((prev) => ({ ...prev, password: undefined }));
-                }
-                clearError();
-              }}
-              error={fieldErrors.password}
-              disabled={isLoading}
-              autoComplete="current-password"
-              required
-              leftIcon={<Lock className="h-4 w-4" />}
-              placeholder="Tu contraseña"
-            />
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white drop-shadow-md">Contraseña</label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70">
+                  <Lock className="h-5 w-5" />
+                </div>
+                <input
+                  type="password"
+                  name="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (fieldErrors.password) {
+                      setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                    }
+                    clearError();
+                  }}
+                  placeholder="Tu contraseña"
+                  disabled={isLoading}
+                  autoComplete="current-password"
+                  className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"
+                />
+              </div>
+              {fieldErrors.password && (
+                <p className="text-sm text-red-400 font-medium drop-shadow-md">{fieldErrors.password}</p>
+              )}
+            </div>
 
             {/* Recuperar contraseña */}
             <div className="flex justify-end">
@@ -252,19 +227,17 @@ export function LoginPage() {
 
             {/* Error */}
             {error && (
-              <Alert variant="destructive" className="border-2">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="font-medium">
-                  {error}
-                </AlertDescription>
-              </Alert>
+              <div className="flex items-center gap-2 p-3 bg-red-500/20 border border-red-500/30 rounded-xl">
+                <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
+                <p className="text-sm text-red-300">{error}</p>
+              </div>
             )}
 
             {/* Submit Button */}
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-6"
+              className="w-full h-11 md:h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
               size="lg"
             >
               {isLoading ? (
@@ -282,12 +255,12 @@ export function LoginPage() {
           </form>
 
           {/* Divider */}
-          <div className="relative">
+          <div className="relative my-4 md:my-6">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border/50" />
+              <span className="w-full border-t border-white/30" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-card px-3 text-muted-foreground font-medium">
+              <span className="bg-gray-900/80 px-3 text-white/80 font-medium rounded">
                 ¿No tienes cuenta?
               </span>
             </div>
@@ -298,17 +271,20 @@ export function LoginPage() {
             type="button"
             variant="outline"
             onClick={() => navigate(ROUTES.HOME)}
-            className="w-full border-2 hover:bg-primary/5 hover:border-primary transition-all duration-200"
+            className="w-full h-11 md:h-12 bg-black/40 border-2 border-white/30 text-white font-semibold hover:bg-white/20 hover:border-white/50 rounded-xl transition-all duration-200"
             size="lg"
           >
-            <span className="font-semibold text-primary">
-              Crear una cuenta nueva
-            </span>
+            Crear una cuenta nueva
           </Button>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+
+        {/* Texto de copyright */}
+        <p className="text-center text-white/70 text-xs md:text-sm mt-4 md:mt-6 drop-shadow-md">
+          © 2026 {APP_NAME}. Todos los derechos reservados.
+        </p>
+        </div>
       </div>
     </div>
   );
 }
-

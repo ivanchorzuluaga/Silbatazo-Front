@@ -84,33 +84,35 @@ export function Features() {
         </div>
 
         {/* Features Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-16">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="group relative p-6 bg-background rounded-xl border border-border/50 hover:shadow-lg hover:border-primary/20 transition-all duration-300 hover:-translate-y-1"
+              className="group relative p-5 sm:p-6 bg-card/10 backdrop-blur-m rounded-xl border border-primary/40 hover:shadow-xl hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 text-center"
             >
               {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
               
-              {/* Icon container */}
-              <div className="relative">
-                <div className="w-14 h-14 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <feature.icon className={`w-7 h-7 ${feature.color}`} />
+              {/* Icon container - Centrado */}
+              <div className="relative flex justify-center">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-primary/10">
+                  <feature.icon className={`w-7 h-7 sm:w-8 sm:h-8 ${feature.color}`} />
                 </div>
               </div>
               
-              {/* Content */}
-              <h3 className="font-semibold text-lg mb-2 text-foreground group-hover:text-primary transition-colors">
+              {/* Content - Centrado */}
+              <h3 className="font-bold text-base sm:text-lg mb-2 text-foreground group-hover:text-primary transition-colors">
                 {feature.title}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                 {feature.description}
               </p>
               
-              {/* Highlight badge */}
-              <div className="inline-flex items-center gap-1 px-3 py-1 bg-primary/5 border border-primary/10 rounded-full text-xs font-medium text-primary">
-                {feature.highlight}
+              {/* Highlight badge - Centrado */}
+              <div className="flex justify-center">
+                <div className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-xs font-semibold text-primary">
+                  {feature.highlight}
+                </div>
               </div>
             </div>
           ))}
@@ -141,25 +143,25 @@ export function Features() {
         </div>
 
         {/* Trust indicators */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-8 p-6 bg-card border border-border/50 rounded-xl shadow-sm">
+        <div className="mt-12 sm:mt-16 flex justify-center">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 p-4 sm:p-6 bg-card border border-border/50 rounded-xl shadow-sm">
             <div className="flex items-center gap-2">
               <div className="flex -space-x-2">
-                <div className="w-8 h-8 bg-primary/20 rounded-full border-2 border-background" />
-                <div className="w-8 h-8 bg-secondary/20 rounded-full border-2 border-background" />
-                <div className="w-8 h-8 bg-accent/20 rounded-full border-2 border-background" />
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary/20 rounded-full border-2 border-background" />
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-secondary/20 rounded-full border-2 border-background" />
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-accent/20 rounded-full border-2 border-background" />
               </div>
-              <span className="text-sm font-medium text-foreground">+50 árbitros activos</span>
+              <span className="text-xs sm:text-sm font-medium text-foreground">+50 árbitros</span>
             </div>
-            <div className="w-px h-6 bg-border" />
+            <div className="hidden sm:block w-px h-6 bg-border" />
             <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-green-500" />
-              <span className="text-sm font-medium text-foreground">Garantía de calidad</span>
+              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+              <span className="text-xs sm:text-sm font-medium text-foreground">Garantía</span>
             </div>
-            <div className="w-px h-6 bg-border" />
+            <div className="hidden sm:block w-px h-6 bg-border" />
             <div className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-yellow-500" />
-              <span className="text-sm font-medium text-foreground">Respuesta rápida</span>
+              <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />
+              <span className="text-xs sm:text-sm font-medium text-foreground">Rápido</span>
             </div>
           </div>
         </div>

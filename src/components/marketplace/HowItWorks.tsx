@@ -1,4 +1,6 @@
+import { Link } from "react-router-dom";
 import { Search, Calendar, CreditCard, Trophy, ArrowRight } from "lucide-react";
+import { ROUTES } from "@/lib/constants";
 
 export function HowItWorks() {
   const steps = [
@@ -122,10 +124,13 @@ export function HowItWorks() {
               </h3>
               <p className="text-black/70 text-sm">Únete a más de 500 clientes satisfechos</p>
             </div>
-            <button className="px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-black/90 transition-colors shadow-lg hover:shadow-xl cursor-pointer">
+            <Link
+              to={ROUTES.ARBITROS}
+              className="px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-black/90 transition-colors shadow-lg hover:shadow-xl cursor-pointer inline-flex items-center"
+            >
               Comenzar Ahora
-              <ArrowRight className="inline-block w-4 h-4 ml-2" />
-            </button>
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
           </div>
         </div>
 

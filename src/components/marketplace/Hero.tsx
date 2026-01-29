@@ -18,8 +18,8 @@ export function Hero() {
       <div className="absolute bottom-1/2 left-0 h-96 w-96 bg-primary/10 rounded-full blur-3xl" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-6 lg:py-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="space-y-6 lg:space-y-8">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium text-primary backdrop-blur-sm">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
@@ -44,6 +44,30 @@ export function Hero() {
                 <span className="w-1 h-1 bg-muted-foreground rounded-full" />
                 <CheckCircle className="h-4 w-4 text-green-500" />
                 <span>Puntualidad asegurada</span>
+              </div>
+            </div>
+
+            {/* Image section - Solo visible en móvil, después de garantías */}
+            <div className="relative lg:hidden">
+              <div className="aspect-[4/3] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
+                <img
+                  src="/professional-soccer-referee-in-black-uniform-blowi.jpg"
+                  alt="Árbitro profesional"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src =
+                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro Profesional%3C/text%3E%3C/svg%3E";
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+              </div>
+              {/* Floating card móvil */}
+              <div className="absolute -bottom-3 right-4 bg-card p-3 rounded-lg shadow-lg border border-border/50 backdrop-blur-sm z-20">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-sm font-medium">Disponible ahora</span>
+                </div>
               </div>
             </div>
 
@@ -76,7 +100,7 @@ export function Hero() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-4 lg:pt-8">
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Trophy className="h-5 w-5 text-yellow-500" />
@@ -108,8 +132,8 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Image section */}
-          <div className="relative lg:order-2">
+          {/* Image section - Solo visible en desktop */}
+          <div className="relative hidden lg:block">
             {/* Main image container */}
             <div className="aspect-[4/5] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
               <img
@@ -126,7 +150,7 @@ export function Hero() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
 
-            {/* Floating cards - fuera del overflow-hidden para que no se recorten */}
+            {/* Floating cards - solo desktop */}
             <div className="absolute -top-4 -right-4 bg-card p-3 rounded-lg shadow-lg border border-border/50 backdrop-blur-sm z-20">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
