@@ -81,7 +81,10 @@ export function CategoriaForm({ categoria, onSubmit, onCancel, isLoading }: Cate
         onChange={(e) => {
           setNombre(e.target.value);
           if (fieldErrors.nombre) {
-            setFieldErrors((prev) => ({ ...prev, nombre: undefined }));
+            setFieldErrors((prev) => {
+              const { nombre: _, ...rest } = prev;
+              return rest;
+            });
           }
         }}
         error={fieldErrors.nombre}
@@ -118,7 +121,10 @@ export function CategoriaForm({ categoria, onSubmit, onCancel, isLoading }: Cate
           const value = e.target.value;
           setTarifa(value);
           if (fieldErrors.tarifa) {
-            setFieldErrors((prev) => ({ ...prev, tarifa: undefined }));
+            setFieldErrors((prev) => {
+              const { tarifa: _, ...rest } = prev;
+              return rest;
+            });
           }
         }}
         error={fieldErrors.tarifa}

@@ -19,7 +19,6 @@ export function BilleteraPage() {
     error,
     listarRetiros,
     obtenerSaldo,
-    clearError,
   } = useRetiros();
   const [showFormModal, setShowFormModal] = useState(false);
   const [filtroEstado, setFiltroEstado] = useState<"pendiente" | "procesado" | "rechazado" | "todos">("todos");

@@ -5,17 +5,36 @@
  */
 
 import { useState, useEffect } from "react";
-import { Header, Hero, Features, HowItWorks, Footer, RefereesPreview } from "@/components/marketplace";
+import { useLocation } from "react-router-dom";
+import {
+  Header,
+  Hero,
+  Features,
+  HowItWorks,
+  Footer,
+  RefereesPreview,
+} from "@/components/marketplace";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
 export function HomePage() {
   const [arbitrosDestacados, setArbitrosDestacados] = useState<Arbitro[]>([]);
   const [isLoadingArbitros, setIsLoadingArbitros] = useState(false);
+  const location = useLocation();
 
-  // Scroll al inicio al cargar la página
+  // Manejar scroll: si hay hash ir a esa sección, si no ir al inicio
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    if (location.hash) {
+      // Esperar un momento para que la página cargue completamente
+      setTimeout(() => {
+        const element = document.querySelector(location.hash);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [location.hash]);
 
   // Cargar árbitros destacados
   useEffect(() => {
@@ -34,10 +53,9 @@ export function HomePage() {
         const queryParams = new URLSearchParams();
         queryParams.append("ordering", "-created_at");
 
-        const response = await fetch(
-          `${API_URL}/api/arbitros/?${queryParams.toString()}`,
-          { headers }
-        );
+        const response = await fetch(`${API_URL}/api/arbitros/?${queryParams.toString()}`, {
+          headers,
+        });
 
         if (response.ok) {
           const data = await response.json();

@@ -5,7 +5,6 @@
 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLayout } from "@/components/layout";
 import { ROUTES } from "@/lib/constants";
@@ -14,11 +13,8 @@ import {
   Users,
   Calendar,
   Shield,
-  FileText,
   Settings,
   DollarSign,
-  TrendingUp,
-  CheckCircle,
   Clock,
   AlertCircle,
   Trophy,

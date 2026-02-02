@@ -13,6 +13,7 @@ import { usePartido } from "../hooks/usePartido";
 import { useMunicipios } from "@/features/arbitro/hooks/useMunicipios";
 import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
 import { ROUTES } from "@/lib/constants";
+import { getTodayLocalDate, compareDates } from "@/lib/utils";
 
 interface PartidoFormProps {
   onSuccess?: () => void;

@@ -1,22 +1,33 @@
 /**
  * Modal con formulario para crear un partido con árbitro pre-seleccionado
- * Se usa desde el marketplace cuando se hace clic en "Solicitar árbitro"
+ * Componente presentacional - la lógica está en usePartidoForm
  */
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { FormField } from "@/components/forms";
-import { TimePicker24h } from "@/components/forms/TimePicker24h";
+import { TimePicker } from "@/components/ui/time-picker";
+import { CalendarPicker } from "@/components/ui/calendar-picker";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { usePartido } from "../hooks/usePartido";
-import { useMunicipios } from "@/features/arbitro/hooks/useMunicipios";
-import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
+import { usePartidoForm } from "../hooks/usePartidoForm";
 import { DisponibilidadDisplay } from "@/features/arbitro/components/DisponibilidadDisplay";
-import { getTodayLocalDate, compareDates } from "@/lib/utils";
-import { ROUTES } from "@/lib/constants";
+import { getRefereeImage } from "@/lib/referee-images";
+import { cn } from "@/lib/utils";
+import {
+  X,
+  Calendar,
+  Clock,
+  MapPin,
+  Trophy,
+  FileText,
+  CreditCard,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  Star,
+  User,
+} from "lucide-react";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
 interface PartidoFormModalProps {
@@ -26,498 +37,553 @@ interface PartidoFormModalProps {
   onSuccess?: () => void;
 }
 
-export function PartidoFormModal({ arbitro, open, onClose, onSuccess }: PartidoFormModalProps) {
-  const navigate = useNavigate();
-  const { crearPartido, isLoading, error, clearError } = usePartido();
-  const { municipios, isLoading: municipiosLoading } = useMunicipios();
-  const { categorias, isLoading: categoriasLoading } = useCategorias();
+export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalProps) {
+  // Hook con toda la lógica del formulario
+  const {
+    formState,
+    fieldErrors,
+    showSuccess,
+    partidoCreado,
+    isLoading,
+    error,
+    municipiosLoading,
+    categoriasLoading,
+    municipiosDisponibles,
+    categoriasDisponibles,
+    categoriaSeleccionada,
+    tarifa,
+    setFecha,
+    setHora,
+    setMunicipioId,
+    setCategoriaId,
+    setLugar,
+    setDireccion,
+    setNotasCliente,
+    handleSubmit,
+    handleClose,
+    handleAceptar,
+  } = usePartidoForm(arbitro, open, onClose);
 
-  // Estados del formulario
-  const [fecha, setFecha] = useState("");
-  const [hora, setHora] = useState("");
-  const [municipioId, setMunicipioId] = useState("");
-  const [categoriaId, setCategoriaId] = useState("");
-  const [lugar, setLugar] = useState("");
-  const [direccion, setDireccion] = useState("");
-  const [notasCliente, setNotasCliente] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [partidoCreado, setPartidoCreado] = useState<{ id: number; estado: string } | null>(null);
+  // Estado local para UI del calendario
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [calendarPos, setCalendarPos] = useState({ top: 0, left: 0 });
+  const dateButtonRef = useRef<HTMLButtonElement>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
 
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
-
-  // Filtrar municipios y categorías según el árbitro
-  const municipiosDisponibles = municipios.filter((municipio) =>
-    arbitro.municipios.some((m) => m.id === municipio.id)
+  // Imagen del árbitro
+  const imagenArbitro = getRefereeImage(
+    arbitro.foto_perfil,
+    arbitro.id,
+    arbitro.experiencia_anos,
+    arbitro.full_name || arbitro.username,
   );
 
-  const categoriasDisponibles = categorias.filter((categoria) =>
-    arbitro.categorias.some((c) => c.id === categoria.id)
-  );
+  // Rating del árbitro
+  const rating = arbitro.calificacion_promedio || 0;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearError();
-    setFieldErrors({});
-
-    // Validaciones básicas
-    const errors: Record<string, string> = {};
-    if (!fecha) errors.fecha = "La fecha es requerida";
-    if (!hora) errors.hora = "La hora es requerida";
-    if (!municipioId) errors.municipio_id = "Debes seleccionar un municipio";
-    if (!categoriaId) errors.categoria_id = "Debes seleccionar una categoría";
-    if (!lugar.trim()) errors.lugar = "El lugar es requerido";
-
-    // Validar fecha futura (comparar strings YYYY-MM-DD para evitar problemas de zona horaria)
-    if (fecha) {
-      const hoy = getTodayLocalDate();
-      if (compareDates(fecha, hoy) < 0) {
-        errors.fecha = "La fecha debe ser futura";
-      }
-    }
-
-    // Validar que el municipio esté en los disponibles del árbitro
-    if (municipioId && !municipiosDisponibles.some((m) => m.id === parseInt(municipioId))) {
-      errors.municipio_id = "El árbitro no trabaja en este municipio";
-    }
-
-    // Validar que la categoría esté en las disponibles del árbitro
-    if (categoriaId && !categoriasDisponibles.some((c) => c.id === parseInt(categoriaId))) {
-      errors.categoria_id = "El árbitro no tiene esta categoría";
-    }
-
-    // Validar disponibilidad del árbitro (fecha y hora)
-    if (fecha && hora && municipioId && categoriaId) {
-      // Parsear la fecha correctamente para evitar problemas de zona horaria
-      // Formato: YYYY-MM-DD
-      const [ano, mes, dia] = fecha.split("-").map(Number);
-      const fechaPartido = new Date(ano, mes - 1, dia); // mes - 1 porque Date usa 0-11
-      const diaNumero = fechaPartido.getDay(); // 0=Domingo, 1=Lunes, etc.
-      const diasMap: Record<number, string> = {
-        0: "domingo",
-        1: "lunes",
-        2: "martes",
-        3: "miercoles",
-        4: "jueves",
-        5: "viernes",
-        6: "sabado",
-      };
-      const diaSemana = diasMap[diaNumero];
-
-      const disponibilidades = arbitro.disponibilidades?.filter(
-        (disp) => disp.dia_semana === diaSemana && disp.activo
-      );
-
-      if (!disponibilidades || disponibilidades.length === 0) {
-        errors.fecha = `El árbitro no tiene disponibilidad para ${diaSemana}`;
-      } else {
-        // Asegurar que la hora esté en formato HH:MM (24 horas)
-        // El input type="time" siempre devuelve formato HH:MM (24 horas)
-        const horaPartido = hora.trim().substring(0, 5); // HH:MM
-        const [horaStr, minutoStr] = horaPartido.split(":");
-
-        // Validar que sean números válidos
-        const horaNum = parseInt(horaStr, 10);
-        const minutoNum = parseInt(minutoStr, 10);
-
-        if (
-          isNaN(horaNum) ||
-          isNaN(minutoNum) ||
-          horaNum < 0 ||
-          horaNum > 23 ||
-          minutoNum < 0 ||
-          minutoNum > 59
-        ) {
-          errors.hora = "Formato de hora inválido";
-        } else {
-          const horaPartidoTime = horaNum * 60 + minutoNum; // Convertir a minutos desde medianoche
-
-          const horaValida = disponibilidades.some((disp) => {
-            // Asegurar que las horas de disponibilidad estén en formato HH:MM
-            // El backend devuelve las horas en formato HH:MM (24 horas)
-            const horaInicioFormato = disp.hora_inicio.trim().substring(0, 5);
-            const horaFinFormato = disp.hora_fin.trim().substring(0, 5);
-
-            const [horaInicioStr, minutoInicioStr] = horaInicioFormato.split(":");
-            const [horaFinStr, minutoFinStr] = horaFinFormato.split(":");
-
-            const horaInicio = parseInt(horaInicioStr, 10) * 60 + parseInt(minutoInicioStr, 10);
-            const horaFin = parseInt(horaFinStr, 10) * 60 + parseInt(minutoFinStr, 10);
-
-
-            // Validar que la hora del partido esté dentro del rango
-            return horaPartidoTime >= horaInicio && horaPartidoTime <= horaFin;
-          });
-
-          if (!horaValida) {
-            errors.hora = "El árbitro no tiene disponibilidad en este horario";
-          }
-        }
-      }
-    }
-
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
-      return;
-    }
-
-    try {
-      const data = {
-        arbitro_id: arbitro.id, // Árbitro pre-seleccionado
-        fecha,
-        hora: hora.length === 5 ? hora : hora.substring(0, 5), // Asegurar formato HH:MM
-        municipio_id: parseInt(municipioId),
-        categoria_id: parseInt(categoriaId),
-        lugar: lugar.trim(),
-        direccion: direccion.trim() || undefined,
-        notas_cliente: notasCliente.trim() || undefined,
-      };
-
-      const nuevoPartido = await crearPartido(data);
-
-      // Mostrar mensaje de éxito
-      setPartidoCreado({
-        id: nuevoPartido.id,
-        estado: nuevoPartido.estado,
+  // Calcular posición del calendario
+  const updateCalendarPosition = useCallback(() => {
+    if (dateButtonRef.current) {
+      const rect = dateButtonRef.current.getBoundingClientRect();
+      setCalendarPos({
+        top: rect.bottom + 8,
+        left: Math.max(16, Math.min(rect.left, window.innerWidth - 340)),
       });
-      setShowSuccess(true);
-
-      // Limpiar formulario
-      setFecha("");
-      setHora("");
-      setMunicipioId("");
-      setCategoriaId("");
-      setLugar("");
-      setDireccion("");
-      setNotasCliente("");
-      setFieldErrors({});
-    } catch (err) {
-      // El error ya está manejado por el hook
-      console.error("Error al crear partido:", err);
     }
-  };
+  }, []);
 
-  const handleClose = () => {
-    if (!isLoading && !showSuccess) {
-      setFecha("");
-      setHora("");
-      setMunicipioId("");
-      setCategoriaId("");
-      setLugar("");
-      setDireccion("");
-      setNotasCliente("");
-      setFieldErrors({});
-      clearError();
-      onClose();
-    }
-  };
+  // Abrir calendario
+  const openCalendar = useCallback(() => {
+    updateCalendarPosition();
+    setShowCalendar(true);
+  }, [updateCalendarPosition]);
 
-  const handleAceptar = () => {
-    setShowSuccess(false);
-    setPartidoCreado(null);
-    setFecha("");
-    setHora("");
-    setMunicipioId("");
-    setCategoriaId("");
-    setLugar("");
-    setDireccion("");
-    setNotasCliente("");
-    setFieldErrors({});
-    clearError();
-    onClose();
-    // Redirigir a la lista de partidos
-    navigate(ROUTES.PARTIDOS);
-  };
+  // Cerrar calendario
+  const closeCalendar = useCallback(() => {
+    setShowCalendar(false);
+  }, []);
 
-  // Resetear estado de éxito cuando se cierra el modal
+  // Manejar selección de fecha
+  const handleDateSelect = useCallback(
+    (date: string) => {
+      setFecha(date);
+      closeCalendar();
+    },
+    [setFecha, closeCalendar],
+  );
+
+  // Efecto para actualizar posición en resize/scroll
   useEffect(() => {
-    if (!open) {
-      // Resetear cuando el modal se cierra
-      const timer = setTimeout(() => {
-        setShowSuccess(false);
-        setPartidoCreado(null);
-      }, 100);
-      return () => clearTimeout(timer);
+    if (!showCalendar) return;
+
+    const handleUpdate = () => updateCalendarPosition();
+    window.addEventListener("resize", handleUpdate);
+    window.addEventListener("scroll", handleUpdate, true);
+
+    return () => {
+      window.removeEventListener("resize", handleUpdate);
+      window.removeEventListener("scroll", handleUpdate, true);
+    };
+  }, [showCalendar, updateCalendarPosition]);
+
+  // Cerrar calendario al hacer clic fuera
+  useEffect(() => {
+    if (!showCalendar) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(e.target as Node) &&
+        dateButtonRef.current &&
+        !dateButtonRef.current.contains(e.target as Node)
+      ) {
+        closeCalendar();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showCalendar, closeCalendar]);
+
+  // Cerrar calendario con Escape
+  useEffect(() => {
+    if (!showCalendar) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeCalendar();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [showCalendar, closeCalendar]);
+
+  // Bloquear scroll del body cuando el modal está abierto
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
     }
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
-  return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Solicitar Árbitro: {arbitro.full_name || arbitro.username}</DialogTitle>
-        </DialogHeader>
+  if (!open) return null;
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {showSuccess && partidoCreado ? (
-            <>
-              {/* Mensaje de éxito - Solo se muestra cuando hay éxito */}
-              <Alert variant="success" className="mb-4">
-                <AlertTitle className="flex items-center gap-2">
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  ¡Partido creado exitosamente!
-                </AlertTitle>
-                <AlertDescription className="mt-2">
-                  {partidoCreado.estado === "pendiente" ? (
-                    <>
-                      El partido #{partidoCreado.id} ha sido creado y está{" "}
-                      <strong>pendiente de confirmación</strong> por parte del árbitro. Recibirás una
-                      notificación cuando el árbitro acepte o rechace el partido.
-                    </>
-                  ) : (
-                    <>
-                      El partido #{partidoCreado.id} ha sido creado y está{" "}
-                      <strong>buscando árbitro</strong>. Los árbitros podrán postularse y un
-                      administrador asignará el árbitro final.
-                    </>
-                  )}
-                </AlertDescription>
-              </Alert>
-              {/* Botón Aceptar */}
-              <div className="flex gap-4 pt-4">
-                <Button type="button" onClick={handleAceptar} className="flex-1" disabled={isLoading}>
-                  Aceptar
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              {error && (
-                <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
-                  <p className="text-sm text-destructive">{error}</p>
-                </div>
-              )}
+  // Formatear fecha para mostrar
+  const formatearFecha = (fecha: string) => {
+    if (!fecha) return "";
+    const [year, month, day] = fecha.split("-");
+    const meses = [
+      "Ene",
+      "Feb",
+      "Mar",
+      "Abr",
+      "May",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dic",
+    ];
+    return `${day} ${meses[parseInt(month) - 1]} ${year}`;
+  };
 
-              {/* Información del árbitro */}
-              <div className="p-3 rounded-md bg-muted/50 border space-y-3">
-            <div>
-              <p className="text-sm font-medium mb-1">Árbitro seleccionado</p>
-              <p className="text-xs text-muted-foreground">
-                {arbitro.full_name || arbitro.username}
-              </p>
-            </div>
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      onClick={handleClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
-            {/* Disponibilidad del árbitro */}
-            {arbitro.disponibilidades && arbitro.disponibilidades.length > 0 && (
-              <div className="pt-3 border-t">
-                <p className="text-sm font-medium mb-2">Horarios Disponibles</p>
-                <DisponibilidadDisplay disponibilidades={arbitro.disponibilidades} />
-              </div>
-            )}
-          </div>
-
-          {/* Fecha y Hora */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField
-              label="Fecha del Partido"
-              name="fecha"
-              type="date"
-              value={fecha}
-              onChange={(e) => {
-                setFecha(e.target.value);
-                if (fieldErrors.fecha) {
-                  setFieldErrors((prev) => ({ ...prev, fecha: undefined }));
-                }
-              }}
-              error={fieldErrors.fecha}
-              disabled={isLoading}
-              required
+      {/* Modal */}
+      <div
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-900/95 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {showSuccess && partidoCreado ? (
+          <SuccessView partidoCreado={partidoCreado} onAceptar={handleAceptar} />
+        ) : (
+          <>
+            {/* Header con info del árbitro */}
+            <ModalHeader
+              arbitro={arbitro}
+              imagenArbitro={imagenArbitro}
+              rating={rating}
+              onClose={handleClose}
+              isLoading={isLoading}
             />
 
-            <div className="space-y-2">
-              <label htmlFor="hora" className="text-sm font-medium">
-                Hora del Partido (24 horas) <span className="text-destructive">*</span>
-              </label>
-              <TimePicker24h
-                id="hora"
-                name="hora"
-                value={hora}
-                onChange={(value) => {
-                  setHora(value);
-                  if (fieldErrors.hora) {
-                    setFieldErrors((prev) => ({ ...prev, hora: undefined }));
-                  }
-                }}
-                error={fieldErrors.hora}
-                disabled={isLoading}
-                required
-              />
-            </div>
-          </div>
+            {/* Formulario */}
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              {error && <ErrorAlert error={error} />}
 
-          {/* Municipio y Categoría */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <label htmlFor="municipio_id" className="text-sm font-medium">
-                Municipio <span className="text-destructive">*</span>
-              </label>
-              <Select
-                id="municipio_id"
-                value={municipioId}
-                onChange={(e) => {
-                  setMunicipioId(e.target.value);
-                  if (fieldErrors.municipio_id) {
-                    setFieldErrors((prev) => ({ ...prev, municipio_id: undefined }));
-                  }
-                }}
-                disabled={isLoading || municipiosLoading}
-                className={fieldErrors.municipio_id ? "border-destructive" : ""}
-              >
-                <option value="">Selecciona un municipio</option>
-                {municipiosDisponibles.map((municipio) => (
-                  <option key={municipio.id} value={municipio.id}>
-                    {municipio.nombre}
-                    {municipio.departamento && `, ${municipio.departamento}`}
-                  </option>
-                ))}
-              </Select>
-              {fieldErrors.municipio_id && (
-                <p className="text-sm text-destructive">{fieldErrors.municipio_id}</p>
-              )}
-              {municipiosDisponibles.length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  El árbitro no tiene municipios disponibles
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="categoria_id" className="text-sm font-medium">
-                Categoría <span className="text-destructive">*</span>
-              </label>
-              <Select
-                id="categoria_id"
-                value={categoriaId}
-                onChange={(e) => {
-                  setCategoriaId(e.target.value);
-                  if (fieldErrors.categoria_id) {
-                    setFieldErrors((prev) => ({ ...prev, categoria_id: undefined }));
-                  }
-                }}
-                disabled={isLoading || categoriasLoading}
-                className={fieldErrors.categoria_id ? "border-destructive" : ""}
-              >
-                <option value="">Selecciona una categoría</option>
-                {categoriasDisponibles.map((categoria) => (
-                  <option key={categoria.id} value={categoria.id}>
-                    {categoria.nombre}
-                  </option>
-                ))}
-              </Select>
-              {fieldErrors.categoria_id && (
-                <p className="text-sm text-destructive">{fieldErrors.categoria_id}</p>
-              )}
-              {categoriasDisponibles.length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  El árbitro no tiene categorías disponibles
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Lugar y Dirección */}
-          <FormField
-            label="Lugar"
-            name="lugar"
-            value={lugar}
-            onChange={(e) => {
-              setLugar(e.target.value);
-              if (fieldErrors.lugar) {
-                setFieldErrors((prev) => ({ ...prev, lugar: undefined }));
-              }
-            }}
-            error={fieldErrors.lugar}
-            disabled={isLoading}
-            placeholder="Ej: Cancha Los Olivos"
-            required
-          />
-
-          <FormField
-            label="Dirección (Opcional)"
-            name="direccion"
-            value={direccion}
-            onChange={(e) => setDireccion(e.target.value)}
-            disabled={isLoading}
-            placeholder="Calle 123 #45-67"
-          />
-
-          {/* Resumen de pago */}
-          {categoriaId && (() => {
-            const categoriaSeleccionada = categoriasDisponibles.find(
-              (c) => c.id === parseInt(categoriaId)
-            );
-            if (!categoriaSeleccionada) return null;
-            
-            const tarifa = parseFloat(categoriaSeleccionada.tarifa);
-            return (
-              <div className="p-4 rounded-lg border-2 border-primary/20 bg-primary/5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Resumen de Pago</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Categoría: <span className="font-medium">{categoriaSeleccionada.nombre}</span>
-                    </p>
-                  </div>
+              {/* Fecha y Hora */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                {/* Campo de Fecha con Calendario */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-primary" />
+                    Fecha del Partido
+                    <span className="text-red-400">*</span>
+                  </label>
+                  <button
+                    ref={dateButtonRef}
+                    type="button"
+                    onClick={openCalendar}
+                    disabled={isLoading}
+                    className={cn(
+                      "w-full h-10 px-3 text-left rounded-lg border transition-colors",
+                      "bg-white/5 border-white/10 text-white",
+                      "hover:bg-white/10 hover:border-white/20",
+                      "focus:outline-none focus:ring-2 focus:ring-primary/50",
+                      fieldErrors.fecha && "border-red-500",
+                      !formState.fecha && "text-white/50",
+                    )}
+                  >
+                    {formState.fecha ? formatearFecha(formState.fecha) : "Seleccionar fecha"}
+                  </button>
+                  {fieldErrors.fecha && <p className="text-xs text-red-400">{fieldErrors.fecha}</p>}
                 </div>
-                <div className="pt-3 border-t border-primary/10">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Tarifa del partido:</span>
-                    <span className="text-lg font-semibold text-foreground">
-                      ${tarifa.toLocaleString("es-CO")} COP
-                    </span>
-                  </div>
+
+                {/* Campo de Hora */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-primary" />
+                    Hora (24h)
+                    <span className="text-red-400">*</span>
+                  </label>
+                  <TimePicker value={formState.hora} onChange={setHora} disabled={isLoading} />
+                  {fieldErrors.hora && <p className="text-xs text-red-400">{fieldErrors.hora}</p>}
                 </div>
-                <div className="pt-3 border-t-2 border-primary/30">
-                  <div className="flex items-center justify-between">
-                    <span className="text-base font-semibold">Total a pagar:</span>
-                    <span className="text-2xl font-bold text-primary">
-                      ${tarifa.toLocaleString("es-CO")} COP
-                    </span>
-                  </div>
-                </div>
-                <p className="text-xs text-center text-muted-foreground pt-2 border-t border-primary/10">
-                  El pago se procesará al confirmar la solicitud del árbitro
-                </p>
               </div>
-            );
-          })()}
 
-          {/* Notas */}
-          <FormField
-            label="Notas Adicionales (Opcional)"
-            name="notas_cliente"
-            value={notasCliente}
-            onChange={(e) => setNotasCliente(e.target.value)}
-            disabled={isLoading}
-            placeholder="Información adicional sobre el partido..."
-            multiline
-            rows={4}
-          />
+              {/* Municipio y Categoría */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-primary" />
+                    Municipio
+                    <span className="text-red-400">*</span>
+                  </label>
+                  <Select
+                    id="municipio_id"
+                    value={formState.municipioId}
+                    onChange={(e) => setMunicipioId(e.target.value)}
+                    disabled={isLoading || municipiosLoading}
+                    className={cn(
+                      "bg-white/5 border-white/10 text-white",
+                      fieldErrors.municipio_id && "border-red-500",
+                    )}
+                  >
+                    <option value="">Selecciona un municipio</option>
+                    {municipiosDisponibles.map((municipio) => (
+                      <option key={municipio.id} value={municipio.id}>
+                        {municipio.nombre}
+                        {municipio.departamento && `, ${municipio.departamento}`}
+                      </option>
+                    ))}
+                  </Select>
+                  {fieldErrors.municipio_id && (
+                    <p className="text-xs text-red-400">{fieldErrors.municipio_id}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-primary" />
+                    Categoría
+                    <span className="text-red-400">*</span>
+                  </label>
+                  <Select
+                    id="categoria_id"
+                    value={formState.categoriaId}
+                    onChange={(e) => setCategoriaId(e.target.value)}
+                    disabled={isLoading || categoriasLoading}
+                    className={cn(
+                      "bg-white/5 border-white/10 text-white",
+                      fieldErrors.categoria_id && "border-red-500",
+                    )}
+                  >
+                    <option value="">Selecciona una categoría</option>
+                    {categoriasDisponibles.map((categoria) => (
+                      <option key={categoria.id} value={categoria.id}>
+                        {categoria.nombre} - ${parseFloat(categoria.tarifa).toLocaleString("es-CO")}
+                      </option>
+                    ))}
+                  </Select>
+                  {fieldErrors.categoria_id && (
+                    <p className="text-xs text-red-400">{fieldErrors.categoria_id}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Lugar */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  Lugar del Partido
+                  <span className="text-red-400">*</span>
+                </label>
+                <FormField
+                  label=""
+                  name="lugar"
+                  value={formState.lugar}
+                  onChange={(e) => setLugar(e.target.value)}
+                  error={fieldErrors.lugar}
+                  disabled={isLoading}
+                  placeholder="Ej: Cancha Los Olivos"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+
+              {/* Dirección */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white/70 flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  Dirección (Opcional)
+                </label>
+                <FormField
+                  label=""
+                  name="direccion"
+                  value={formState.direccion}
+                  onChange={(e) => setDireccion(e.target.value)}
+                  disabled={isLoading}
+                  placeholder="Calle 123 #45-67"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+
+              {/* Resumen de pago */}
+              {tarifa > 0 && (
+                <PaymentSummary categoriaSeleccionada={categoriaSeleccionada} tarifa={tarifa} />
+              )}
+
+              {/* Notas */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white/70 flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Notas Adicionales (Opcional)
+                </label>
+                <FormField
+                  label=""
+                  name="notas_cliente"
+                  value={formState.notasCliente}
+                  onChange={(e) => setNotasCliente(e.target.value)}
+                  disabled={isLoading}
+                  placeholder="Información adicional sobre el partido..."
+                  multiline
+                  rows={3}
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
 
               {/* Botones */}
-              <div className="flex gap-4 pt-4">
-                <Button type="submit" disabled={isLoading || showSuccess} className="flex-1">
-                  {isLoading ? "Creando..." : "Solicitar Partido"}
+              <div className="flex gap-3 pt-4">
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex-1 h-12 text-base shadow-lg shadow-primary/25"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    "Confirmar Solicitud"
+                  )}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleClose}
-                  disabled={isLoading || showSuccess}
+                  disabled={isLoading}
+                  className="border-white/20 text-white hover:bg-white/10"
                 >
                   Cancelar
                 </Button>
               </div>
-            </>
+            </form>
+          </>
+        )}
+      </div>
+
+      {/* Calendario flotante con portal */}
+      {showCalendar &&
+        createPortal(
+          <div
+            ref={calendarRef}
+            style={{
+              position: "fixed",
+              top: calendarPos.top,
+              left: calendarPos.left,
+              zIndex: 99999,
+            }}
+          >
+            <CalendarPicker
+              selectedDate={formState.fecha}
+              onSelect={handleDateSelect}
+              onClose={closeCalendar}
+            />
+          </div>,
+          document.body,
+        )}
+    </div>
+  );
+
+  return createPortal(modalContent, document.body);
+}
+
+// =============================================================================
+// Componentes auxiliares (presentacionales)
+// =============================================================================
+
+interface ModalHeaderProps {
+  arbitro: Arbitro;
+  imagenArbitro: string;
+  rating: number;
+  onClose: () => void;
+  isLoading: boolean;
+}
+
+function ModalHeader({ arbitro, imagenArbitro, rating, onClose, isLoading }: ModalHeaderProps) {
+  return (
+    <div className="relative p-6 border-b border-white/10">
+      {/* Botón cerrar */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+        disabled={isLoading}
+      >
+        <X className="w-5 h-5 text-white" />
+      </button>
+
+      <div className="flex items-center gap-4">
+        {/* Foto del árbitro */}
+        <div className="relative shrink-0">
+          <img
+            src={imagenArbitro}
+            alt={arbitro.full_name || arbitro.username}
+            className="w-20 h-20 rounded-xl object-cover border-2 border-primary/30"
+          />
+          {rating > 0 && (
+            <div className="absolute -bottom-2 -right-2 bg-black/80 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+              <span className="text-white text-xs font-semibold">{rating.toFixed(1)}</span>
+            </div>
           )}
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <h2 className="text-xl font-bold text-white truncate">
+            Solicitar a {arbitro.full_name || arbitro.username}
+          </h2>
+          <div className="flex flex-wrap items-center gap-3 mt-1 text-white/60 text-sm">
+            {arbitro.experiencia_anos > 0 && (
+              <span className="flex items-center gap-1">
+                <User className="w-3 h-3" />
+                {arbitro.experiencia_anos} años exp.
+              </span>
+            )}
+            {arbitro.municipios.length > 0 && (
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3 h-3" />
+                {arbitro.municipios.length} zonas
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Disponibilidad resumida */}
+      {arbitro.disponibilidades && arbitro.disponibilidades.length > 0 && (
+        <div className="mt-4 p-3 bg-white/5 rounded-xl border border-white/10">
+          <p className="text-xs font-medium text-white/70 mb-2 flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            Horarios Disponibles
+          </p>
+          <DisponibilidadDisplay disponibilidades={arbitro.disponibilidades} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface SuccessViewProps {
+  partidoCreado: { id: number; estado: string };
+  onAceptar: () => void;
+}
+
+function SuccessView({ partidoCreado, onAceptar }: SuccessViewProps) {
+  return (
+    <div className="p-8 text-center">
+      <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+        <CheckCircle className="w-10 h-10 text-green-400" />
+      </div>
+      <h2 className="text-2xl font-bold text-white mb-3">¡Solicitud Creada!</h2>
+      <p className="text-white/70 mb-4 max-w-md mx-auto">
+        El partido <span className="text-primary font-semibold">#{partidoCreado.id}</span> ha sido
+        creado exitosamente.
+      </p>
+      <p className="text-white/50 text-sm mb-8">
+        Ahora procede a realizar el pago para confirmar tu solicitud con el árbitro.
+      </p>
+      <Button onClick={onAceptar} size="lg" className="px-8">
+        <CreditCard className="w-5 h-5 mr-2" />
+        Proceder al Pago
+      </Button>
+    </div>
+  );
+}
+
+interface ErrorAlertProps {
+  error: string;
+}
+
+function ErrorAlert({ error }: ErrorAlertProps) {
+  return (
+    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
+      <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+      <p className="text-sm text-red-300">{error}</p>
+    </div>
+  );
+}
+
+interface PaymentSummaryProps {
+  categoriaSeleccionada: { nombre: string; tarifa: string } | undefined;
+  tarifa: number;
+}
+
+function PaymentSummary({ categoriaSeleccionada, tarifa }: PaymentSummaryProps) {
+  return (
+    <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+      <div className="flex items-center gap-2 mb-3">
+        <CreditCard className="w-5 h-5 text-primary" />
+        <span className="font-semibold text-white">Resumen de Pago</span>
+      </div>
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-white/70">Categoría:</span>
+          <span className="text-white">{categoriaSeleccionada?.nombre}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-white/70">Tarifa del partido:</span>
+          <span className="text-white">${tarifa.toLocaleString("es-CO")} COP</span>
+        </div>
+        <div className="pt-3 mt-3 border-t border-primary/20 flex justify-between items-center">
+          <span className="font-semibold text-white">Total:</span>
+          <span className="text-2xl font-bold text-primary">${tarifa.toLocaleString("es-CO")}</span>
+        </div>
+      </div>
+      <p className="text-xs text-center text-white/50 mt-3">
+        El pago se procesará al confirmar la solicitud
+      </p>
+    </div>
   );
 }

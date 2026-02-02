@@ -15,12 +15,9 @@ import {
   Clock, 
   CheckCircle, 
   DollarSign, 
-  TrendingUp, 
   User, 
   Shield,
   Wallet,
-  FileText,
-  Star,
   Activity
 } from "lucide-react";
 import { parseLocalDate, getTodayLocalDate } from "@/lib/utils";

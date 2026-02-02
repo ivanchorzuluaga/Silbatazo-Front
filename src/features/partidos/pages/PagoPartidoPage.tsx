@@ -1,367 +1,576 @@
 /**
  * Página para realizar el pago de un partido
- * Muestra el QR de Nequi y la información necesaria para la transferencia
+ * Diseño moderno con glassmorphism y subida de comprobante
  */
 
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useRef } from "react";
+import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { PageLayout } from "@/components/layout";
-import { usePartido } from "@/features/partidos/hooks/usePartido";
-import { partidoEndpoints } from "@/api/endpoints/partido.endpoints";
-import { authService } from "@/features/auth/services/auth.service";
-import { useAuth } from "@/hooks/useAuth";
-import { ROUTES, getPartidoDetailRoute } from "@/lib/constants";
-import { Loader2, CheckCircle2, XCircle, Copy, ExternalLink } from "lucide-react";
-
-// Configuración de Nequi (debería venir de variables de entorno)
-// Si no hay URL configurada, intenta usar la imagen en /public/nequi_qr.jpeg
-const NEQUI_QR_URL =
-  import.meta.env.VITE_NEQUI_QR_URL || "/nequi_qr.jpeg";
-const NEQUI_PHONE = import.meta.env.VITE_NEQUI_PHONE || "0091187234";
-const NEQUI_NAME = import.meta.env.VITE_NEQUI_NAME || "Silbatazo";
+import { usePagoPartido } from "../hooks/usePagoPartido";
+import { ROUTES } from "@/lib/constants";
+import logoImage from "@/assets/Silbatazo-bordes.png";
+import {
+  Loader2,
+  CheckCircle,
+  XCircle,
+  Copy,
+  ExternalLink,
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  Trophy,
+  Clock,
+  CreditCard,
+  Smartphone,
+  CheckCircle2,
+  AlertCircle,
+  Banknote,
+  Upload,
+  Image as ImageIcon,
+  X,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function PagoPartidoPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { partido, isLoading, error, obtenerPartido, refresh } = usePartido();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [isMarkingAsPaid, setIsMarkingAsPaid] = useState(false);
+  const {
+    partido,
+    isLoading,
+    error,
+    isMarkingAsPaid,
+    yaPagado,
+    estadoPago,
+    comprobante,
+    comprobantePreview,
+    comprobanteError,
+    monto,
+    referencia,
+    nequiConfig,
+    tienePermiso,
+    handleMarcarComoPagado,
+    handleComprobanteChange,
+    handleCopy,
+    formatCurrency,
+    navigateToDashboard,
+  } = usePagoPartido(id);
 
-  useEffect(() => {
-    if (id) {
-      obtenerPartido(parseInt(id));
-    }
-  }, [id, obtenerPartido]);
+  // Manejar click en el área de subida
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
 
-  const handleMarcarComoPagado = async () => {
-    if (!partido) return;
-    
-    const token = authService.getAccessToken();
-    if (!token) {
-      alert("No estás autenticado. Por favor, inicia sesión.");
-      return;
-    }
+  // Manejar archivo seleccionado
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    handleComprobanteChange(file);
+  };
 
-    setIsMarkingAsPaid(true);
-    try {
-      await partidoEndpoints.marcarPartidoPagado(token, partido.id);
-      alert("Pago marcado como enviado. Estará en revisión.");
-      refresh();
-    } catch (err: any) {
-      alert(err?.message || "Error al marcar el pago. Intenta nuevamente.");
-    } finally {
-      setIsMarkingAsPaid(false);
+  // Eliminar comprobante
+  const handleRemoveComprobante = () => {
+    handleComprobanteChange(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
-  const handleCopy = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    // Notificación silenciosa - solo copia al portapapeles
-  };
-
-  const formatCurrency = (value: string | number) => {
-    const num = typeof value === "string" ? parseFloat(value) : value;
-    return new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-      minimumFractionDigits: 0,
-    }).format(num);
-  };
-
+  // Estado de carga
   if (isLoading) {
     return (
-      <PageLayout title="Pago del Partido">
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <PageContainer>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center">
+            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+            <p className="text-lg font-medium text-white">Cargando información del pago...</p>
+          </div>
         </div>
-      </PageLayout>
+      </PageContainer>
     );
   }
 
+  // Estado de error
   if (error || !partido) {
     return (
-      <PageLayout title="Pago del Partido" backButton={{ label: "Volver", to: ROUTES.CLIENTE_DASHBOARD }}>
-        <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-6 text-center">
-          <XCircle className="mx-auto h-12 w-12 text-destructive mb-4" />
-          <p className="text-destructive">{error || "Partido no encontrado"}</p>
-          <Button
-            variant="outline"
-            onClick={() => navigate(ROUTES.CLIENTE_DASHBOARD)}
-            className="mt-4"
-          >
-            Volver al Dashboard
-          </Button>
+      <PageContainer>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="bg-red-500/10 backdrop-blur-md rounded-2xl border border-red-500/20 p-8 text-center max-w-md">
+            <XCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+            <p className="text-lg font-medium text-white mb-2">Error</p>
+            <p className="text-white/70 mb-6">{error || "Partido no encontrado"}</p>
+            <Button onClick={navigateToDashboard}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Volver al Dashboard
+            </Button>
+          </div>
         </div>
-      </PageLayout>
+      </PageContainer>
     );
   }
 
-  // Verificar que el usuario sea el cliente del partido
-  if (user?.id !== partido.cliente) {
+  // Sin permisos
+  if (!tienePermiso) {
     return (
-      <PageLayout title="Pago del Partido" backButton={{ label: "Volver", to: ROUTES.CLIENTE_DASHBOARD }}>
-        <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-6 text-center">
-          <XCircle className="mx-auto h-12 w-12 text-destructive mb-4" />
-          <p className="text-destructive">No tienes permiso para ver este pago</p>
+      <PageContainer>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="bg-red-500/10 backdrop-blur-md rounded-2xl border border-red-500/20 p-8 text-center max-w-md">
+            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+            <p className="text-lg font-medium text-white mb-2">Acceso Denegado</p>
+            <p className="text-white/70 mb-6">No tienes permiso para ver este pago</p>
+            <Button onClick={navigateToDashboard}>Volver al Dashboard</Button>
+          </div>
         </div>
-      </PageLayout>
+      </PageContainer>
     );
   }
-
-  const monto = parseFloat(partido.tarifa);
-  const referencia = partido.codigo || `PARTIDO-${partido.id}`;
-  const descripcion = `Partido ${referencia} - ${partido.categoria.nombre} - ${partido.municipio.nombre}`;
-
-  // Estado del pago
-  const estadoPago = partido.estado_pago;
-  const yaPagado = estadoPago !== "pendiente";
 
   return (
-    <PageLayout
-      title="Pago del Partido"
-      backButton={{ label: "Volver al Partido", to: getPartidoDetailRoute(partido.id) }}
-    >
-      <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6 pb-6">
-        {/* Información del partido */}
-        <div className="rounded-xl border bg-card p-5 sm:p-6 shadow-sm">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">Información del Partido</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm sm:text-base">
-            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
-              <span className="text-muted-foreground">Código:</span>
-              <span className="font-medium font-mono break-all">{referencia}</span>
-            </div>
-            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
-              <span className="text-muted-foreground">Categoría:</span>
-              <span className="font-medium">{partido.categoria.nombre}</span>
-            </div>
-            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
-              <span className="text-muted-foreground">Municipio:</span>
-              <span className="font-medium">{partido.municipio.nombre}</span>
-            </div>
-            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
-              <span className="text-muted-foreground">Fecha:</span>
-              <span className="font-medium">
-                {new Date(partido.fecha).toLocaleDateString("es-CO", {
+    <PageContainer>
+      {/* Header */}
+      <header className="mb-8">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={navigateToDashboard}
+          className="mb-4 bg-white/10 border border-white/20 text-white hover:bg-white/20"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Volver al Dashboard
+        </Button>
+        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Pago del Partido</h1>
+        <p className="text-white/60">Completa el pago para confirmar tu solicitud</p>
+      </header>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Columna izquierda - Info del partido y estado */}
+        <div className="lg:col-span-1 space-y-6">
+          {/* Info del partido */}
+          <InfoCard icon={Trophy} title="Información del Partido">
+            <div className="space-y-3">
+              <InfoRow
+                icon={Calendar}
+                label="Fecha"
+                value={new Date(partido.fecha).toLocaleDateString("es-CO", {
                   weekday: "long",
-                  year: "numeric",
-                  month: "long",
                   day: "numeric",
+                  month: "long",
                 })}
-              </span>
+              />
+              <InfoRow icon={Clock} label="Hora" value={partido.hora.substring(0, 5)} />
+              <InfoRow icon={MapPin} label="Municipio" value={partido.municipio.nombre} />
+              <InfoRow icon={Trophy} label="Categoría" value={partido.categoria.nombre} />
+              <div className="pt-3 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-white/60 text-sm">Código:</span>
+                  <code className="text-primary font-mono text-sm">{referencia}</code>
+                </div>
+              </div>
             </div>
+          </InfoCard>
+
+          {/* Estado del pago */}
+          {yaPagado && <PaymentStatusCard estadoPago={estadoPago} notasPago={partido.notas_pago} />}
+
+          {/* Monto a pagar */}
+          <div className="bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-primary/20 rounded-lg">
+                <Banknote className="w-5 h-5 text-primary" />
+              </div>
+              <span className="font-semibold text-white">Total a Pagar</span>
+            </div>
+            <p className="text-4xl font-bold text-primary">{formatCurrency(monto)}</p>
+            <p className="text-white/50 text-sm mt-2">COP - Pesos Colombianos</p>
           </div>
         </div>
 
-        {/* Estado del pago */}
-        {yaPagado && (
-          <div
-            className={`rounded-xl border p-5 ${
-              estadoPago === "aprobado"
-                ? "bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800"
-                : estadoPago === "en_revision"
-                ? "bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800"
-                : "bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800"
-            }`}
-          >
-            <div className="flex items-start gap-3">
-              {estadoPago === "aprobado" ? (
-                <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
-              ) : estadoPago === "en_revision" ? (
-                <Loader2 className="h-6 w-6 animate-spin text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
-              ) : (
-                <XCircle className="h-6 w-6 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-base mb-1">
-                  {estadoPago === "aprobado"
-                    ? "Pago Aprobado"
-                    : estadoPago === "en_revision"
-                    ? "Pago en Revisión"
-                    : "Pago Rechazado"}
-                </p>
-                <p className="text-sm sm:text-base text-muted-foreground">
-                  {estadoPago === "aprobado"
-                    ? "Tu pago ha sido verificado y aprobado."
-                    : estadoPago === "en_revision"
-                    ? "Tu pago está siendo revisado por el administrador."
-                    : partido.notas_pago || "El pago fue rechazado. Por favor, verifica la información."}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Columna derecha - Pago */}
+        <div className="lg:col-span-2">
+          {!yaPagado ? (
+            <div className="space-y-6">
+              {/* Sección de pago con Nequi */}
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-[#E61D73]/20 rounded-lg">
+                    <Smartphone className="w-5 h-5 text-[#E61D73]" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">Pagar con Nequi</h2>
+                    <p className="text-white/60 text-sm">Transferencia rápida y segura</p>
+                  </div>
+                </div>
 
-        {/* Información de pago */}
-        {!yaPagado && (
-          <>
-            <div className="rounded-xl border bg-card p-5 sm:p-6 shadow-sm">
-              <h2 className="text-lg sm:text-xl font-semibold mb-5 sm:mb-6">Realizar Pago con Nequi</h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* QR Code */}
+                  <div className="flex flex-col items-center">
+                    <div className="bg-white p-4 rounded-xl border-2 border-[#E61D73]/30 shadow-lg mb-4">
+                      <img
+                        src={nequiConfig.qrUrl}
+                        alt="QR Code Nequi"
+                        className="w-48 h-48 sm:w-56 sm:h-56 object-contain"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    </div>
+                    <p className="text-white/60 text-sm text-center">
+                      Escanea el código QR con la app de Nequi
+                    </p>
+                  </div>
 
-              {/* Layout: QR a la izquierda, información a la derecha en desktop */}
-              <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-8">
-                {/* QR Code - Lado izquierdo en desktop */}
-                <div className="flex flex-col items-center lg:items-start lg:shrink-0">
-                  <div className="bg-white p-4 rounded-xl border-2 border-primary/20 shadow-sm mb-3">
-                    <img
-                      src={NEQUI_QR_URL}
-                      alt="QR Code Nequi"
-                      className="w-56 h-56 sm:w-64 sm:h-64 lg:w-72 lg:h-72 object-contain"
-                      onError={(e) => {
-                        // Si la imagen no carga, ocultar el contenedor
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = "none";
-                        const container = target.closest("div.flex.flex-col");
-                        if (container) {
-                          (container as HTMLElement).style.display = "none";
-                        }
-                      }}
+                  {/* Datos de transferencia */}
+                  <div className="space-y-4">
+                    <CopyField
+                      label="Número Nequi"
+                      value={nequiConfig.phone}
+                      onCopy={handleCopy}
+                      sublabel={`Nombre: ${nequiConfig.name}`}
                     />
-                  </div>
-                  <p className="text-sm sm:text-base text-muted-foreground text-center lg:text-left max-w-xs">
-                    Escanea el código QR con la app de Nequi
-                  </p>
-                </div>
-
-                {/* Información de transferencia - Lado derecho en desktop */}
-                <div className="flex-1 space-y-4 min-w-0">
-                  <div className="bg-muted/50 rounded-xl p-4 sm:p-5 space-y-4">
-                    <div>
-                      <label className="text-sm sm:text-base font-medium text-muted-foreground block mb-2">
-                        Monto a Pagar
-                      </label>
-                      <div className="flex items-center justify-between bg-background border rounded-lg p-3 sm:p-4">
-                        <span className="text-xl sm:text-2xl font-bold text-primary break-all pr-2">{formatCurrency(monto)}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCopy(monto.toString(), "Monto")}
-                          className="shrink-0 h-9 w-9 touch-manipulation"
-                        >
-                          <Copy className="h-4 w-4 sm:h-5 sm:w-5" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm sm:text-base font-medium text-muted-foreground block mb-2">
-                        Número de Teléfono Nequi
-                      </label>
-                      <div className="flex items-center justify-between bg-background border rounded-lg p-3 sm:p-4 gap-2">
-                        <span className="text-base sm:text-lg font-mono font-semibold break-all">{NEQUI_PHONE}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCopy(NEQUI_PHONE, "Número de Nequi")}
-                          className="shrink-0 h-9 w-9 touch-manipulation"
-                        >
-                          <Copy className="h-4 w-4 sm:h-5 sm:w-5" />
-                        </Button>
-                      </div>
-                      <p className="text-xs sm:text-sm text-muted-foreground mt-2">
-                        Nombre: {NEQUI_NAME}
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className="text-sm sm:text-base font-medium text-muted-foreground block mb-2">
-                        Referencia (Código del Partido)
-                      </label>
-                      <div className="flex items-center justify-between bg-background border rounded-lg p-3 sm:p-4 gap-2">
-                        <span className="text-base sm:text-lg font-mono font-semibold break-all">{referencia}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCopy(referencia, "Referencia")}
-                          className="shrink-0 h-9 w-9 touch-manipulation"
-                        >
-                          <Copy className="h-4 w-4 sm:h-5 sm:w-5" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm sm:text-base font-medium text-muted-foreground block mb-2">
-                        Descripción (Opcional)
-                      </label>
-                      <div className="flex items-center justify-between bg-background border rounded-lg p-3 sm:p-4 gap-2">
-                        <span className="text-sm sm:text-base break-words flex-1">{descripcion}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCopy(descripcion, "Descripción")}
-                          className="shrink-0 h-9 w-9 touch-manipulation"
-                        >
-                          <Copy className="h-4 w-4 sm:h-5 sm:w-5" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Instrucciones */}
-                  <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-xl p-4 sm:p-5">
-                    <h3 className="font-semibold mb-3 text-base sm:text-lg text-blue-900 dark:text-blue-100">
-                      Instrucciones para pagar:
-                    </h3>
-                    <ol className="list-decimal list-inside space-y-2 text-sm sm:text-base text-blue-800 dark:text-blue-200">
-                      <li>Abre la app de Nequi</li>
-                      <li>Ve a "Enviar" o "Transferir"</li>
-                      <li>Ingresa el número: <strong className="font-mono">{NEQUI_PHONE}</strong></li>
-                      <li>Ingresa el monto: <strong>{formatCurrency(monto)}</strong></li>
-                      <li>En la referencia, escribe: <strong className="font-mono">{referencia}</strong></li>
-                      <li>Confirma y realiza la transferencia</li>
-                      <li>Vuelve aquí y marca como "Ya pagué"</li>
-                    </ol>
+                    <CopyField
+                      label="Monto"
+                      value={formatCurrency(monto)}
+                      onCopy={() => handleCopy(monto.toString())}
+                    />
+                    <CopyField label="Referencia" value={referencia} onCopy={handleCopy} mono />
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Botón de confirmación */}
-            <div className="rounded-xl border bg-card p-5 sm:p-6 shadow-sm">
-              <p className="text-sm sm:text-base text-muted-foreground mb-5 sm:mb-6 text-center px-2 max-w-2xl mx-auto">
-                Una vez que hayas realizado la transferencia, marca el pago como enviado para que
-                podamos verificarlo.
-              </p>
-              <div className="max-w-md mx-auto">
+              {/* Instrucciones */}
+              <div className="bg-blue-500/10 backdrop-blur-md rounded-2xl border border-blue-500/20 p-6">
+                <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-blue-400" />
+                  Instrucciones para pagar
+                </h3>
+                <ol className="space-y-3">
+                  {[
+                    "Abre la app de Nequi en tu celular",
+                    'Ve a "Enviar" o "Transferir"',
+                    `Ingresa el número: ${nequiConfig.phone}`,
+                    `Ingresa el monto: ${formatCurrency(monto)}`,
+                    `En la referencia, escribe: ${referencia}`,
+                    "Confirma y realiza la transferencia",
+                    "Toma una captura de pantalla del comprobante",
+                    "Sube la captura y confirma tu pago",
+                  ].map((step, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span className="shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-medium">
+                        {index + 1}
+                      </span>
+                      <span className="text-white/80 text-sm">{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              {/* Subir comprobante */}
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-primary/20 rounded-lg">
+                    <Upload className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Subir Comprobante de Pago</h3>
+                    <p className="text-white/60 text-sm">
+                      Sube una captura de pantalla de la transferencia
+                    </p>
+                  </div>
+                </div>
+
+                {/* Input oculto */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+
+                {/* Área de subida o preview */}
+                {comprobantePreview ? (
+                  <div className="relative">
+                    <div className="relative rounded-xl overflow-hidden border-2 border-primary/30">
+                      <img
+                        src={comprobantePreview}
+                        alt="Comprobante"
+                        className="w-full max-h-80 object-contain bg-black/20"
+                      />
+                      <button
+                        onClick={handleRemoveComprobante}
+                        className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 rounded-full transition-colors"
+                      >
+                        <X className="w-4 h-4 text-white" />
+                      </button>
+                    </div>
+                    <p className="text-center text-white/60 text-sm mt-3">
+                      <CheckCircle className="w-4 h-4 inline-block mr-1 text-green-400" />
+                      Comprobante cargado: {comprobante?.name}
+                    </p>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleUploadClick}
+                    className={cn(
+                      "w-full p-8 border-2 border-dashed rounded-xl transition-all",
+                      "hover:border-primary/50 hover:bg-primary/5",
+                      comprobanteError
+                        ? "border-red-500/50 bg-red-500/5"
+                        : "border-white/20 bg-white/5",
+                    )}
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="p-4 bg-white/10 rounded-full">
+                        <ImageIcon className="w-8 h-8 text-white/60" />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-white font-medium">
+                          Haz clic para seleccionar la captura
+                        </p>
+                        <p className="text-white/50 text-sm mt-1">
+                          JPG, PNG, WebP o GIF (máx. 5MB)
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                )}
+
+                {/* Error del comprobante */}
+                {comprobanteError && (
+                  <p className="text-red-400 text-sm mt-3 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    {comprobanteError}
+                  </p>
+                )}
+              </div>
+
+              {/* Botón de confirmación */}
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6 text-center">
+                <p className="text-white/60 text-sm mb-6 max-w-md mx-auto">
+                  Una vez que hayas subido el comprobante, confirma tu pago para que podamos
+                  verificarlo.
+                </p>
                 <Button
                   onClick={handleMarcarComoPagado}
-                  disabled={isMarkingAsPaid}
-                  className="w-full h-12 sm:h-11 touch-manipulation text-base font-semibold"
+                  disabled={isMarkingAsPaid || !comprobante}
                   size="lg"
+                  className={cn(
+                    "h-14 px-8 text-lg shadow-lg shadow-primary/25",
+                    !comprobante && "opacity-50 cursor-not-allowed",
+                  )}
                 >
                   {isMarkingAsPaid ? (
                     <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Procesando...
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Enviando...
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="mr-2 h-5 w-5" />
-                      Ya Realicé el Pago
+                      <CheckCircle2 className="w-5 h-5 mr-2" />
+                      Confirmar Pago
                     </>
                   )}
                 </Button>
+                {!comprobante && (
+                  <p className="text-amber-400/80 text-xs mt-3">
+                    Debes subir el comprobante para confirmar
+                  </p>
+                )}
               </div>
             </div>
-          </>
-        )}
-
-        {/* Link a Nequi */}
-        <div className="text-center pt-2">
-          <a
-            href="https://www.nequi.com.co"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm sm:text-base text-primary hover:underline touch-manipulation py-2"
-          >
-            Descargar Nequi
-            <ExternalLink className="h-4 w-4" />
-          </a>
+          ) : (
+            <PaymentCompletedView estadoPago={estadoPago} />
+          )}
         </div>
       </div>
-    </PageLayout>
+
+      {/* Link a Nequi */}
+      <div className="text-center mt-8">
+        <a
+          href="https://www.nequi.com.co"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+        >
+          ¿No tienes Nequi? Descárgalo aquí
+          <ExternalLink className="w-4 h-4" />
+        </a>
+      </div>
+    </PageContainer>
   );
 }
 
+// =============================================================================
+// Componentes auxiliares
+// =============================================================================
+
+function PageContainer({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen relative">
+      {/* Fondo */}
+      <div className="fixed inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-background" />
+      <div className="fixed top-0 right-0 h-96 w-96 bg-primary/20 rounded-full blur-[128px] pointer-events-none" />
+      <div className="fixed bottom-0 left-0 h-64 w-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+
+      {/* Logo de fondo */}
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+        <img src={logoImage} alt="" className="w-[400px] h-[400px] object-contain opacity-[0.02]" />
+      </div>
+
+      {/* Contenido */}
+      <main className="relative z-10 max-w-6xl mx-auto px-4 py-8">{children}</main>
+    </div>
+  );
+}
+
+interface InfoCardProps {
+  icon: React.ElementType;
+  title: string;
+  children: React.ReactNode;
+}
+
+function InfoCard({ icon: Icon, title, children }: InfoCardProps) {
+  return (
+    <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="p-2 bg-primary/20 rounded-lg">
+          <Icon className="w-5 h-5 text-primary" />
+        </div>
+        <h2 className="font-semibold text-white">{title}</h2>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+interface InfoRowProps {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+}
+
+function InfoRow({ icon: Icon, label, value }: InfoRowProps) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-white/60 text-sm flex items-center gap-2">
+        <Icon className="w-4 h-4" />
+        {label}
+      </span>
+      <span className="text-white font-medium text-sm">{value}</span>
+    </div>
+  );
+}
+
+interface CopyFieldProps {
+  label: string;
+  value: string;
+  onCopy: (value: string) => void;
+  sublabel?: string;
+  mono?: boolean;
+}
+
+function CopyField({ label, value, onCopy, sublabel, mono }: CopyFieldProps) {
+  return (
+    <div className="space-y-1">
+      <label className="text-white/60 text-sm">{label}</label>
+      <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg p-3">
+        <span className={cn("flex-1 text-white font-medium", mono && "font-mono")}>{value}</span>
+        <button
+          onClick={() => onCopy(typeof value === "string" ? value : String(value))}
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+        >
+          <Copy className="w-4 h-4 text-white/60" />
+        </button>
+      </div>
+      {sublabel && <p className="text-white/40 text-xs">{sublabel}</p>}
+    </div>
+  );
+}
+
+interface PaymentStatusCardProps {
+  estadoPago: string;
+  notasPago?: string;
+}
+
+function PaymentStatusCard({ estadoPago, notasPago }: PaymentStatusCardProps) {
+  const isAprobado = estadoPago === "aprobado";
+  const isEnRevision = estadoPago === "en_revision";
+
+  return (
+    <div
+      className={cn(
+        "backdrop-blur-md rounded-2xl border p-6",
+        isAprobado && "bg-green-500/10 border-green-500/20",
+        isEnRevision && "bg-amber-500/10 border-amber-500/20",
+        !isAprobado && !isEnRevision && "bg-red-500/10 border-red-500/20",
+      )}
+    >
+      <div className="flex items-start gap-4">
+        {isAprobado ? (
+          <CheckCircle className="w-8 h-8 text-green-400 shrink-0" />
+        ) : isEnRevision ? (
+          <Loader2 className="w-8 h-8 text-amber-400 animate-spin shrink-0" />
+        ) : (
+          <XCircle className="w-8 h-8 text-red-400 shrink-0" />
+        )}
+        <div>
+          <p className="font-semibold text-white mb-1">
+            {isAprobado ? "Pago Aprobado" : isEnRevision ? "Pago en Revisión" : "Pago Rechazado"}
+          </p>
+          <p className="text-white/70 text-sm">
+            {isAprobado
+              ? "Tu pago ha sido verificado y aprobado."
+              : isEnRevision
+                ? "Tu pago está siendo revisado por el administrador."
+                : notasPago || "El pago fue rechazado. Por favor, verifica la información."}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface PaymentCompletedViewProps {
+  estadoPago: string;
+}
+
+function PaymentCompletedView({ estadoPago }: PaymentCompletedViewProps) {
+  const isAprobado = estadoPago === "aprobado";
+  const isEnRevision = estadoPago === "en_revision";
+
+  return (
+    <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center">
+      <div
+        className={cn(
+          "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6",
+          isAprobado && "bg-green-500/20",
+          isEnRevision && "bg-amber-500/20",
+          !isAprobado && !isEnRevision && "bg-red-500/20",
+        )}
+      >
+        {isAprobado ? (
+          <CheckCircle className="w-10 h-10 text-green-400" />
+        ) : isEnRevision ? (
+          <Loader2 className="w-10 h-10 text-amber-400 animate-spin" />
+        ) : (
+          <XCircle className="w-10 h-10 text-red-400" />
+        )}
+      </div>
+      <h2 className="text-2xl font-bold text-white mb-3">
+        {isAprobado ? "¡Pago Confirmado!" : isEnRevision ? "Pago en Revisión" : "Pago Rechazado"}
+      </h2>
+      <p className="text-white/70 max-w-md mx-auto mb-8">
+        {isAprobado
+          ? "Tu pago ha sido verificado exitosamente. El árbitro ha sido notificado y tu partido está confirmado."
+          : isEnRevision
+            ? "Tu pago está siendo revisado por nuestro equipo. Te notificaremos cuando sea aprobado."
+            : "Hubo un problema con tu pago. Por favor, contacta a soporte o intenta nuevamente."}
+      </p>
+      <Link to={ROUTES.CLIENTE_DASHBOARD}>
+        <Button size="lg" className="px-8">
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Volver al Dashboard
+        </Button>
+      </Link>
+    </div>
+  );
+}

@@ -2,11 +2,11 @@
  * Hook para manejar localStorage de forma reactiva
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from "react";
 
 export function useLocalStorage<T>(
   key: string,
-  initialValue: T
+  initialValue: T,
 ): [T, (value: T | ((val: T) => T)) => void] {
   // Estado para almacenar el valor
   const [storedValue, setStoredValue] = useState<T>(() => {
@@ -19,22 +19,24 @@ export function useLocalStorage<T>(
     }
   });
 
-  // Función para actualizar el valor
-  const setValue = (value: T | ((val: T) => T)) => {
-    try {
-      // Permite que value sea una función para actualizar basado en el valor anterior
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value;
-      
-      setStoredValue(valueToStore);
-      
-      // Guardar en localStorage
-      window.localStorage.setItem(key, JSON.stringify(valueToStore));
-    } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error);
-    }
-  };
+  // Función para actualizar el valor - memoizada para evitar re-renders
+  const setValue = useCallback(
+    (value: T | ((val: T) => T)) => {
+      try {
+        setStoredValue((currentValue) => {
+          const valueToStore = value instanceof Function ? value(currentValue) : value;
+
+          // Guardar en localStorage
+          window.localStorage.setItem(key, JSON.stringify(valueToStore));
+
+          return valueToStore;
+        });
+      } catch (error) {
+        console.error(`Error setting localStorage key "${key}":`, error);
+      }
+    },
+    [key],
+  );
 
   return [storedValue, setValue];
 }
-

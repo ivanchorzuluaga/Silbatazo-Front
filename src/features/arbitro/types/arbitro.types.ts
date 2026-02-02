@@ -86,6 +86,11 @@ export interface Arbitro {
   verificado_por_username?: string;
   created_at: string;
   updated_at: string;
+  // Propiedades opcionales del marketplace
+  calificacion_promedio?: number;
+  total_calificaciones?: number;
+  total_partidos?: number;
+  foto_perfil?: string;
 }
 
 export interface ArbitroCreateData {
@@ -93,7 +98,7 @@ export interface ArbitroCreateData {
   fecha_nacimiento?: string;
   documento_identidad?: string;
   biografia?: string;
-  tarifa: number;
+  tarifa?: number; // Opcional - ahora la tarifa viene de la categoría
   experiencia_anos: number;
   municipios_ids: number[];
   categorias_ids: number[];

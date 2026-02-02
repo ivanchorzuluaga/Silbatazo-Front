@@ -4,7 +4,6 @@
  */
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -27,7 +26,6 @@ const ESTADOS_PARTIDO: { value: EstadoPartido | ""; label: string }[] = [
 ];
 
 export function GestionPartidosPage() {
-  const navigate = useNavigate();
   const { municipios } = useMunicipios();
   const { categorias } = useCategorias();
 
@@ -50,7 +48,7 @@ export function GestionPartidosPage() {
   if (clienteId) filtros.cliente_id = parseInt(clienteId);
   if (arbitroId) filtros.arbitro_id = parseInt(arbitroId);
 
-  const { partidos, isLoading, error, refetch } = usePartidos(filtros);
+  const { partidos, isLoading, error } = usePartidos(filtros);
 
   const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setEstado(e.target.value as EstadoPartido | "");
@@ -69,12 +67,9 @@ export function GestionPartidosPage() {
 
   return (
     <PageLayout
-      backButton={
-        <Button variant="ghost" onClick={() => navigate(ROUTES.ADMIN_DASHBOARD)}>
-          ← Volver al Dashboard
-        </Button>
-      }
+      backButton={{ label: "Dashboard", to: ROUTES.ADMIN_DASHBOARD }}
       title="Gestión de Partidos"
+      contentClassName="container mx-auto px-4 py-6 max-w-7xl"
     >
       <div className="space-y-6">
         {/* Filtros */}

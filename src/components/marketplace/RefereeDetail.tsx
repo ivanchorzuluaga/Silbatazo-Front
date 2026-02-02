@@ -29,18 +29,15 @@ export function RefereeDetail({ arbitro }: RefereeDetailProps) {
   
   // Calcular precio promedio de las categorías
   const precioPromedio = arbitro.categorias.length > 0 && arbitro.categorias[0].tarifa
-    ? arbitro.categorias[0].tarifa
+    ? parseFloat(String(arbitro.categorias[0].tarifa))
     : 0;
 
   // Certificaciones (simuladas basadas en categorías)
   const certificaciones = arbitro.categorias.map(c => c.nombre);
 
-  // Disponibilidad (simulada)
+  // Disponibilidad
   const disponibilidad = arbitro.disponibilidades && arbitro.disponibilidades.length > 0
-    ? arbitro.disponibilidades.map(d => {
-        const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-        return dias[d.dia_semana];
-      })
+    ? arbitro.disponibilidades.map(d => d.dia_semana_display)
     : ["Consultar disponibilidad"];
 
   return (

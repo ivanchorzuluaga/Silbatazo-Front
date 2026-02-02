@@ -6,6 +6,8 @@ import { createBrowserRouter } from "react-router-dom";
 import { HomePage } from "@/features/auth/pages/HomePage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { ClienteDashboardPage } from "@/features/cliente/pages/ClienteDashboardPage";
+import { ClienteArbitrosPage } from "@/features/cliente/pages/ClienteArbitrosPage";
+import { ClienteArbitroDetailPage } from "@/features/cliente/pages/ClienteArbitroDetailPage";
 import { ArbitroDashboardPage } from "@/features/arbitro/pages/ArbitroDashboardPage";
 import { AdminDashboardPage } from "@/features/admin/pages/AdminDashboardPage";
 import { PerfilArbitroPage } from "@/features/arbitro/pages/PerfilArbitroPage";
@@ -24,10 +26,10 @@ import { PartidoCreatePage } from "@/features/partidos/pages/PartidoCreatePage";
 import { PartidoDetailPage } from "@/features/partidos/pages/PartidoDetailPage";
 import { PagoPartidoPage } from "@/features/partidos/pages/PagoPartidoPage";
 import { BilleteraPage } from "@/features/arbitro/pages/BilleteraPage";
-import { 
-  TerminosCondicionesPage, 
-  PoliticaPrivacidadPage, 
-  PoliticaReembolsoPage 
+import {
+  TerminosCondicionesPage,
+  PoliticaPrivacidadPage,
+  PoliticaReembolsoPage,
 } from "@/features/legal";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { DashboardRedirect } from "./DashboardRedirect";
@@ -82,6 +84,24 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute allowedRoles={[USER_ROLES.CLIENTE]}>
         <ClienteDashboardPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Árbitros para clientes (con sidebar)
+  {
+    path: ROUTES.CLIENTE_ARBITROS,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.CLIENTE]}>
+        <ClienteArbitrosPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Detalle de árbitro para clientes (con sidebar)
+  {
+    path: ROUTES.CLIENTE_ARBITRO_DETALLE,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.CLIENTE]}>
+        <ClienteArbitroDetailPage />
       </ProtectedRoute>
     ),
   },
@@ -171,6 +191,15 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
         <AsignacionPartidosPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Pagos pendientes (admin)
+  {
+    path: ROUTES.ADMIN_PAGOS_PENDIENTES,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+        <PagosPendientesPage />
       </ProtectedRoute>
     ),
   },

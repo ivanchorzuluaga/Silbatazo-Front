@@ -17,7 +17,6 @@ export function RetirosPage() {
     error,
     listarRetiros,
     procesarRetiro,
-    clearError,
   } = useRetiros();
   const [filtroEstado, setFiltroEstado] = useState<"pendiente" | "procesado" | "rechazado" | "todos">("pendiente");
 

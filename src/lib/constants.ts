@@ -17,6 +17,8 @@ export const ROUTES = {
   DASHBOARD: "/dashboard",
   // Rutas específicas por rol
   CLIENTE_DASHBOARD: "/cliente/dashboard",
+  CLIENTE_ARBITROS: "/cliente/arbitros",
+  CLIENTE_ARBITRO_DETALLE: "/cliente/arbitros/:id",
   ARBITRO_DASHBOARD: "/arbitro/dashboard",
   ARBITRO_PERFIL: "/arbitro/perfil",
   ARBITRO_BILLETERA: "/arbitro/billetera",
@@ -29,7 +31,7 @@ export const ROUTES = {
   ADMIN_CATEGORIAS: "/admin/categorias",
   ADMIN_ASIGNACION_PARTIDOS: "/admin/partidos/asignacion",
   ADMIN_PAGOS_PENDIENTES: "/admin/pagos/pendientes",
-  // Marketplace
+  // Marketplace (público)
   ARBITROS: "/arbitros",
   ARBITRO_DETALLE: "/arbitros/:id",
   // Partidos
@@ -45,10 +47,17 @@ export const ROUTES = {
 } as const;
 
 /**
- * Construye la ruta de detalle de árbitro con un ID
+ * Construye la ruta de detalle de árbitro con un ID (público)
  */
 export function getArbitroDetailRoute(id: number | string): string {
   return `/arbitros/${id}`;
+}
+
+/**
+ * Construye la ruta de detalle de árbitro para clientes (con sidebar)
+ */
+export function getClienteArbitroDetailRoute(id: number | string): string {
+  return `/cliente/arbitros/${id}`;
 }
 
 /**

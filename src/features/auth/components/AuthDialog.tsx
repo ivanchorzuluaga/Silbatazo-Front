@@ -3,7 +3,7 @@
  * Permite seleccionar tipo de usuario y autenticarse
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   SlidePanel,
@@ -15,7 +15,6 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormField } from "@/components/forms";
 import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLogin } from "../hooks/useLogin";

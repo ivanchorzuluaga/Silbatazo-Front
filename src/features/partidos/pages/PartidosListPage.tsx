@@ -10,11 +10,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PageLayout } from "@/components/layout";
 import { usePartidos } from "../hooks/usePartidos";
 import { PartidoCard } from "../components/PartidoCard";
-import { Skeleton, PartidoCardSkeleton } from "@/components/ui/skeleton";
+import { PartidoCardSkeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
 import type { EstadoPartido, PartidosListParams } from "../types/partido.types";
-import { Calendar, Filter, Plus, Search } from "lucide-react";
+import { Calendar, Filter, Plus, Search, CheckCircle, Shield, Star } from "lucide-react";
 
 export function PartidosListPage() {
   const navigate = useNavigate();

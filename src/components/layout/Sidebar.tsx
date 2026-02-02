@@ -18,11 +18,9 @@ import {
   Users,
   FileText,
   CreditCard,
-  Settings,
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Avatar } from "@/components/ui/avatar";
 
 interface NavItem {
   label: string;
@@ -54,7 +52,7 @@ const navSections: { title?: string; items: NavItem[] }[] = [
       {
         label: "Árbitros",
         icon: Search,
-        route: ROUTES.ARBITROS,
+        route: ROUTES.CLIENTE_ARBITROS,
         roles: [USER_ROLES.CLIENTE],
       },
     ],
@@ -141,24 +139,18 @@ export function Sidebar({ className }: SidebarProps) {
     <aside
       className={cn(
         "hidden sm:flex sm:flex-col sm:fixed sm:left-0 sm:top-0 sm:h-screen sm:w-64 sm:border-r sm:bg-card/50 sm:backdrop-blur-sm sm:z-40",
-        className
+        className,
       )}
     >
       {/* Header con Logo */}
       <div className="flex h-20 items-center gap-3 border-b px-6 flex-shrink-0">
-        <Link 
-          to={ROUTES.HOME} 
+        <Link
+          to={ROUTES.HOME}
           className="flex items-center gap-3 flex-1 min-w-0 hover:opacity-80 transition-opacity cursor-pointer"
         >
-          <img
-            src={logoImage}
-            alt="Silbatazo Logo"
-            className="h-10 w-auto object-contain"
-          />
+          <img src={logoImage} alt="Silbatazo Logo" className="h-10 w-auto object-contain" />
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-muted-foreground truncate">
-              {APP_NAME}
-            </p>
+            <p className="text-xs font-semibold text-muted-foreground truncate">{APP_NAME}</p>
             <p className="text-sm font-bold truncate">{user.username}</p>
           </div>
         </Link>
@@ -173,7 +165,7 @@ export function Sidebar({ className }: SidebarProps) {
               // Si no tiene roles, es el dashboard genérico
               return true;
             }
-            return item.roles.includes(user.role);
+            return user.role ? item.roles.includes(user.role) : false;
           });
 
           if (visibleItems.length === 0) {
@@ -193,8 +185,7 @@ export function Sidebar({ className }: SidebarProps) {
                   const route = item.route || dashboardRoute;
                   const isActive =
                     location.pathname === route ||
-                    (route !== ROUTES.HOME &&
-                      location.pathname.startsWith(route));
+                    (route !== ROUTES.HOME && location.pathname.startsWith(route));
 
                   return (
                     <li key={item.route || "dashboard"}>
@@ -204,7 +195,7 @@ export function Sidebar({ className }: SidebarProps) {
                           "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-ios",
                           "hover:bg-accent hover:text-accent-foreground",
                           isActive &&
-                            "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
+                            "bg-primary/10 text-primary font-semibold hover:bg-primary/15",
                         )}
                       >
                         <Icon className="size-4 shrink-0" />
@@ -226,11 +217,7 @@ export function Sidebar({ className }: SidebarProps) {
 
       {/* Footer */}
       <div className="border-t p-4 flex-shrink-0">
-        <Button
-          variant="ghost"
-          className="w-full justify-start"
-          onClick={handleLogout}
-        >
+        <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
           <LogOut className="mr-2 size-4" />
           Cerrar Sesión
         </Button>
@@ -238,4 +225,3 @@ export function Sidebar({ className }: SidebarProps) {
     </aside>
   );
 }
-

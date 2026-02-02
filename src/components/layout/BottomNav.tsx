@@ -15,8 +15,6 @@ import {
   User,
   Wallet,
   Shield,
-  Users,
-  Settings,
 } from "lucide-react";
 
 interface NavItem {
@@ -75,7 +73,7 @@ export function BottomNav() {
   // Filtrar items según el rol del usuario
   const visibleItems = navItems.filter((item) => {
     if (!item.roles) return true;
-    return item.roles.includes(user.role);
+    return user.role ? item.roles.includes(user.role) : false;
   });
 
   // Si solo hay un item o menos, no mostrar la navegación
@@ -84,7 +82,7 @@ export function BottomNav() {
   }
 
   // Obtener la ruta del dashboard del usuario
-  const dashboardRoute = getDashboardRoute(user.role);
+  const dashboardRoute = getDashboardRoute(user.role || "cliente");
 
   // Agregar el dashboard como primer item si no está en la lista
   const allItems = [

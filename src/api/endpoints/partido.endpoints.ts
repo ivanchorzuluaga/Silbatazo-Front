@@ -65,7 +65,7 @@ export const partidoEndpoints = {
   async actualizarPartido(
     token: string,
     id: number,
-    data: PartidoUpdateData
+    data: PartidoUpdateData,
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/actualizar/`, token, {
       method: "PATCH",
@@ -79,7 +79,7 @@ export const partidoEndpoints = {
   async aceptarPartido(
     token: string,
     id: number,
-    data?: PartidoAceptarData
+    data?: PartidoAceptarData,
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/aceptar/`, token, {
       method: "PATCH",
@@ -93,7 +93,7 @@ export const partidoEndpoints = {
   async rechazarPartido(
     token: string,
     id: number,
-    data: PartidoRechazarData
+    data: PartidoRechazarData,
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/rechazar/`, token, {
       method: "PATCH",
@@ -107,7 +107,7 @@ export const partidoEndpoints = {
   async cancelarPartido(
     token: string,
     id: number,
-    data: PartidoCancelarData
+    data: PartidoCancelarData,
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/cancelar/`, token, {
       method: "PATCH",
@@ -121,7 +121,7 @@ export const partidoEndpoints = {
   async completarPartido(
     token: string,
     id: number,
-    data?: PartidoCompletarData
+    data?: PartidoCompletarData,
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/completar/`, token, {
       method: "PATCH",
@@ -151,7 +151,7 @@ export const partidoEndpoints = {
   async postularseAPartido(
     token: string,
     id: number,
-    data?: PostulacionCreateData
+    data?: PostulacionCreateData,
   ): Promise<PostulacionArbitro> {
     return authenticatedApiClient<PostulacionArbitro>(`/api/partidos/${id}/postular/`, token, {
       method: "POST",
@@ -165,7 +165,7 @@ export const partidoEndpoints = {
   async obtenerPostulaciones(token: string, id: number): Promise<PostulacionArbitro[]> {
     return authenticatedApiClient<PostulacionArbitro[]>(
       `/api/partidos/${id}/postulaciones/`,
-      token
+      token,
     );
   },
 
@@ -175,7 +175,7 @@ export const partidoEndpoints = {
   async asignarArbitro(
     token: string,
     id: number,
-    data: PartidoAsignarData
+    data: PartidoAsignarData,
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/asignar/`, token, {
       method: "PATCH",
@@ -196,7 +196,7 @@ export const partidoEndpoints = {
   async listarArbitrosDisponibles(token: string, partidoId: number): Promise<Arbitro[]> {
     return authenticatedApiClient<Arbitro[]>(
       `/api/partidos/${partidoId}/arbitros-disponibles/`,
-      token
+      token,
     );
   },
 
@@ -210,7 +210,7 @@ export const partidoEndpoints = {
   async listarCalificacionesPartido(token: string, partidoId: number): Promise<Calificacion[]> {
     return authenticatedApiClient<Calificacion[]>(
       `/api/partidos/${partidoId}/calificaciones/`,
-      token
+      token,
     );
   },
 
@@ -220,7 +220,7 @@ export const partidoEndpoints = {
   async crearCalificacion(
     token: string,
     partidoId: number,
-    data: CalificacionCreateData
+    data: CalificacionCreateData,
   ): Promise<Calificacion> {
     return authenticatedApiClient<Calificacion>(`/api/partidos/${partidoId}/calificar/`, token, {
       method: "POST",
@@ -234,7 +234,7 @@ export const partidoEndpoints = {
   async listarCalificacionesArbitro(token: string, arbitroId: number): Promise<Calificacion[]> {
     return authenticatedApiClient<Calificacion[]>(
       `/api/partidos/arbitros/${arbitroId}/calificaciones/`,
-      token
+      token,
     );
   },
 
@@ -244,7 +244,7 @@ export const partidoEndpoints = {
   async obtenerPromedioArbitro(token: string, arbitroId: number): Promise<PromedioArbitro> {
     return authenticatedApiClient<PromedioArbitro>(
       `/api/partidos/arbitros/${arbitroId}/promedio/`,
-      token
+      token,
     );
   },
 
@@ -254,12 +254,30 @@ export const partidoEndpoints = {
 
   /**
    * Marcar un partido como pagado (solo cliente)
+   * Opcionalmente acepta un comprobante de pago (imagen)
    */
-  async marcarPartidoPagado(token: string, id: number): Promise<PartidoDetail> {
-    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/marcar-pagado/`, token, {
+  async marcarPartidoPagado(token: string, id: number, comprobante?: File): Promise<PartidoDetail> {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+    const formData = new FormData();
+    if (comprobante) {
+      formData.append("comprobante_pago", comprobante);
+    }
+
+    const response = await fetch(`${API_URL}/api/partidos/${id}/marcar-pagado/`, {
       method: "PATCH",
-      body: JSON.stringify({}),
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
     });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || errorData.detail || "Error al marcar como pagado");
+    }
+
+    return response.json();
   },
 
   /**
@@ -268,7 +286,7 @@ export const partidoEndpoints = {
   async aprobarPago(
     token: string,
     id: number,
-    data?: { notas_pago?: string }
+    data?: { notas_pago?: string },
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/aprobar-pago/`, token, {
       method: "PATCH",

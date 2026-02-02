@@ -5,10 +5,15 @@
 
 import { RouterProvider } from "react-router-dom";
 import { router } from "./router";
+import { AuthProvider } from "./contexts/AuthContext";
 
 function App() {
   try {
-    return <RouterProvider router={router} />;
+    return (
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    );
   } catch (error) {
     console.error("Error al inicializar la aplicación:", error);
     return (

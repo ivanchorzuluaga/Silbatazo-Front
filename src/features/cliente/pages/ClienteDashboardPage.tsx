@@ -1,388 +1,480 @@
 /**
  * Dashboard específico para Clientes
- * Muestra información y funcionalidades relevantes para clientes
+ * Muestra información relevante: estadísticas, próximos partidos, pagos pendientes
  */
 
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton, PartidoCardSkeleton, DashboardStatsSkeleton } from "@/components/ui/skeleton";
-import { PageLayout } from "@/components/layout";
-import { ROUTES } from "@/lib/constants";
-import { usePartidos } from "@/features/partidos/hooks/usePartidos";
-import { Calendar, Search, Plus, TrendingUp, Clock, CheckCircle, Users, MapPin, DollarSign, Activity, ArrowRight, Star, Shield } from "lucide-react";
-import { parseLocalDate, getTodayLocalDate } from "@/lib/utils";
-import { Link } from "react-router-dom";
-import { getPartidoDetailRoute } from "@/lib/constants";
+import { useClienteDashboard } from "../hooks/useClienteDashboard";
+import { Sidebar } from "@/components/layout/Sidebar";
+import logoImage from "@/assets/Silbatazo-bordes.png";
+import {
+  Calendar,
+  Clock,
+  CheckCircle,
+  MapPin,
+  Trophy,
+  ArrowRight,
+  Star,
+  Loader2,
+  CreditCard,
+  AlertCircle,
+  TrendingUp,
+} from "lucide-react";
+import { parseLocalDate, cn } from "@/lib/utils";
 
 export function ClienteDashboardPage() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const { partidos, isLoading } = usePartidos();
+  const {
+    username,
+    isLoading,
+    stats,
+    proximosPartidos,
+    partidosRecientes,
+    partidosPagosPendientes,
+    navigateToPartidos,
+    navigateToPartido,
+    navigateToPago,
+  } = useClienteDashboard();
 
-  // Calcular estadísticas
-  const totalPartidos = partidos.length;
-  const partidosPendientes = partidos.filter((p) => p.estado === "pendiente" || p.estado === "buscando_arbitro").length;
-  const partidosAceptados = partidos.filter((p) => p.estado === "aceptado").length;
-  const partidosCompletados = partidos.filter((p) => p.estado === "completado").length;
-  
-  // Partidos recientes (últimos 3)
-  const partidosRecientes = partidos
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 3);
-
-  // Próximos partidos
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  const proximosPartidos = partidos
-    .filter((p) => {
-      const fechaPartido = new Date(p.fecha);
-      fechaPartido.setHours(0, 0, 0, 0);
-      return fechaPartido >= hoy && (p.estado === "aceptado" || p.estado === "pendiente");
-    })
-    .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
-    .slice(0, 3);
+  // Fecha actual formateada
+  const fechaHoy = new Date().toLocaleDateString("es-CO", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 
   return (
-    <PageLayout
-      title="Dashboard"
-      showNavigation={true}
-      contentClassName="container mx-auto px-4 py-6 sm:py-8 max-w-7xl space-y-8"
-    >
-      {/* Header mejorado */}
-      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-6 border border-primary/10">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <h1 className="text-3xl sm:text-4xl font-bold text-foreground">
-                ¡Hola, <span className="text-primary">{user?.username || "Cliente"}</span>! 👋
-              </h1>
-            </div>
-            <p className="text-muted-foreground text-lg">
-              ¿Listo para organizar tu próximo partido?
-            </p>
-          </div>
-          <div className="hidden sm:block">
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Fecha actual</p>
-              <p className="font-semibold">{getTodayLocalDate()}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Cards de métricas mejoradas */}
-      {isLoading ? (
-        <DashboardStatsSkeleton />
-      ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-blue-600 dark:text-blue-300">Total Partidos</CardTitle>
-                <Activity className="w-5 h-5 text-blue-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-blue-600 dark:text-blue-300">{totalPartidos}</div>
-              <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">En total organizados</p>
-            </CardContent>
-          </Card>
-
-          <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-yellow-50 to-orange-100 dark:from-yellow-950 dark:to-orange-900">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-orange-600 dark:text-orange-300">Pendientes</CardTitle>
-                <Clock className="w-5 h-5 text-orange-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-orange-600 dark:text-orange-300">{partidosPendientes}</div>
-              <p className="text-xs text-orange-500 dark:text-orange-400 mt-1">Esperando árbitro</p>
-            </CardContent>
-          </Card>
-
-          <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-green-600 dark:text-green-300">Confirmados</CardTitle>
-                <CheckCircle className="w-5 h-5 text-green-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-600 dark:text-green-300">{partidosAceptados}</div>
-              <p className="text-xs text-green-500 dark:text-green-400 mt-1">Árbitro asignado</p>
-            </CardContent>
-          </Card>
-
-          <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-purple-600 dark:text-purple-300">Completados</CardTitle>
-                <Star className="w-5 h-5 text-purple-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-purple-600 dark:text-purple-300">{partidosCompletados}</div>
-              <p className="text-xs text-purple-500 dark:text-purple-400 mt-1">Partidos jugados</p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Acciones rápidas mejoradas */}
-      <div className="grid sm:grid-cols-3 gap-6">
-        <Button
-          onClick={() => navigate(ROUTES.PARTIDOS_CREAR)}
-          size="lg"
-          className="h-auto flex-col gap-4 py-8 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 group"
-        >
-          <div className="p-3 bg-white/20 rounded-lg group-hover:scale-110 transition-transform">
-            <Plus className="size-6" />
-          </div>
-          <div className="text-center">
-            <span className="text-base font-semibold">Crear Partido</span>
-            <p className="text-xs opacity-80 mt-1">Nuevo evento</p>
-          </div>
-        </Button>
-
-        <Button
-          onClick={() => navigate(ROUTES.ARBITROS)}
-          size="lg"
-          variant="outline"
-          className="h-auto flex-col gap-4 py-8 border-2 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group"
-        >
-          <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-            <Search className="size-6 text-primary" />
-          </div>
-          <div className="text-center">
-            <span className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">Buscar Árbitros</span>
-            <p className="text-xs text-muted-foreground mt-1">Explorar disponibles</p>
-          </div>
-        </Button>
-
-        <Button
-          onClick={() => navigate(ROUTES.PARTIDOS)}
-          size="lg"
-          variant="outline"
-          className="h-auto flex-col gap-4 py-8 border-2 hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group"
-        >
-          <div className="p-3 bg-secondary/10 rounded-lg group-hover:bg-secondary/20 transition-colors">
-            <Calendar className="size-6 text-secondary" />
-          </div>
-          <div className="text-center">
-            <span className="text-base font-semibold text-foreground group-hover:text-secondary transition-colors">Mis Partidos</span>
-            <p className="text-xs text-muted-foreground mt-1">Ver todos</p>
-          </div>
-        </Button>
-      </div>
-
-      {/* Próximos partidos mejorados */}
-      {isLoading ? (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Clock className="size-5 text-primary" />
-              </div>
+    <div className="flex min-h-screen">
+      <Sidebar />
+      <main className="flex-1 lg:ml-72">
+        <DashboardContainer>
+          {/* Header de bienvenida */}
+          <header className="mb-8">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <Skeleton variant="text" className="h-8 w-40" />
-                <Skeleton variant="text" className="h-4 w-32 mt-1" />
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-white/60 text-sm">En línea</span>
+                </div>
+                <h1 className="text-3xl sm:text-4xl font-bold text-white">
+                  ¡Hola, <span className="text-primary">{username}</span>!
+                </h1>
+              </div>
+              <div className="hidden sm:block text-right">
+                <p className="text-white/40 text-sm">Hoy es</p>
+                <p className="text-white/80 font-medium capitalize">{fechaHoy}</p>
               </div>
             </div>
-            <Skeleton variant="rectangular" className="h-8 w-20" />
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <PartidoCardSkeleton key={index} />
-            ))}
-          </div>
-        </div>
-      ) : proximosPartidos.length > 0 && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Clock className="size-5 text-primary" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">Próximos Partidos</h2>
-                <p className="text-sm text-muted-foreground">Tus partidos confirmados</p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => navigate(ROUTES.PARTIDOS)} className="group">
-              Ver todos
-              <ArrowRight className="ml-2 h-3 w-3 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {proximosPartidos.map((partido) => (
-              <Link key={partido.id} to={getPartidoDetailRoute(partido.id)}>
-                <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-0 overflow-hidden bg-gradient-to-br from-card to-card/80">
-                  {/* Status badge */}
-                  <div className="relative">
-                    <div className="absolute top-3 right-3 z-10">
-                      <Badge 
-                        variant={partido.estado === "aceptado" ? "success" : "warning"}
-                        className="shadow-md"
-                      >
-                        {partido.estado_display}
-                      </Badge>
-                    </div>
-                    
-                    {/* Date display */}
-                    <div className="h-32 bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center">
-                      <div className="text-center">
-                        <p className="text-3xl font-bold text-primary">
-                          {parseLocalDate(partido.fecha).getDate()}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {parseLocalDate(partido.fecha).toLocaleDateString("es-CO", { month: "short" }).toUpperCase()}
-                        </p>
-                      </div>
+          </header>
+
+          {/* Alerta de pagos pendientes - Prioridad alta */}
+          {partidosPagosPendientes.length > 0 && (
+            <section className="mb-8">
+              <div className="p-5 bg-amber-500/10 backdrop-blur-md rounded-2xl border border-amber-500/20">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-amber-500/20 rounded-xl">
+                    <CreditCard className="w-6 h-6 text-amber-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-white text-lg mb-1">Pagos Pendientes</h3>
+                    <p className="text-white/60 text-sm mb-4">
+                      Completa el pago para confirmar la asignación del árbitro
+                    </p>
+                    <div className="space-y-2">
+                      {partidosPagosPendientes.map((partido) => (
+                        <button
+                          key={partido.id}
+                          onClick={() => navigateToPago(partido.id)}
+                          className="w-full flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-colors group"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="text-center">
+                              <p className="text-lg font-bold text-amber-400">
+                                {parseLocalDate(partido.fecha).getDate()}
+                              </p>
+                              <p className="text-xs text-white/50">
+                                {parseLocalDate(partido.fecha)
+                                  .toLocaleDateString("es-CO", { month: "short" })
+                                  .toUpperCase()}
+                              </p>
+                            </div>
+                            <div className="text-left">
+                              <p className="text-white font-medium">Partido #{partido.id}</p>
+                              <p className="text-white/50 text-sm">{partido.lugar}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-amber-400 font-bold">
+                              ${parseFloat(partido.tarifa).toLocaleString("es-CO")}
+                            </span>
+                            <ArrowRight className="w-4 h-4 text-white/40 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   </div>
-                  
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <span className="bg-primary/10 px-2 py-1 rounded text-sm font-mono">#{partido.id}</span>
-                    </CardTitle>
-                    <CardDescription className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      {parseLocalDate(partido.fecha).toLocaleDateString("es-CO", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-medium">{partido.lugar}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Users className="w-4 h-4 text-muted-foreground" />
-                        <span>{partido.categoria?.nombre || "Categoría"}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pt-2 border-t border-border/50">
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4 text-green-500" />
-                        <p className="text-xl font-bold text-green-600">
-                          ${(parseFloat(partido.tarifa) || 0).toLocaleString("es-CO")}
-                        </p>
-                      </div>
-                      <div className="text-xs text-primary font-medium group-hover:text-primary/80 transition-colors">
-                        Ver detalles →
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+                </div>
+              </div>
+            </section>
+          )}
 
-      {/* Partidos recientes */}
-      {partidosRecientes.length > 0 && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <TrendingUp className="size-5" />
-              Partidos Recientes
-            </h2>
-            <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.PARTIDOS)}>
-              Ver todos
-            </Button>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {partidosRecientes.map((partido) => (
-              <Link key={partido.id} to={getPartidoDetailRoute(partido.id)}>
-                <Card variant="elevated" className="hover:shadow-ios-lg transition-ios cursor-pointer h-full">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <CardTitle className="text-lg">Partido #{partido.id}</CardTitle>
-                      <Badge variant="soft">{partido.estado_display}</Badge>
-                    </div>
-                    <CardDescription>
-                      {parseLocalDate(partido.fecha).toLocaleDateString("es-CO")}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{partido.categoria.nombre}</p>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+          {/* Estadísticas */}
+          <section className="mb-8">
+            <h2 className="text-lg font-semibold text-white/80 mb-4">Resumen</h2>
+            {isLoading ? (
+              <StatsLoading />
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard icon={TrendingUp} label="Total" value={stats.total} color="blue" />
+                <StatCard icon={Clock} label="Pendientes" value={stats.pendientes} color="amber" />
+                <StatCard
+                  icon={CheckCircle}
+                  label="Confirmados"
+                  value={stats.aceptados}
+                  color="green"
+                />
+                <StatCard
+                  icon={Star}
+                  label="Completados"
+                  value={stats.completados}
+                  color="purple"
+                />
+              </div>
+            )}
+          </section>
 
-      {/* Empty state mejorado */}
-      {!isLoading && totalPartidos === 0 && (
-        <Card className="text-center py-16 border-0 bg-gradient-to-br from-primary/5 to-secondary/5">
-          <CardContent className="space-y-6">
-            <div className="relative mx-auto w-24 h-24">
-              <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
-              <div className="relative w-full h-full bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-lg">
-                <Calendar className="size-12 text-white" />
+          {/* Próximos partidos */}
+          {isLoading ? (
+            <PartidosLoading title="Próximos Partidos" />
+          ) : proximosPartidos.length > 0 ? (
+            <section className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-500/20 rounded-lg">
+                    <Calendar className="w-5 h-5 text-green-400" />
+                  </div>
+                  <h2 className="text-lg font-semibold text-white">Próximos Partidos</h2>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={navigateToPartidos}
+                  className="text-white/60 hover:text-white hover:bg-white/10"
+                >
+                  Ver todos
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               </div>
-            </div>
-            
-            <div className="space-y-3">
-              <h3 className="text-2xl font-bold text-foreground">¡Es hora del primer partido!</h3>
-              <p className="text-muted-foreground text-lg max-w-md mx-auto">
-                Crea tu primer partido y conecta con árbitros profesionales certificados
-              </p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={() => navigate(ROUTES.PARTIDOS_CREAR)} 
-                size="lg" 
-                className="shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Crear mi primer partido
-              </Button>
-              <Button 
-                onClick={() => navigate(ROUTES.ARBITROS)} 
-                size="lg" 
-                variant="outline"
-                className="border-2 hover:border-primary/50"
-              >
-                <Search className="w-5 h-5 mr-2" />
-                Explorar árbitros
-              </Button>
-            </div>
-            
-            {/* Trust indicators */}
-            <div className="flex items-center justify-center gap-8 pt-6">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Árbitros verificados</span>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                {proximosPartidos.map((partido) => (
+                  <PartidoCard
+                    key={partido.id}
+                    partido={partido}
+                    onClick={() => navigateToPartido(partido.id)}
+                    variant="upcoming"
+                  />
+                ))}
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Shield className="w-4 h-4 text-blue-500" />
-                <span>Pago seguro</span>
+            </section>
+          ) : null}
+
+          {/* Actividad reciente */}
+          {!isLoading && partidosRecientes.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <Clock className="w-5 h-5 text-white/60" />
+                  </div>
+                  <h2 className="text-lg font-semibold text-white">Actividad Reciente</h2>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={navigateToPartidos}
+                  className="text-white/60 hover:text-white hover:bg-white/10"
+                >
+                  Ver historial
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Star className="w-4 h-4 text-yellow-500" />
-                <span>Calificación garantizada</span>
+
+              <div className="space-y-3">
+                {partidosRecientes.slice(0, 5).map((partido) => (
+                  <ActivityItem
+                    key={partido.id}
+                    partido={partido}
+                    onClick={() => navigateToPartido(partido.id)}
+                  />
+                ))}
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </PageLayout>
+            </section>
+          )}
+
+          {/* Empty state - Solo si no hay nada */}
+          {!isLoading && stats.total === 0 && <EmptyState />}
+        </DashboardContainer>
+      </main>
+    </div>
   );
 }
 
+// =============================================================================
+// Componentes auxiliares
+// =============================================================================
+
+function DashboardContainer({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen relative">
+      {/* Fondo */}
+      <div className="fixed inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-background" />
+      <div className="fixed top-0 right-0 h-96 w-96 bg-primary/20 rounded-full blur-[128px] pointer-events-none" />
+      <div className="fixed bottom-0 left-0 h-64 w-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+
+      {/* Logo de fondo */}
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+        <img src={logoImage} alt="" className="w-[500px] h-[500px] object-contain opacity-[0.02]" />
+      </div>
+
+      {/* Contenido */}
+      <div className="relative z-10 max-w-5xl mx-auto px-4 py-8">{children}</div>
+    </div>
+  );
+}
+
+interface StatCardProps {
+  icon: React.ElementType;
+  label: string;
+  value: number;
+  color: "blue" | "amber" | "green" | "purple";
+}
+
+function StatCard({ icon: Icon, label, value, color }: StatCardProps) {
+  const colorClasses = {
+    blue: "border-blue-500/20 text-blue-400",
+    amber: "border-amber-500/20 text-amber-400",
+    green: "border-green-500/20 text-green-400",
+    purple: "border-purple-500/20 text-purple-400",
+  };
+
+  return (
+    <div className={cn("p-4 rounded-xl border bg-white/5 backdrop-blur-md", colorClasses[color])}>
+      <div className="flex items-center justify-between mb-2">
+        <Icon className="w-5 h-5" />
+        <span className="text-2xl font-bold text-white">{value}</span>
+      </div>
+      <p className="text-white/50 text-sm">{label}</p>
+    </div>
+  );
+}
+
+function StatsLoading() {
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {[1, 2, 3, 4].map((i) => (
+        <div
+          key={i}
+          className="p-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md animate-pulse"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="w-5 h-5 bg-white/10 rounded" />
+            <div className="w-8 h-7 bg-white/10 rounded" />
+          </div>
+          <div className="h-4 w-16 bg-white/10 rounded" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+interface PartidoCardProps {
+  partido: {
+    id: number;
+    fecha: string;
+    hora: string;
+    lugar: string;
+    estado: string;
+    estado_display: string;
+    categoria: { nombre: string };
+    tarifa: string;
+    arbitro_info?: { full_name: string } | null;
+  };
+  onClick: () => void;
+  variant?: "upcoming" | "recent";
+}
+
+function PartidoCard({ partido, onClick }: PartidoCardProps) {
+  const fecha = parseLocalDate(partido.fecha);
+  const isAceptado = partido.estado === "aceptado";
+
+  return (
+    <button
+      onClick={onClick}
+      className="w-full p-4 bg-white/5 backdrop-blur-md rounded-xl border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 text-left group"
+    >
+      <div className="flex gap-4">
+        {/* Fecha */}
+        <div className="text-center px-3 py-2 bg-primary/10 rounded-lg">
+          <p className="text-2xl font-bold text-primary">{fecha.getDate()}</p>
+          <p className="text-xs text-white/60">
+            {fecha.toLocaleDateString("es-CO", { month: "short" }).toUpperCase()}
+          </p>
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <code className="text-xs bg-white/10 text-white/70 px-2 py-0.5 rounded">
+              #{partido.id}
+            </code>
+            <Badge
+              className={cn(
+                "text-xs",
+                isAceptado
+                  ? "bg-green-500/20 text-green-400 border-green-500/30"
+                  : "bg-amber-500/20 text-amber-400 border-amber-500/30",
+              )}
+            >
+              {partido.estado_display}
+            </Badge>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm mb-1">
+            <MapPin className="w-3 h-3 text-white/40 shrink-0" />
+            <span className="text-white truncate">{partido.lugar}</span>
+          </div>
+
+          <div className="flex items-center gap-4 text-sm text-white/50">
+            <span className="flex items-center gap-1">
+              <Trophy className="w-3 h-3" />
+              {partido.categoria.nombre}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {partido.hora.substring(0, 5)}
+            </span>
+          </div>
+        </div>
+
+        {/* Precio */}
+        <div className="text-right">
+          <p className="text-lg font-bold text-primary">
+            ${parseFloat(partido.tarifa).toLocaleString("es-CO")}
+          </p>
+          <p className="text-xs text-white/40 group-hover:text-primary transition-colors">
+            Ver más →
+          </p>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+interface ActivityItemProps {
+  partido: {
+    id: number;
+    fecha: string;
+    estado: string;
+    estado_display: string;
+    lugar: string;
+    created_at: string;
+  };
+  onClick: () => void;
+}
+
+function ActivityItem({ partido, onClick }: ActivityItemProps) {
+  const fecha = parseLocalDate(partido.fecha);
+  const createdAt = new Date(partido.created_at);
+
+  const getStatusColor = (estado: string) => {
+    switch (estado) {
+      case "aceptado":
+        return "text-green-400";
+      case "completado":
+        return "text-purple-400";
+      case "pendiente":
+      case "buscando_arbitro":
+        return "text-amber-400";
+      case "cancelado":
+      case "rechazado":
+        return "text-red-400";
+      default:
+        return "text-white/60";
+    }
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-4 p-3 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-colors group"
+    >
+      <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+        <Calendar className="w-5 h-5 text-white/60" />
+      </div>
+
+      <div className="flex-1 min-w-0 text-left">
+        <p className="text-white font-medium truncate">
+          Partido #{partido.id} - {partido.lugar}
+        </p>
+        <p className="text-white/50 text-sm">
+          {fecha.toLocaleDateString("es-CO", {
+            day: "numeric",
+            month: "short",
+          })}
+        </p>
+      </div>
+
+      <div className="text-right shrink-0">
+        <p className={cn("text-sm font-medium", getStatusColor(partido.estado))}>
+          {partido.estado_display}
+        </p>
+        <p className="text-white/40 text-xs">
+          {createdAt.toLocaleDateString("es-CO", { day: "numeric", month: "short" })}
+        </p>
+      </div>
+
+      <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors shrink-0" />
+    </button>
+  );
+}
+
+function PartidosLoading({ title }: { title: string }) {
+  return (
+    <section className="mb-8">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="p-2 bg-white/10 rounded-lg w-9 h-9 animate-pulse" />
+        <div className="h-6 w-40 bg-white/10 rounded animate-pulse" />
+      </div>
+      <div className="grid sm:grid-cols-2 gap-4">
+        {[1, 2].map((i) => (
+          <div key={i} className="p-4 bg-white/5 rounded-xl border border-white/10 animate-pulse">
+            <div className="flex gap-4">
+              <div className="w-16 h-16 bg-white/10 rounded-lg" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 w-20 bg-white/10 rounded" />
+                <div className="h-4 w-full bg-white/10 rounded" />
+                <div className="h-4 w-32 bg-white/10 rounded" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-12 text-center">
+      <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+        <Calendar className="w-10 h-10 text-primary" />
+      </div>
+
+      <h3 className="text-xl font-bold text-white mb-2">Sin actividad aún</h3>
+      <p className="text-white/60 max-w-sm mx-auto">
+        Cuando crees partidos, aquí verás un resumen de tu actividad y próximos eventos.
+      </p>
+    </div>
+  );
+}

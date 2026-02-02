@@ -258,14 +258,14 @@ export function TerminosCondicionesPage() {
       {/* Header */}
       <header className="relative z-50 sticky top-0 bg-gray-950/80 backdrop-blur-md border-b border-white/10">
         <div className="max-w-5xl mx-auto px-4 py-4">
-          <Link to={ROUTES.HOME}>
+          <Link to="/#contacto">
             <Button
               variant="ghost"
               size="sm"
               className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 hover:text-white"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver al inicio
+              Volver
             </Button>
           </Link>
         </div>

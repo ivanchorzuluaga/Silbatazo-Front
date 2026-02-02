@@ -13,23 +13,7 @@ interface PartidoCardProps {
   partido: Partido;
 }
 
-const estadoColors: Record<string, string> = {
-  pendiente: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20",
-  aceptado: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
-  rechazado: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
-  completado: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
-  cancelado: "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20",
-};
-
-const estadoPagoColors: Record<string, string> = {
-  pendiente: "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20",
-  en_revision: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20",
-  aprobado: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
-  rechazado: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
-};
-
 export function PartidoCard({ partido }: PartidoCardProps) {
-  const estadoColor = estadoColors[partido.estado] || estadoColors.pendiente;
 
   return (
     <Link
