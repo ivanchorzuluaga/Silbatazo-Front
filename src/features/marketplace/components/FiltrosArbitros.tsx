@@ -148,10 +148,10 @@ export function FiltrosArbitros({
   };
 
   const selectBaseClass = cn(
-    "w-full h-12 rounded-xl border-2 border-white/10 bg-white/5 pl-11 pr-4 text-sm",
+    "w-full h-12 rounded-xl border-2 border-border bg-input pl-11 pr-4 text-sm text-foreground",
     "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
     "disabled:opacity-50 disabled:cursor-not-allowed",
-    "appearance-none cursor-pointer",
+    "appearance-none cursor-pointer"
   );
 
   return (
@@ -190,11 +190,11 @@ export function FiltrosArbitros({
           placeholder="Buscar árbitro por nombre..."
           disabled={isLoading}
           className={cn(
-            "w-full h-14 rounded-xl border-2 border-white/10 bg-white/5 pl-12 pr-4 text-base",
+            "w-full h-14 rounded-xl border-2 border-border bg-input pl-12 pr-4 text-base text-foreground",
             "placeholder:text-muted-foreground/50",
             "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
             "disabled:opacity-50 disabled:cursor-not-allowed",
-            "transition-all duration-200",
+            "transition-all duration-200"
           )}
         />
       </div>
@@ -298,12 +298,12 @@ export function FiltrosArbitros({
               onClick={() => (showCalendar ? closeCalendar() : openCalendar())}
               disabled={isLoading}
               className={cn(
-                "w-full h-12 rounded-xl border-2 border-white/10 bg-white/5 pl-11 pr-4 text-sm text-left",
+                "w-full h-12 rounded-xl border-2 border-border bg-input pl-11 pr-4 text-sm text-left text-foreground",
                 "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
                 "disabled:opacity-50 disabled:cursor-not-allowed",
                 "transition-all duration-200",
                 showCalendar && "ring-2 ring-primary/50 border-primary",
-                !filtros.fecha && "text-muted-foreground/50",
+                !filtros.fecha && "text-muted-foreground"
               )}
             >
               {filtros.fecha ? formatDateDisplay(filtros.fecha) : "Seleccionar fecha"}
@@ -327,7 +327,7 @@ export function FiltrosArbitros({
                     onClose={closeCalendar}
                   />
                 </div>,
-                document.body,
+                document.body
               )}
           </div>
         </div>

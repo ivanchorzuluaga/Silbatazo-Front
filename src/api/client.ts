@@ -38,12 +38,18 @@ export class ApiException extends Error {
 async function apiClient<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_URL}${endpoint}`;
 
+  const isFormData = options.body instanceof FormData;
+  const headers: Record<string, string> = {
+    ...(options.headers as Record<string, string>),
+  };
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
+  // Con FormData no se debe setear Content-Type; el navegador pone multipart/form-data y boundary
+
   const config: RequestInit = {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
+    headers,
   };
 
   try {

@@ -5,7 +5,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/forms";
-import type { Categoria, CategoriaCreateData, CategoriaUpdateData } from "@/features/arbitro/types/arbitro.types";
+import type {
+  Categoria,
+  CategoriaCreateData,
+  CategoriaUpdateData,
+} from "@/features/arbitro/types/arbitro.types";
 
 interface CategoriaFormProps {
   categoria?: Categoria;
@@ -18,7 +22,6 @@ export function CategoriaForm({ categoria, onSubmit, onCancel, isLoading }: Cate
   const [nombre, setNombre] = useState(categoria?.nombre || "");
   const [descripcion, setDescripcion] = useState(categoria?.descripcion || "");
   const [nivel, setNivel] = useState(categoria?.nivel || "");
-  const [tarifa, setTarifa] = useState(categoria?.tarifa || "0");
   const [activo, setActivo] = useState(categoria?.activo ?? true);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -27,7 +30,6 @@ export function CategoriaForm({ categoria, onSubmit, onCancel, isLoading }: Cate
       setNombre(categoria.nombre);
       setDescripcion(categoria.descripcion || "");
       setNivel(categoria.nivel || "");
-      setTarifa(categoria.tarifa);
       setActivo(categoria.activo);
     }
   }, [categoria]);
@@ -37,11 +39,6 @@ export function CategoriaForm({ categoria, onSubmit, onCancel, isLoading }: Cate
 
     if (!nombre.trim()) {
       errors.nombre = "El nombre es requerido";
-    }
-
-    const tarifaNum = parseFloat(tarifa);
-    if (!tarifa || isNaN(tarifaNum) || tarifaNum < 0) {
-      errors.tarifa = "La tarifa debe ser un número positivo";
     }
 
     setFieldErrors(errors);
@@ -59,7 +56,6 @@ export function CategoriaForm({ categoria, onSubmit, onCancel, isLoading }: Cate
       nombre: nombre.trim(),
       descripcion: descripcion.trim() || undefined,
       nivel: nivel.trim() || undefined,
-      tarifa: parseFloat(tarifa),
       activo,
     };
 
@@ -112,29 +108,6 @@ export function CategoriaForm({ categoria, onSubmit, onCancel, isLoading }: Cate
         disabled={isLoading}
       />
 
-      <FormField
-        label="Tarifa (COP) *"
-        name="tarifa"
-        type="number"
-        value={tarifa}
-        onChange={(e) => {
-          const value = e.target.value;
-          setTarifa(value);
-          if (fieldErrors.tarifa) {
-            setFieldErrors((prev) => {
-              const { tarifa: _, ...rest } = prev;
-              return rest;
-            });
-          }
-        }}
-        error={fieldErrors.tarifa}
-        disabled={isLoading}
-        min="0"
-        step="1000"
-        required
-        helperText="Tarifa fija para partidos de esta categoría"
-      />
-
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -162,4 +135,3 @@ export function CategoriaForm({ categoria, onSubmit, onCancel, isLoading }: Cate
     </form>
   );
 }
-

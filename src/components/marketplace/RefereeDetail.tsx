@@ -10,54 +10,45 @@ interface RefereeDetailProps {
 export function RefereeDetail({ arbitro }: RefereeDetailProps) {
   const rating = arbitro.calificacion_promedio || 0;
   const nombre = arbitro.full_name || arbitro.username;
-  const experiencia = arbitro.experiencia_anos 
-    ? `${arbitro.experiencia_anos} años` 
-    : "Experiencia";
-  const especialidad = arbitro.categorias.length > 0 
-    ? arbitro.categorias.map(c => c.nombre).join(", ") 
-    : "Árbitro";
+  const experiencia = arbitro.experiencia_anos ? `${arbitro.experiencia_anos} años` : "Experiencia";
+  const especialidad =
+    arbitro.categorias.length > 0 ? arbitro.categorias.map((c) => c.nombre).join(", ") : "Árbitro";
   const partidos = arbitro.total_partidos || 0;
-  const imagen = getRefereeImage(
-    arbitro.foto_perfil,
-    arbitro.id,
-    arbitro.experiencia_anos,
-    nombre
-  );
-  const municipio = arbitro.municipios.length > 0 
-    ? arbitro.municipios.map(m => m.nombre).join(", ") 
-    : "Ubicación no especificada";
-  
-  // Calcular precio promedio de las categorías
-  const precioPromedio = arbitro.categorias.length > 0 && arbitro.categorias[0].tarifa
-    ? parseFloat(String(arbitro.categorias[0].tarifa))
-    : 0;
+  const imagen = getRefereeImage(arbitro.foto_perfil, arbitro.id, arbitro.experiencia_anos, nombre);
+  const municipio =
+    arbitro.municipios.length > 0
+      ? arbitro.municipios.map((m) => m.nombre).join(", ")
+      : "Ubicación no especificada";
 
   // Certificaciones (simuladas basadas en categorías)
-  const certificaciones = arbitro.categorias.map(c => c.nombre);
+  const certificaciones = arbitro.categorias.map((c) => c.nombre);
 
   // Disponibilidad
-  const disponibilidad = arbitro.disponibilidades && arbitro.disponibilidades.length > 0
-    ? arbitro.disponibilidades.map(d => d.dia_semana_display)
-    : ["Consultar disponibilidad"];
+  const disponibilidad =
+    arbitro.disponibilidades && arbitro.disponibilidades.length > 0
+      ? arbitro.disponibilidades.map((d) => d.dia_semana_display)
+      : ["Consultar disponibilidad"];
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row gap-6">
         <div className="w-full sm:w-64 aspect-[3/4] bg-secondary rounded-lg overflow-hidden shrink-0 shadow-lg">
-          <img 
-            src={imagen} 
-            alt={nombre} 
-            className="w-full h-full object-cover" 
+          <img
+            src={imagen}
+            alt={nombre}
+            className="w-full h-full object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               // Si falla la imagen asignada, intentar con otra del pool
               const fallbackImages = [
                 "/professional-soccer-referee-in-black-uniform-blowi.jpg",
                 "/male-referee-in-black-uniform-portrait.jpg",
-                "/placeholder.jpg"
+                "/placeholder.jpg",
               ];
-              const currentSrc = target.src.split('/').pop() || '';
-              const nextImage = fallbackImages.find(img => !currentSrc.includes(img.split('/').pop() || '')) || "/placeholder.jpg";
+              const currentSrc = target.src.split("/").pop() || "";
+              const nextImage =
+                fallbackImages.find((img) => !currentSrc.includes(img.split("/").pop() || "")) ||
+                "/placeholder.jpg";
               target.src = nextImage;
             }}
           />
@@ -91,15 +82,6 @@ export function RefereeDetail({ arbitro }: RefereeDetailProps) {
               {partidos} partidos arbitrados
             </div>
           </div>
-
-          {precioPromedio > 0 && (
-            <div className="pt-2">
-              <p className="text-3xl font-bold">
-                ${precioPromedio.toLocaleString()}
-                <span className="text-base font-normal text-muted-foreground">/partido</span>
-              </p>
-            </div>
-          )}
         </div>
       </div>
 

@@ -1,8 +1,9 @@
 /**
  * Formulario para crear un partido
+ * El usuario selecciona un tipo de partido (con precio fijo) según sus necesidades.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FormField } from "@/components/forms";
 import { TimePicker24h } from "@/components/forms/TimePicker24h";
@@ -12,8 +13,11 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { usePartido } from "../hooks/usePartido";
 import { useMunicipios } from "@/features/arbitro/hooks/useMunicipios";
 import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
-import { ROUTES } from "@/lib/constants";
+import { partidoService } from "../services/partido.service";
+import { ROUTES, CATEGORIAS_PARTIDO } from "@/lib/constants";
 import { getTodayLocalDate, compareDates } from "@/lib/utils";
+import { TipoPartidoCardGrid } from "./TipoPartidoCardGrid";
+import type { TipoPartido } from "../types/partido.types";
 
 interface PartidoFormProps {
   onSuccess?: () => void;
@@ -23,20 +27,43 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
   const navigate = useNavigate();
   const { crearPartido, isLoading, error, clearError } = usePartido();
   const { municipios, isLoading: municipiosLoading } = useMunicipios();
-  const { categorias, isLoading: categoriasLoading } = useCategorias();
+  const { categorias } = useCategorias();
+  const categoriasPartido = categorias.filter((c) =>
+    (CATEGORIAS_PARTIDO as readonly string[]).includes(c.nombre)
+  );
 
   // Estados del formulario
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
   const [municipioId, setMunicipioId] = useState("");
-  const [categoriaId, setCategoriaId] = useState("");
   const [lugar, setLugar] = useState("");
   const [direccion, setDireccion] = useState("");
   const [notasCliente, setNotasCliente] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [partidoCreado, setPartidoCreado] = useState<{ id: number; estado: string } | null>(null);
 
+  // Tipo de partido (selector único con precio fijo)
+  const [tiposPartido, setTiposPartido] = useState<TipoPartido[]>([]);
+  const [loadingTipos, setLoadingTipos] = useState(true);
+  const [tipoPartidoId, setTipoPartidoId] = useState("");
+  const [errorTipos, setErrorTipos] = useState<string | null>(null);
+
+  const selectedTipo = tiposPartido.find((t) => t.id === parseInt(tipoPartidoId));
+  const montoTotal = selectedTipo ? selectedTipo.monto : null;
+
   const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
+
+  // Cargar tipos de partido al montar (loadingTipos ya es true por defecto)
+  useEffect(() => {
+    partidoService
+      .listarTiposPartido()
+      .then(setTiposPartido)
+      .catch((err) => {
+        setTiposPartido([]);
+        setErrorTipos(err instanceof Error ? err.message : "Error al cargar tipos de partido");
+      })
+      .finally(() => setLoadingTipos(false));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,8 +75,12 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
     if (!fecha) errors.fecha = "La fecha es requerida";
     if (!hora) errors.hora = "La hora es requerida";
     if (!municipioId) errors.municipio_id = "Debes seleccionar un municipio";
-    if (!categoriaId) errors.categoria_id = "Debes seleccionar una categoría";
+    if (!tipoPartidoId)
+      errors.tipo_partido_id = "Selecciona el tipo de partido que se acomoda a tu partido";
     if (!lugar.trim()) errors.lugar = "El lugar es requerido";
+    const defaultCategoriaId = categoriasPartido[0]?.id;
+    if (!defaultCategoriaId)
+      errors.categoria_id = "No hay categoría disponible. Intenta más tarde.";
 
     // Validar fecha futura (comparar strings YYYY-MM-DD para evitar problemas de zona horaria)
     if (fecha) {
@@ -65,14 +96,17 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
     }
 
     try {
+      const defaultCategoriaId = categoriasPartido[0]?.id;
       const data = {
-        arbitro_id: null, // Siempre crear sin árbitro (buscando árbitro)
+        arbitro_id: null,
         fecha,
-        hora: hora.length === 5 ? hora : hora.substring(0, 5), // Asegurar formato HH:MM
+        hora: hora.length === 5 ? hora : hora.substring(0, 5),
         municipio_id: parseInt(municipioId),
-        categoria_id: parseInt(categoriaId),
+        categoria_id: defaultCategoriaId ?? 0,
         lugar: lugar.trim(),
         direccion: direccion.trim() || undefined,
+        tipo_partido_id: tipoPartidoId ? parseInt(tipoPartidoId) : undefined,
+        monto_total: montoTotal ?? undefined,
         notas_cliente: notasCliente.trim() || undefined,
       };
 
@@ -84,12 +118,12 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
         estado: nuevoPartido.estado,
       });
       setShowSuccess(true);
+      setTipoPartidoId("");
 
       // Limpiar formulario
       setFecha("");
       setHora("");
       setMunicipioId("");
-      setCategoriaId("");
       setLugar("");
       setDireccion("");
       setNotasCliente("");
@@ -197,64 +231,62 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
             </div>
           </div>
 
-          {/* Municipio y Categoría */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <label htmlFor="municipio_id" className="text-sm font-medium">
-                Municipio <span className="text-destructive">*</span>
-              </label>
-              <Select
-                id="municipio_id"
-                value={municipioId}
-                onChange={(e) => {
-                  setMunicipioId(e.target.value);
-                  if (fieldErrors.municipio_id) {
-                    setFieldErrors((prev) => ({ ...prev, municipio_id: undefined }));
-                  }
-                }}
-                disabled={isLoading || municipiosLoading}
-                className={fieldErrors.municipio_id ? "border-destructive" : ""}
-              >
-                <option value="">Selecciona un municipio</option>
-                {municipios.map((municipio) => (
-                  <option key={municipio.id} value={municipio.id}>
-                    {municipio.nombre}
-                    {municipio.departamento && `, ${municipio.departamento}`}
-                  </option>
-                ))}
-              </Select>
-              {fieldErrors.municipio_id && (
-                <p className="text-sm text-destructive">{fieldErrors.municipio_id}</p>
-              )}
-            </div>
+          {/* Municipio */}
+          <div className="space-y-2">
+            <label htmlFor="municipio_id" className="text-sm font-medium">
+              Municipio <span className="text-destructive">*</span>
+            </label>
+            <Select
+              id="municipio_id"
+              value={municipioId}
+              onChange={(e) => {
+                setMunicipioId(e.target.value);
+                if (fieldErrors.municipio_id) {
+                  setFieldErrors((prev) => ({ ...prev, municipio_id: undefined }));
+                }
+              }}
+              disabled={isLoading || municipiosLoading}
+              className={fieldErrors.municipio_id ? "border-destructive" : ""}
+            >
+              <option value="">Selecciona un municipio</option>
+              {municipios.map((municipio) => (
+                <option key={municipio.id} value={municipio.id}>
+                  {municipio.nombre}
+                  {municipio.departamento && `, ${municipio.departamento}`}
+                </option>
+              ))}
+            </Select>
+            {fieldErrors.municipio_id && (
+              <p className="text-sm text-destructive">{fieldErrors.municipio_id}</p>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <label htmlFor="categoria_id" className="text-sm font-medium">
-                Categoría <span className="text-destructive">*</span>
-              </label>
-              <Select
-                id="categoria_id"
-                value={categoriaId}
-                onChange={(e) => {
-                  setCategoriaId(e.target.value);
-                  if (fieldErrors.categoria_id) {
-                    setFieldErrors((prev) => ({ ...prev, categoria_id: undefined }));
-                  }
-                }}
-                disabled={isLoading || categoriasLoading}
-                className={fieldErrors.categoria_id ? "border-destructive" : ""}
-              >
-                <option value="">Selecciona una categoría</option>
-                {categorias.map((categoria) => (
-                  <option key={categoria.id} value={categoria.id}>
-                    {categoria.nombre}
-                  </option>
-                ))}
-              </Select>
-              {fieldErrors.categoria_id && (
-                <p className="text-sm text-destructive">{fieldErrors.categoria_id}</p>
-              )}
-            </div>
+          {/* Tipo de partido: cards seleccionables */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold">¿Qué tipo de partido vas a jugar?</h3>
+            <p className="text-xs text-muted-foreground">
+              Selecciona la opción que se acomoda a tu partido. El precio está incluido.
+            </p>
+            <TipoPartidoCardGrid
+              tipos={tiposPartido}
+              selectedId={tipoPartidoId}
+              onSelect={(id) => {
+                setTipoPartidoId(id);
+                if (fieldErrors.tipo_partido_id) {
+                  setFieldErrors((prev) => ({ ...prev, tipo_partido_id: undefined }));
+                }
+              }}
+              disabled={isLoading}
+              variant="default"
+              loading={loadingTipos}
+              error={errorTipos}
+            />
+            {fieldErrors.tipo_partido_id && (
+              <p className="text-sm text-destructive">{fieldErrors.tipo_partido_id}</p>
+            )}
+            {fieldErrors.categoria_id && (
+              <p className="text-sm text-destructive">{fieldErrors.categoria_id}</p>
+            )}
           </div>
 
           {/* Lugar y Dirección */}
@@ -282,47 +314,6 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
             disabled={isLoading}
             placeholder="Calle 123 #45-67"
           />
-
-          {/* Resumen de pago */}
-          {categoriaId &&
-            (() => {
-              const categoriaSeleccionada = categorias.find((c) => c.id === parseInt(categoriaId));
-              if (!categoriaSeleccionada) return null;
-
-              const tarifa = parseFloat(categoriaSeleccionada.tarifa);
-              return (
-                <div className="p-4 rounded-lg border-2 border-primary/20 bg-primary/5 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Resumen de Pago</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Categoría:{" "}
-                        <span className="font-medium">{categoriaSeleccionada.nombre}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="pt-3 border-t border-primary/10">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Tarifa del partido:</span>
-                      <span className="text-lg font-semibold text-foreground">
-                        ${tarifa.toLocaleString("es-CO")} COP
-                      </span>
-                    </div>
-                  </div>
-                  <div className="pt-3 border-t-2 border-primary/30">
-                    <div className="flex items-center justify-between">
-                      <span className="text-base font-semibold">Total a pagar:</span>
-                      <span className="text-2xl font-bold text-primary">
-                        ${tarifa.toLocaleString("es-CO")} COP
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-xs text-center text-muted-foreground pt-2 border-t border-primary/10">
-                    El pago se procesará al confirmar la creación del partido
-                  </p>
-                </div>
-              );
-            })()}
 
           {/* Notas */}
           <FormField

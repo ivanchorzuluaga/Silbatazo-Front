@@ -15,18 +15,15 @@ const SlidePanel = ({ open, onOpenChange, children }: SlidePanelProps) => {
   if (!open) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50"
-      onClick={() => onOpenChange(false)}
-    >
+    <div className="fixed inset-0 z-50" onClick={() => onOpenChange(false)}>
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm transition-opacity"
         aria-hidden="true"
       />
-      {/* Panel que se desliza desde arriba */}
-      <div 
-        className="fixed top-0 left-0 right-0 z-50 safe-area-top"
+      {/* Panel centrado: flex para centrar el contenido y padding horizontal en móvil */}
+      <div
+        className="fixed top-0 left-0 right-0 z-50 safe-area-top flex justify-center px-4 sm:px-6"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -80,15 +77,8 @@ const SlidePanelDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => {
-  return (
-    <p
-      ref={ref}
-      className={cn("text-sm text-muted-foreground mt-1", className)}
-      {...props}
-    />
-  );
+  return <p ref={ref} className={cn("text-sm text-muted-foreground mt-1", className)} {...props} />;
 });
 SlidePanelDescription.displayName = "SlidePanelDescription";
 
 export { SlidePanel, SlidePanelContent, SlidePanelHeader, SlidePanelTitle, SlidePanelDescription };
-

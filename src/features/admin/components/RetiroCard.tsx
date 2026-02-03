@@ -12,6 +12,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { FormField } from "@/components/forms";
+import { formatCop } from "@/lib/utils";
 import type { Retiro, RetiroProcesarData } from "@/features/arbitro/types/arbitro.types";
 
 interface RetiroCardProps {
@@ -84,7 +85,7 @@ export function RetiroCard({ retiro, onProcesar, isLoading = false }: RetiroCard
             </div>
             <div className="text-right shrink-0">
               <p className="text-xl font-bold text-primary">
-                ${parseFloat(retiro.monto).toLocaleString("es-CO")}
+                {formatCop(parseFloat(retiro.monto))}
               </p>
               <p className="text-xs text-muted-foreground">COP</p>
             </div>

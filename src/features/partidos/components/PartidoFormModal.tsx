@@ -19,7 +19,6 @@ import {
   Calendar,
   Clock,
   MapPin,
-  Trophy,
   FileText,
   CreditCard,
   CheckCircle,
@@ -28,6 +27,7 @@ import {
   Star,
   User,
 } from "lucide-react";
+import { TipoPartidoCardGrid } from "./TipoPartidoCardGrid";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
 interface PartidoFormModalProps {
@@ -47,15 +47,17 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
     isLoading,
     error,
     municipiosLoading,
-    categoriasLoading,
     municipiosDisponibles,
     categoriasDisponibles,
-    categoriaSeleccionada,
-    tarifa,
+    tiposPartido,
+    loadingTipos,
+    errorTipos,
+    tipoPartidoSeleccionado,
+    montoTotal,
+    setTipoPartidoId,
     setFecha,
     setHora,
     setMunicipioId,
-    setCategoriaId,
     setLugar,
     setDireccion,
     setNotasCliente,
@@ -75,7 +77,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
     arbitro.foto_perfil,
     arbitro.id,
     arbitro.experiencia_anos,
-    arbitro.full_name || arbitro.username,
+    arbitro.full_name || arbitro.username
   );
 
   // Rating del árbitro
@@ -109,7 +111,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
       setFecha(date);
       closeCalendar();
     },
-    [setFecha, closeCalendar],
+    [setFecha, closeCalendar]
   );
 
   // Efecto para actualizar posición en resize/scroll
@@ -198,11 +200,11 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
       onClick={handleClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/70 dark:bg-black/70 backdrop-blur-sm" />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-900/95 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl"
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-popover backdrop-blur-md rounded-2xl border border-border shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {showSuccess && partidoCreado ? (
@@ -226,10 +228,10 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
               <div className="grid gap-4 sm:grid-cols-2">
                 {/* Campo de Fecha con Calendario */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white flex items-center gap-2">
+                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-primary" />
                     Fecha del Partido
-                    <span className="text-red-400">*</span>
+                    <span className="text-destructive">*</span>
                   </label>
                   <button
                     ref={dateButtonRef}
@@ -238,96 +240,95 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                     disabled={isLoading}
                     className={cn(
                       "w-full h-10 px-3 text-left rounded-lg border transition-colors",
-                      "bg-white/5 border-white/10 text-white",
-                      "hover:bg-white/10 hover:border-white/20",
+                      "bg-input border-input text-foreground",
+                      "hover:bg-accent hover:border-accent",
                       "focus:outline-none focus:ring-2 focus:ring-primary/50",
-                      fieldErrors.fecha && "border-red-500",
-                      !formState.fecha && "text-white/50",
+                      fieldErrors.fecha && "border-destructive",
+                      !formState.fecha && "text-muted-foreground"
                     )}
                   >
                     {formState.fecha ? formatearFecha(formState.fecha) : "Seleccionar fecha"}
                   </button>
-                  {fieldErrors.fecha && <p className="text-xs text-red-400">{fieldErrors.fecha}</p>}
+                  {fieldErrors.fecha && (
+                    <p className="text-xs text-destructive">{fieldErrors.fecha}</p>
+                  )}
                 </div>
 
                 {/* Campo de Hora */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white flex items-center gap-2">
+                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
                     <Clock className="w-4 h-4 text-primary" />
                     Hora (24h)
-                    <span className="text-red-400">*</span>
+                    <span className="text-destructive">*</span>
                   </label>
                   <TimePicker value={formState.hora} onChange={setHora} disabled={isLoading} />
-                  {fieldErrors.hora && <p className="text-xs text-red-400">{fieldErrors.hora}</p>}
+                  {fieldErrors.hora && (
+                    <p className="text-xs text-destructive">{fieldErrors.hora}</p>
+                  )}
                 </div>
               </div>
 
-              {/* Municipio y Categoría */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-primary" />
-                    Municipio
-                    <span className="text-red-400">*</span>
-                  </label>
-                  <Select
-                    id="municipio_id"
-                    value={formState.municipioId}
-                    onChange={(e) => setMunicipioId(e.target.value)}
-                    disabled={isLoading || municipiosLoading}
-                    className={cn(
-                      "bg-white/5 border-white/10 text-white",
-                      fieldErrors.municipio_id && "border-red-500",
-                    )}
-                  >
-                    <option value="">Selecciona un municipio</option>
-                    {municipiosDisponibles.map((municipio) => (
-                      <option key={municipio.id} value={municipio.id}>
-                        {municipio.nombre}
-                        {municipio.departamento && `, ${municipio.departamento}`}
-                      </option>
-                    ))}
-                  </Select>
-                  {fieldErrors.municipio_id && (
-                    <p className="text-xs text-red-400">{fieldErrors.municipio_id}</p>
+              {/* Municipio */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  Municipio
+                  <span className="text-destructive">*</span>
+                </label>
+                <Select
+                  id="municipio_id"
+                  value={formState.municipioId}
+                  onChange={(e) => setMunicipioId(e.target.value)}
+                  disabled={isLoading || municipiosLoading}
+                  className={cn(
+                    "bg-input border-input text-foreground",
+                    fieldErrors.municipio_id && "border-destructive"
                   )}
-                </div>
+                >
+                  <option value="">Selecciona un municipio</option>
+                  {municipiosDisponibles.map((municipio) => (
+                    <option key={municipio.id} value={municipio.id}>
+                      {municipio.nombre}
+                      {municipio.departamento && `, ${municipio.departamento}`}
+                    </option>
+                  ))}
+                </Select>
+                {fieldErrors.municipio_id && (
+                  <p className="text-xs text-destructive">{fieldErrors.municipio_id}</p>
+                )}
+              </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-primary" />
-                    Categoría
-                    <span className="text-red-400">*</span>
-                  </label>
-                  <Select
-                    id="categoria_id"
-                    value={formState.categoriaId}
-                    onChange={(e) => setCategoriaId(e.target.value)}
-                    disabled={isLoading || categoriasLoading}
-                    className={cn(
-                      "bg-white/5 border-white/10 text-white",
-                      fieldErrors.categoria_id && "border-red-500",
-                    )}
-                  >
-                    <option value="">Selecciona una categoría</option>
-                    {categoriasDisponibles.map((categoria) => (
-                      <option key={categoria.id} value={categoria.id}>
-                        {categoria.nombre} - ${parseFloat(categoria.tarifa).toLocaleString("es-CO")}
-                      </option>
-                    ))}
-                  </Select>
-                  {fieldErrors.categoria_id && (
-                    <p className="text-xs text-red-400">{fieldErrors.categoria_id}</p>
-                  )}
-                </div>
+              {/* Tipo de partido: cards seleccionables */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-foreground">
+                  ¿Qué tipo de partido vas a jugar?
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Selecciona la opción que se acomoda a tu partido. El precio está incluido.
+                </p>
+                <TipoPartidoCardGrid
+                  tipos={tiposPartido}
+                  selectedId={formState.tipoPartidoId}
+                  onSelect={(id) => setTipoPartidoId(id)}
+                  disabled={isLoading}
+                  variant="modal"
+                  loading={loadingTipos}
+                  error={errorTipos}
+                />
+                {fieldErrors.tipo_partido_id && (
+                  <p className="text-xs text-destructive">{fieldErrors.tipo_partido_id}</p>
+                )}
+                {fieldErrors.categoria_id && (
+                  <p className="text-xs text-destructive">{fieldErrors.categoria_id}</p>
+                )}
               </div>
 
               {/* Lugar */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white flex items-center gap-2">
+                <label className="text-sm font-medium text-foreground flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-primary" />
                   Lugar del Partido
-                  <span className="text-red-400">*</span>
+                  <span className="text-destructive">*</span>
                 </label>
                 <FormField
                   label=""
@@ -337,13 +338,12 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                   error={fieldErrors.lugar}
                   disabled={isLoading}
                   placeholder="Ej: Cancha Los Olivos"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
 
               {/* Dirección */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white/70 flex items-center gap-2">
+                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
                   Dirección (Opcional)
                 </label>
@@ -354,18 +354,12 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                   onChange={(e) => setDireccion(e.target.value)}
                   disabled={isLoading}
                   placeholder="Calle 123 #45-67"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
 
-              {/* Resumen de pago */}
-              {tarifa > 0 && (
-                <PaymentSummary categoriaSeleccionada={categoriaSeleccionada} tarifa={tarifa} />
-              )}
-
               {/* Notas */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white/70 flex items-center gap-2">
+                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <FileText className="w-4 h-4" />
                   Notas Adicionales (Opcional)
                 </label>
@@ -378,7 +372,6 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                   placeholder="Información adicional sobre el partido..."
                   multiline
                   rows={3}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
 
@@ -398,13 +391,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                     "Confirmar Solicitud"
                   )}
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleClose}
-                  disabled={isLoading}
-                  className="border-white/20 text-white hover:bg-white/10"
-                >
+                <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
                   Cancelar
                 </Button>
               </div>
@@ -431,7 +418,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
               onClose={closeCalendar}
             />
           </div>,
-          document.body,
+          document.body
         )}
     </div>
   );
@@ -453,14 +440,14 @@ interface ModalHeaderProps {
 
 function ModalHeader({ arbitro, imagenArbitro, rating, onClose, isLoading }: ModalHeaderProps) {
   return (
-    <div className="relative p-6 border-b border-white/10">
+    <div className="relative p-6 border-b border-border">
       {/* Botón cerrar */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+        className="absolute top-4 right-4 p-2 rounded-full bg-muted hover:bg-accent transition-colors"
         disabled={isLoading}
       >
-        <X className="w-5 h-5 text-white" />
+        <X className="w-5 h-5 text-foreground" />
       </button>
 
       <div className="flex items-center gap-4">
@@ -472,19 +459,19 @@ function ModalHeader({ arbitro, imagenArbitro, rating, onClose, isLoading }: Mod
             className="w-20 h-20 rounded-xl object-cover border-2 border-primary/30"
           />
           {rating > 0 && (
-            <div className="absolute -bottom-2 -right-2 bg-black/80 px-2 py-0.5 rounded-full flex items-center gap-1">
+            <div className="absolute -bottom-2 -right-2 bg-background px-2 py-0.5 rounded-full flex items-center gap-1 border border-border">
               <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-              <span className="text-white text-xs font-semibold">{rating.toFixed(1)}</span>
+              <span className="text-foreground text-xs font-semibold">{rating.toFixed(1)}</span>
             </div>
           )}
         </div>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h2 className="text-xl font-bold text-white truncate">
+          <h2 className="text-xl font-bold text-foreground truncate">
             Solicitar a {arbitro.full_name || arbitro.username}
           </h2>
-          <div className="flex flex-wrap items-center gap-3 mt-1 text-white/60 text-sm">
+          <div className="flex flex-wrap items-center gap-3 mt-1 text-muted-foreground text-sm">
             {arbitro.experiencia_anos > 0 && (
               <span className="flex items-center gap-1">
                 <User className="w-3 h-3" />
@@ -503,8 +490,8 @@ function ModalHeader({ arbitro, imagenArbitro, rating, onClose, isLoading }: Mod
 
       {/* Disponibilidad resumida */}
       {arbitro.disponibilidades && arbitro.disponibilidades.length > 0 && (
-        <div className="mt-4 p-3 bg-white/5 rounded-xl border border-white/10">
-          <p className="text-xs font-medium text-white/70 mb-2 flex items-center gap-1">
+        <div className="mt-4 p-3 bg-muted/50 rounded-xl border border-border">
+          <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
             <Clock className="w-3 h-3" />
             Horarios Disponibles
           </p>
@@ -523,15 +510,15 @@ interface SuccessViewProps {
 function SuccessView({ partidoCreado, onAceptar }: SuccessViewProps) {
   return (
     <div className="p-8 text-center">
-      <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-        <CheckCircle className="w-10 h-10 text-green-400" />
+      <div className="w-20 h-20 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-6">
+        <CheckCircle className="w-10 h-10 text-success" />
       </div>
-      <h2 className="text-2xl font-bold text-white mb-3">¡Solicitud Creada!</h2>
-      <p className="text-white/70 mb-4 max-w-md mx-auto">
+      <h2 className="text-2xl font-bold text-foreground mb-3">¡Solicitud Creada!</h2>
+      <p className="text-muted-foreground mb-4 max-w-md mx-auto">
         El partido <span className="text-primary font-semibold">#{partidoCreado.id}</span> ha sido
         creado exitosamente.
       </p>
-      <p className="text-white/50 text-sm mb-8">
+      <p className="text-muted-foreground text-sm mb-8">
         Ahora procede a realizar el pago para confirmar tu solicitud con el árbitro.
       </p>
       <Button onClick={onAceptar} size="lg" className="px-8">
@@ -548,42 +535,9 @@ interface ErrorAlertProps {
 
 function ErrorAlert({ error }: ErrorAlertProps) {
   return (
-    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
-      <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-      <p className="text-sm text-red-300">{error}</p>
-    </div>
-  );
-}
-
-interface PaymentSummaryProps {
-  categoriaSeleccionada: { nombre: string; tarifa: string } | undefined;
-  tarifa: number;
-}
-
-function PaymentSummary({ categoriaSeleccionada, tarifa }: PaymentSummaryProps) {
-  return (
-    <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
-      <div className="flex items-center gap-2 mb-3">
-        <CreditCard className="w-5 h-5 text-primary" />
-        <span className="font-semibold text-white">Resumen de Pago</span>
-      </div>
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm">
-          <span className="text-white/70">Categoría:</span>
-          <span className="text-white">{categoriaSeleccionada?.nombre}</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-white/70">Tarifa del partido:</span>
-          <span className="text-white">${tarifa.toLocaleString("es-CO")} COP</span>
-        </div>
-        <div className="pt-3 mt-3 border-t border-primary/20 flex justify-between items-center">
-          <span className="font-semibold text-white">Total:</span>
-          <span className="text-2xl font-bold text-primary">${tarifa.toLocaleString("es-CO")}</span>
-        </div>
-      </div>
-      <p className="text-xs text-center text-white/50 mt-3">
-        El pago se procesará al confirmar la solicitud
-      </p>
+    <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 flex items-start gap-3">
+      <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+      <p className="text-sm text-destructive">{error}</p>
     </div>
   );
 }

@@ -12,6 +12,7 @@ import type {
   ArbitroVerificacionData,
   Municipio,
   Categoria,
+  RolArbitro,
   CategoriaCreateData,
   CategoriaUpdateData,
   DisponibilidadArbitro,
@@ -26,15 +27,13 @@ import type {
 export const arbitroEndpoints = {
   /**
    * Lista de árbitros (marketplace)
-   * Filtros: municipio, categoria, tarifa_min, tarifa_max, search, ordering
+   * Filtros: municipio, categoria, search, ordering
    */
   async listarArbitros(
     token: string,
     params?: {
       municipio?: number;
       categoria?: number;
-      tarifa_min?: number;
-      tarifa_max?: number;
       search?: string;
       ordering?: string;
       estado?: string; // Solo para admins
@@ -45,8 +44,6 @@ export const arbitroEndpoints = {
     const queryParams = new URLSearchParams();
     if (params?.municipio) queryParams.append("municipio", params.municipio.toString());
     if (params?.categoria) queryParams.append("categoria", params.categoria.toString());
-    if (params?.tarifa_min) queryParams.append("tarifa_min", params.tarifa_min.toString());
-    if (params?.tarifa_max) queryParams.append("tarifa_max", params.tarifa_max.toString());
     if (params?.search) queryParams.append("search", params.search);
     if (params?.ordering) queryParams.append("ordering", params.ordering);
     if (params?.estado) queryParams.append("estado", params.estado);
@@ -94,6 +91,18 @@ export const arbitroEndpoints = {
   },
 
   /**
+   * Subir foto de perfil del árbitro (multipart/form-data con campo 'foto_perfil')
+   */
+  async subirFotoPerfil(token: string, file: File): Promise<Arbitro> {
+    const formData = new FormData();
+    formData.append("foto_perfil", file);
+    return authenticatedApiClient<Arbitro>("/api/arbitros/perfil/foto/", token, {
+      method: "POST",
+      body: formData,
+    });
+  },
+
+  /**
    * Lista de todos los árbitros (solo admin, con filtros avanzados)
    */
   async listarTodos(
@@ -102,8 +111,6 @@ export const arbitroEndpoints = {
       estado?: string;
       municipio?: number;
       categoria?: number;
-      tarifa_min?: number;
-      tarifa_max?: number;
       search?: string;
       ordering?: string;
     }
@@ -112,8 +119,6 @@ export const arbitroEndpoints = {
     if (params?.estado) queryParams.append("estado", params.estado);
     if (params?.municipio) queryParams.append("municipio", params.municipio.toString());
     if (params?.categoria) queryParams.append("categoria", params.categoria.toString());
-    if (params?.tarifa_min) queryParams.append("tarifa_min", params.tarifa_min.toString());
-    if (params?.tarifa_max) queryParams.append("tarifa_max", params.tarifa_max.toString());
     if (params?.search) queryParams.append("search", params.search);
     if (params?.ordering) queryParams.append("ordering", params.ordering);
 
@@ -245,6 +250,17 @@ export const arbitroEndpoints = {
       `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/arbitros/categorias/`
     );
     if (!response.ok) throw new Error("Error al obtener categorías");
+    return response.json();
+  },
+
+  /**
+   * Lista de roles de árbitro
+   */
+  async listarRoles(): Promise<RolArbitro[]> {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/arbitros/roles/`
+    );
+    if (!response.ok) throw new Error("Error al obtener roles");
     return response.json();
   },
 

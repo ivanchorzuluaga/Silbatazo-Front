@@ -2,7 +2,7 @@
  * Endpoints relacionados con partidos
  */
 
-import { authenticatedApiClient } from "../client";
+import apiClient, { authenticatedApiClient } from "../client";
 import type {
   Partido,
   PartidoDetail,
@@ -19,6 +19,13 @@ import type {
   Calificacion,
   CalificacionCreateData,
   PromedioArbitro,
+  TipoPartido,
+  // Eventos
+  Evento,
+  EventoDetail,
+  EventoCreateData,
+  EventoUpdateData,
+  EventosListParams,
 } from "@/features/partidos/types/partido.types";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
@@ -36,9 +43,18 @@ export const partidoEndpoints = {
     if (params?.arbitro_id) queryParams.append("arbitro_id", params.arbitro_id.toString());
 
     const query = queryParams.toString();
-    const endpoint = `/api/partidos/${query ? `?${query}` : ""}`;
+    const endpoint = query ? `/api/partidos/?${query}` : "/api/partidos/";
 
-    return authenticatedApiClient<Partido[]>(endpoint, token);
+    const data = await authenticatedApiClient<Partido[] | { results: Partido[] }>(endpoint, token);
+    if (Array.isArray(data)) return data;
+    if (
+      data &&
+      typeof data === "object" &&
+      Array.isArray((data as { results: Partido[] }).results)
+    ) {
+      return (data as { results: Partido[] }).results;
+    }
+    return [];
   },
 
   /**
@@ -60,12 +76,19 @@ export const partidoEndpoints = {
   },
 
   /**
+   * Lista de tipos de partido con precio fijo (selector único)
+   */
+  async listarTiposPartido(token: string): Promise<TipoPartido[]> {
+    return authenticatedApiClient<TipoPartido[]>("/api/partidos/tipos-partido/", token);
+  },
+
+  /**
    * Actualizar un partido (solo cliente, solo buscando árbitro o pendientes)
    */
   async actualizarPartido(
     token: string,
     id: number,
-    data: PartidoUpdateData,
+    data: PartidoUpdateData
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/actualizar/`, token, {
       method: "PATCH",
@@ -79,7 +102,7 @@ export const partidoEndpoints = {
   async aceptarPartido(
     token: string,
     id: number,
-    data?: PartidoAceptarData,
+    data?: PartidoAceptarData
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/aceptar/`, token, {
       method: "PATCH",
@@ -93,7 +116,7 @@ export const partidoEndpoints = {
   async rechazarPartido(
     token: string,
     id: number,
-    data: PartidoRechazarData,
+    data: PartidoRechazarData
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/rechazar/`, token, {
       method: "PATCH",
@@ -107,7 +130,7 @@ export const partidoEndpoints = {
   async cancelarPartido(
     token: string,
     id: number,
-    data: PartidoCancelarData,
+    data: PartidoCancelarData
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/cancelar/`, token, {
       method: "PATCH",
@@ -121,7 +144,7 @@ export const partidoEndpoints = {
   async completarPartido(
     token: string,
     id: number,
-    data?: PartidoCompletarData,
+    data?: PartidoCompletarData
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/completar/`, token, {
       method: "PATCH",
@@ -151,7 +174,7 @@ export const partidoEndpoints = {
   async postularseAPartido(
     token: string,
     id: number,
-    data?: PostulacionCreateData,
+    data?: PostulacionCreateData
   ): Promise<PostulacionArbitro> {
     return authenticatedApiClient<PostulacionArbitro>(`/api/partidos/${id}/postular/`, token, {
       method: "POST",
@@ -165,7 +188,7 @@ export const partidoEndpoints = {
   async obtenerPostulaciones(token: string, id: number): Promise<PostulacionArbitro[]> {
     return authenticatedApiClient<PostulacionArbitro[]>(
       `/api/partidos/${id}/postulaciones/`,
-      token,
+      token
     );
   },
 
@@ -175,7 +198,7 @@ export const partidoEndpoints = {
   async asignarArbitro(
     token: string,
     id: number,
-    data: PartidoAsignarData,
+    data: PartidoAsignarData
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/asignar/`, token, {
       method: "PATCH",
@@ -196,7 +219,7 @@ export const partidoEndpoints = {
   async listarArbitrosDisponibles(token: string, partidoId: number): Promise<Arbitro[]> {
     return authenticatedApiClient<Arbitro[]>(
       `/api/partidos/${partidoId}/arbitros-disponibles/`,
-      token,
+      token
     );
   },
 
@@ -210,7 +233,7 @@ export const partidoEndpoints = {
   async listarCalificacionesPartido(token: string, partidoId: number): Promise<Calificacion[]> {
     return authenticatedApiClient<Calificacion[]>(
       `/api/partidos/${partidoId}/calificaciones/`,
-      token,
+      token
     );
   },
 
@@ -220,7 +243,7 @@ export const partidoEndpoints = {
   async crearCalificacion(
     token: string,
     partidoId: number,
-    data: CalificacionCreateData,
+    data: CalificacionCreateData
   ): Promise<Calificacion> {
     return authenticatedApiClient<Calificacion>(`/api/partidos/${partidoId}/calificar/`, token, {
       method: "POST",
@@ -230,22 +253,33 @@ export const partidoEndpoints = {
 
   /**
    * Lista de calificaciones recibidas por un árbitro
+   * Soporta token opcional (endpoint público para ver perfiles de árbitros)
    */
-  async listarCalificacionesArbitro(token: string, arbitroId: number): Promise<Calificacion[]> {
-    return authenticatedApiClient<Calificacion[]>(
-      `/api/partidos/arbitros/${arbitroId}/calificaciones/`,
-      token,
-    );
+  async listarCalificacionesArbitro(
+    arbitroId: number,
+    token?: string | null
+  ): Promise<Calificacion[]> {
+    if (token) {
+      return authenticatedApiClient<Calificacion[]>(
+        `/api/partidos/arbitros/${arbitroId}/calificaciones/`,
+        token
+      );
+    }
+    return apiClient<Calificacion[]>(`/api/partidos/arbitros/${arbitroId}/calificaciones/`);
   },
 
   /**
    * Obtener el promedio de calificaciones de un árbitro
+   * Soporta token opcional (endpoint público para ver perfiles de árbitros)
    */
-  async obtenerPromedioArbitro(token: string, arbitroId: number): Promise<PromedioArbitro> {
-    return authenticatedApiClient<PromedioArbitro>(
-      `/api/partidos/arbitros/${arbitroId}/promedio/`,
-      token,
-    );
+  async obtenerPromedioArbitro(arbitroId: number, token?: string | null): Promise<PromedioArbitro> {
+    if (token) {
+      return authenticatedApiClient<PromedioArbitro>(
+        `/api/partidos/arbitros/${arbitroId}/promedio/`,
+        token
+      );
+    }
+    return apiClient<PromedioArbitro>(`/api/partidos/arbitros/${arbitroId}/promedio/`);
   },
 
   /**
@@ -286,7 +320,7 @@ export const partidoEndpoints = {
   async aprobarPago(
     token: string,
     id: number,
-    data?: { notas_pago?: string },
+    data?: { notas_pago?: string }
   ): Promise<PartidoDetail> {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/aprobar-pago/`, token, {
       method: "PATCH",
@@ -319,5 +353,126 @@ export const partidoEndpoints = {
     const endpoint = query ? `${baseEndpoint}?${query}` : baseEndpoint;
 
     return authenticatedApiClient<Partido[]>(endpoint, token);
+  },
+};
+// ==================== EVENTOS ====================
+
+export const eventoEndpoints = {
+  /**
+   * Lista de eventos
+   * - Clientes: solo sus eventos
+   * - Admins: todos los eventos
+   */
+  async listarEventos(token: string, params?: EventosListParams): Promise<Evento[]> {
+    const queryParams = new URLSearchParams();
+    if (params?.estado) queryParams.append("estado", params.estado);
+    if (params?.estado_pago) queryParams.append("estado_pago", params.estado_pago);
+    if (params?.fecha_desde) queryParams.append("fecha_desde", params.fecha_desde);
+    if (params?.fecha_hasta) queryParams.append("fecha_hasta", params.fecha_hasta);
+
+    const query = queryParams.toString();
+    const endpoint = `/api/partidos/eventos/${query ? `?${query}` : ""}`;
+
+    return authenticatedApiClient<Evento[]>(endpoint, token);
+  },
+
+  /**
+   * Obtener detalle de un evento con todos sus partidos
+   */
+  async obtenerEvento(token: string, id: number): Promise<EventoDetail> {
+    return authenticatedApiClient<EventoDetail>(`/api/partidos/eventos/${id}/`, token);
+  },
+
+  /**
+   * Crear un nuevo evento con múltiples partidos (solo cliente)
+   */
+  async crearEvento(token: string, data: EventoCreateData): Promise<EventoDetail> {
+    return authenticatedApiClient<EventoDetail>("/api/partidos/eventos/crear/", token, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Actualizar un evento (solo campos básicos)
+   */
+  async actualizarEvento(token: string, id: number, data: EventoUpdateData): Promise<EventoDetail> {
+    return authenticatedApiClient<EventoDetail>(`/api/partidos/eventos/${id}/actualizar/`, token, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Cancelar un evento y todos sus partidos
+   */
+  async cancelarEvento(token: string, id: number, motivo?: string): Promise<EventoDetail> {
+    return authenticatedApiClient<EventoDetail>(`/api/partidos/eventos/${id}/cancelar/`, token, {
+      method: "PATCH",
+      body: JSON.stringify({ motivo_cancelacion: motivo || "Cancelado por el cliente" }),
+    });
+  },
+
+  /**
+   * Marcar un evento como pagado (solo cliente)
+   * Opcionalmente acepta un comprobante de pago (imagen)
+   */
+  async marcarEventoPagado(token: string, id: number, comprobante?: File): Promise<EventoDetail> {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+    const formData = new FormData();
+    if (comprobante) {
+      formData.append("comprobante_pago", comprobante);
+    }
+
+    const response = await fetch(`${API_URL}/api/partidos/eventos/${id}/marcar-pagado/`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || errorData.detail || "Error al marcar como pagado");
+    }
+
+    return response.json();
+  },
+
+  /**
+   * Aprobar pago de un evento (solo admin)
+   */
+  async aprobarPagoEvento(token: string, id: number): Promise<EventoDetail> {
+    return authenticatedApiClient<EventoDetail>(
+      `/api/partidos/eventos/${id}/aprobar-pago/`,
+      token,
+      {
+        method: "PATCH",
+        body: JSON.stringify({}),
+      }
+    );
+  },
+
+  /**
+   * Rechazar pago de un evento (solo admin)
+   */
+  async rechazarPagoEvento(token: string, id: number, notas?: string): Promise<EventoDetail> {
+    return authenticatedApiClient<EventoDetail>(
+      `/api/partidos/eventos/${id}/rechazar-pago/`,
+      token,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ notas_pago: notas || "Pago rechazado" }),
+      }
+    );
+  },
+
+  /**
+   * Lista de eventos con pagos pendientes de revisión (solo admin)
+   */
+  async listarEventosPagosPendientes(token: string): Promise<Evento[]> {
+    return authenticatedApiClient<Evento[]>("/api/partidos/eventos/pagos-pendientes/", token);
   },
 };

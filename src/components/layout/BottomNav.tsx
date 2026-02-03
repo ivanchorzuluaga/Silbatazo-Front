@@ -8,14 +8,8 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES, USER_ROLES } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
-import {
-  Home,
-  Calendar,
-  Search,
-  User,
-  Wallet,
-  Shield,
-} from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Home, Calendar, Search, User, Wallet, Shield } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -94,15 +88,17 @@ export function BottomNav() {
     ...visibleItems.filter((item) => item.route !== dashboardRoute),
   ];
 
+  // Limitar a máximo 4 items de navegación para dejar espacio al ThemeToggle
+  const displayItems = allItems.slice(0, 4);
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-md safe-area-bottom sm:hidden">
       <div className="flex h-16 items-center justify-around px-2">
-        {allItems.slice(0, 5).map((item) => {
+        {displayItems.map((item) => {
           const Icon = item.icon;
           const isActive =
             location.pathname === item.route ||
-            (item.route !== ROUTES.HOME &&
-              location.pathname.startsWith(item.route));
+            (item.route !== ROUTES.HOME && location.pathname.startsWith(item.route));
 
           return (
             <Link
@@ -111,17 +107,10 @@ export function BottomNav() {
               className={cn(
                 "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-ios touch-manipulation",
                 "active:scale-95",
-                isActive
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <div
-                className={cn(
-                  "rounded-lg p-2 transition-ios",
-                  isActive && "bg-primary/10"
-                )}
-              >
+              <div className={cn("rounded-lg p-2 transition-ios", isActive && "bg-primary/10")}>
                 <Icon className="size-5" />
               </div>
               <span
@@ -135,8 +124,14 @@ export function BottomNav() {
             </Link>
           );
         })}
+        {/* ThemeToggle al final */}
+        <div className="flex flex-col items-center justify-center gap-1 flex-1 h-full">
+          <div className="rounded-lg p-2">
+            <ThemeToggle size="sm" />
+          </div>
+          <span className="text-[10px] font-medium text-muted-foreground">Tema</span>
+        </div>
       </div>
     </nav>
   );
 }
-

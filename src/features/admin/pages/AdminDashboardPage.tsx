@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLayout } from "@/components/layout";
 import { ROUTES } from "@/lib/constants";
 import { getTodayLocalDate } from "@/lib/utils";
-import { 
+import {
   Users,
   Calendar,
   Shield,
@@ -19,7 +19,7 @@ import {
   AlertCircle,
   Trophy,
   Wallet,
-  UserCheck
+  UserCheck,
 } from "lucide-react";
 
 export function AdminDashboardPage() {
@@ -50,7 +50,7 @@ export function AdminDashboardPage() {
     },
     {
       title: "Categorías",
-      description: "Gestionar categorías y tarifas",
+      description: "Gestionar categorías",
       icon: Settings,
       color: "from-orange-500 to-orange-600",
       route: ROUTES.ADMIN_CATEGORIAS,
@@ -129,9 +129,7 @@ export function AdminDashboardPage() {
                 ¡Hola, <span className="text-primary">{user?.username || "Admin"}</span>! 👋
               </h1>
             </div>
-            <p className="text-muted-foreground text-lg">
-              Panel de control del sistema
-            </p>
+            <p className="text-muted-foreground text-lg">Panel de control del sistema</p>
           </div>
           <div className="hidden sm:block">
             <div className="text-right">
@@ -145,7 +143,7 @@ export function AdminDashboardPage() {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {quickStats.map((stat) => (
-          <Card 
+          <Card
             key={stat.title}
             className={`group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br ${stat.color}`}
           >
@@ -158,9 +156,7 @@ export function AdminDashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className={`text-3xl font-bold ${stat.textColor}`}>
-                {stat.value}
-              </div>
+              <div className={`text-3xl font-bold ${stat.textColor}`}>{stat.value}</div>
               <p className={`text-xs ${stat.iconColor} mt-1`}>Vista general</p>
             </CardContent>
           </Card>
@@ -189,16 +185,16 @@ export function AdminDashboardPage() {
               <div className={`h-2 bg-gradient-to-r ${action.color}`} />
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className={`p-3 rounded-lg bg-gradient-to-br ${action.color} group-hover:scale-110 transition-transform`}>
+                  <div
+                    className={`p-3 rounded-lg bg-gradient-to-br ${action.color} group-hover:scale-110 transition-transform`}
+                  >
                     <action.icon className="size-6 text-white" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
                       {action.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {action.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">{action.description}</p>
                     <div className="mt-3 flex items-center gap-1 text-sm text-primary font-medium group-hover:gap-2 transition-all">
                       <span>Abrir</span>
                       <span className="group-hover:translate-x-1 transition-transform">→</span>

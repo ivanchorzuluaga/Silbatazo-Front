@@ -2,6 +2,7 @@
  * Componente de tarjeta para mostrar un retiro en la lista
  */
 
+import { formatCop } from "@/lib/utils";
 import type { Retiro } from "../types/arbitro.types";
 
 interface RetiroCardProps {
@@ -27,7 +28,9 @@ export function RetiroCard({ retiro, onProcesar, isAdmin = false }: RetiroCardPr
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <h3 className="text-lg font-semibold">Retiro #{retiro.id}</h3>
-              <span className={`inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium ${estadoColor}`}>
+              <span
+                className={`inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium ${estadoColor}`}
+              >
                 {retiro.estado_display}
               </span>
             </div>
@@ -38,10 +41,7 @@ export function RetiroCard({ retiro, onProcesar, isAdmin = false }: RetiroCardPr
             )}
           </div>
           <div className="text-right shrink-0">
-            <p className="text-xl font-bold text-primary">
-              ${parseFloat(retiro.monto).toLocaleString("es-CO")}
-            </p>
-            <p className="text-xs text-muted-foreground">COP</p>
+            <p className="text-xl font-bold text-primary">{formatCop(parseFloat(retiro.monto))}</p>
           </div>
         </div>
 
@@ -124,4 +124,3 @@ export function RetiroCard({ retiro, onProcesar, isAdmin = false }: RetiroCardPr
     </div>
   );
 }
-

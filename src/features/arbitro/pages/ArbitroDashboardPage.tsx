@@ -10,17 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PageLayout } from "@/components/layout";
 import { ROUTES } from "@/lib/constants";
 import { usePartidos } from "@/features/partidos/hooks/usePartidos";
-import { 
-  Calendar, 
-  Clock, 
-  CheckCircle, 
-  DollarSign, 
-  User, 
-  Shield,
-  Wallet,
-  Activity
-} from "lucide-react";
-import { parseLocalDate, getTodayLocalDate } from "@/lib/utils";
+import { Calendar, Clock, CheckCircle, DollarSign, User, Shield, Activity } from "lucide-react";
+import { parseLocalDate, getTodayLocalDate, formatCop } from "@/lib/utils";
 
 export function ArbitroDashboardPage() {
   const { user } = useAuth();
@@ -29,16 +20,19 @@ export function ArbitroDashboardPage() {
 
   // Calcular estadísticas
   const totalPartidos = partidos.length;
-  const partidosPendientes = partidos.filter((p) => 
-    p.estado === "pendiente" || p.estado === "buscando_arbitro"
+  const partidosPendientes = partidos.filter(
+    (p) => p.estado === "pendiente" || p.estado === "buscando_arbitro"
   ).length;
   const partidosAceptados = partidos.filter((p) => p.estado === "aceptado").length;
   const partidosCompletados = partidos.filter((p) => p.estado === "completado").length;
-  
-  // Calcular ganancias totales (partidos completados)
+
+  // Calcular ganancias totales de partidos completados
   const gananciasTotal = partidos
     .filter((p) => p.estado === "completado")
-    .reduce((sum, p) => sum + parseFloat(p.tarifa || "0"), 0);
+    .reduce((total, partido) => {
+      const monto = partido.monto_total ?? partido.tipo_partido?.monto ?? 0;
+      return total + monto;
+    }, 0);
 
   // Próximos partidos
   const hoy = new Date();
@@ -68,9 +62,7 @@ export function ArbitroDashboardPage() {
                 ¡Hola, <span className="text-primary">{user?.username || "Árbitro"}</span>! 👋
               </h1>
             </div>
-            <p className="text-muted-foreground text-lg">
-              Gestiona tus partidos y disponibilidad
-            </p>
+            <p className="text-muted-foreground text-lg">Gestiona tus partidos y disponibilidad</p>
           </div>
           <div className="hidden sm:block">
             <div className="text-right">
@@ -86,12 +78,16 @@ export function ArbitroDashboardPage() {
         <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-blue-600 dark:text-blue-300">Total Partidos</CardTitle>
+              <CardTitle className="text-sm font-medium text-blue-600 dark:text-blue-300">
+                Total Partidos
+              </CardTitle>
               <Activity className="w-5 h-5 text-blue-500" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-300">{totalPartidos}</div>
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-300">
+              {totalPartidos}
+            </div>
             <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">Partidos totales</p>
           </CardContent>
         </Card>
@@ -99,12 +95,16 @@ export function ArbitroDashboardPage() {
         <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-yellow-50 to-orange-100 dark:from-yellow-950 dark:to-orange-900">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-orange-600 dark:text-orange-300">Pendientes</CardTitle>
+              <CardTitle className="text-sm font-medium text-orange-600 dark:text-orange-300">
+                Pendientes
+              </CardTitle>
               <Clock className="w-5 h-5 text-orange-500" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-orange-600 dark:text-orange-300">{partidosPendientes}</div>
+            <div className="text-3xl font-bold text-orange-600 dark:text-orange-300">
+              {partidosPendientes}
+            </div>
             <p className="text-xs text-orange-500 dark:text-orange-400 mt-1">Por confirmar</p>
           </CardContent>
         </Card>
@@ -112,12 +112,16 @@ export function ArbitroDashboardPage() {
         <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-green-600 dark:text-green-300">Confirmados</CardTitle>
+              <CardTitle className="text-sm font-medium text-green-600 dark:text-green-300">
+                Confirmados
+              </CardTitle>
               <CheckCircle className="w-5 h-5 text-green-500" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600 dark:text-green-300">{partidosAceptados}</div>
+            <div className="text-3xl font-bold text-green-600 dark:text-green-300">
+              {partidosAceptados}
+            </div>
             <p className="text-xs text-green-500 dark:text-green-400 mt-1">Próximos partidos</p>
           </CardContent>
         </Card>
@@ -125,64 +129,21 @@ export function ArbitroDashboardPage() {
         <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-950 dark:to-teal-900">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-emerald-600 dark:text-emerald-300">Ganancias</CardTitle>
+              <CardTitle className="text-sm font-medium text-emerald-600 dark:text-emerald-300">
+                Ganancias
+              </CardTitle>
               <DollarSign className="w-5 h-5 text-emerald-500" />
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-300">
-              ${gananciasTotal.toLocaleString("es-CO")}
+              {formatCop(gananciasTotal)}
             </div>
-            <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">{partidosCompletados} completados</p>
+            <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">
+              {partidosCompletados} completados
+            </p>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Acciones rápidas */}
-      <div className="grid sm:grid-cols-3 gap-6">
-        <Button
-          onClick={() => navigate(ROUTES.ARBITRO_PERFIL)}
-          size="lg"
-          className="h-auto flex-col gap-4 py-8 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 group"
-        >
-          <div className="p-3 bg-white/20 rounded-lg group-hover:scale-110 transition-transform">
-            <User className="size-6" />
-          </div>
-          <div className="text-center">
-            <span className="text-base font-semibold">Mi Perfil</span>
-            <p className="text-xs opacity-80 mt-1">Actualizar información</p>
-          </div>
-        </Button>
-
-        <Button
-          onClick={() => navigate(ROUTES.PARTIDOS)}
-          size="lg"
-          variant="outline"
-          className="h-auto flex-col gap-4 py-8 border-2 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group"
-        >
-          <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-            <Calendar className="size-6 text-primary" />
-          </div>
-          <div className="text-center">
-            <span className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">Mis Partidos</span>
-            <p className="text-xs text-muted-foreground mt-1">Ver asignaciones</p>
-          </div>
-        </Button>
-
-        <Button
-          onClick={() => navigate(ROUTES.ARBITRO_BILLETERA)}
-          size="lg"
-          variant="outline"
-          className="h-auto flex-col gap-4 py-8 border-2 hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group"
-        >
-          <div className="p-3 bg-secondary/10 rounded-lg group-hover:bg-secondary/20 transition-colors">
-            <Wallet className="size-6 text-secondary" />
-          </div>
-          <div className="text-center">
-            <span className="text-base font-semibold text-foreground group-hover:text-secondary transition-colors">Mi Billetera</span>
-            <p className="text-xs text-muted-foreground mt-1">Ver ganancias</p>
-          </div>
-        </Button>
       </div>
 
       {/* Próximos partidos */}
@@ -199,8 +160,8 @@ export function ArbitroDashboardPage() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {proximosPartidos.map((partido) => (
-              <Card 
-                key={partido.id} 
+              <Card
+                key={partido.id}
                 className="group hover:shadow-xl transition-all duration-300 cursor-pointer"
                 onClick={() => navigate(`/partidos/${partido.id}`)}
               >
@@ -213,7 +174,7 @@ export function ArbitroDashboardPage() {
                     {parseLocalDate(partido.fecha).toLocaleDateString("es-CO", {
                       weekday: "long",
                       day: "numeric",
-                      month: "long"
+                      month: "long",
                     })}
                   </CardDescription>
                 </CardHeader>
@@ -226,12 +187,14 @@ export function ArbitroDashboardPage() {
                     <span className="text-sm text-muted-foreground">Lugar</span>
                     <span className="font-medium">{partido.lugar}</span>
                   </div>
-                  <div className="flex items-center justify-between pt-2 border-t">
-                    <span className="text-sm font-medium text-green-600">Ganancia</span>
-                    <span className="text-lg font-bold text-green-600">
-                      ${parseFloat(partido.tarifa).toLocaleString("es-CO")}
-                    </span>
-                  </div>
+                  {(partido.monto_total != null || partido.tipo_partido?.monto != null) && (
+                    <div className="flex items-center justify-between pt-2 border-t">
+                      <span className="text-sm text-muted-foreground">Valor</span>
+                      <span className="font-semibold text-primary tabular-nums">
+                        {formatCop(partido.monto_total ?? partido.tipo_partido?.monto ?? 0)}
+                      </span>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -249,26 +212,26 @@ export function ArbitroDashboardPage() {
                 <Shield className="size-12 text-white" />
               </div>
             </div>
-            
+
             <div className="space-y-3">
               <h3 className="text-2xl font-bold text-foreground">¡Completa tu perfil!</h3>
               <p className="text-muted-foreground text-lg max-w-md mx-auto">
                 Actualiza tu información para empezar a recibir asignaciones de partidos
               </p>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={() => navigate(ROUTES.ARBITRO_PERFIL)} 
-                size="lg" 
+              <Button
+                onClick={() => navigate(ROUTES.ARBITRO_PERFIL)}
+                size="lg"
                 className="shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <User className="w-5 h-5 mr-2" />
                 Completar mi perfil
               </Button>
-              <Button 
-                onClick={() => navigate(ROUTES.PARTIDOS)} 
-                size="lg" 
+              <Button
+                onClick={() => navigate(ROUTES.PARTIDOS)}
+                size="lg"
                 variant="outline"
                 className="border-2 hover:border-primary/50"
               >

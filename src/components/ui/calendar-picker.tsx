@@ -28,7 +28,7 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
   const daysInMonth = new Date(
     currentMonth.getFullYear(),
     currentMonth.getMonth() + 1,
-    0,
+    0
   ).getDate();
 
   const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
@@ -91,7 +91,7 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
 
   return (
     <div
-      className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-4 w-[320px]"
+      className="bg-popover border border-border rounded-xl shadow-2xl p-4 w-[320px]"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header del calendario */}
@@ -101,19 +101,19 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
           onClick={prevMonth}
           disabled={!canGoPrev}
           className={cn(
-            "p-2 rounded-lg transition-colors",
-            canGoPrev ? "hover:bg-gray-800 text-white" : "text-gray-600 cursor-not-allowed",
+            "p-2 rounded-lg transition-colors text-foreground",
+            canGoPrev ? "hover:bg-muted" : "text-muted-foreground cursor-not-allowed"
           )}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h3 className="font-semibold text-white">
+        <h3 className="font-semibold text-foreground">
           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
         </h3>
         <button
           type="button"
           onClick={nextMonth}
-          className="p-2 rounded-lg hover:bg-gray-800 text-white transition-colors"
+          className="p-2 rounded-lg hover:bg-muted text-foreground transition-colors"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -122,7 +122,7 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
       {/* Días de la semana */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {dayNames.map((dayName) => (
-          <div key={dayName} className="text-center text-xs font-medium text-gray-400 py-2">
+          <div key={dayName} className="text-center text-xs font-medium text-muted-foreground py-2">
             {dayName}
           </div>
         ))}
@@ -150,10 +150,10 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
               disabled={past}
               className={cn(
                 "h-10 w-10 rounded-lg text-sm font-medium transition-all flex items-center justify-center",
-                past && "text-gray-600 cursor-not-allowed",
-                !past && !selected && "hover:bg-primary/20 text-white",
-                selected && "bg-primary text-white",
-                todayDay && !selected && "ring-2 ring-primary",
+                past && "text-muted-foreground/50 cursor-not-allowed",
+                !past && !selected && "hover:bg-primary/20 text-foreground",
+                selected && "bg-primary text-primary-foreground",
+                todayDay && !selected && "ring-2 ring-primary"
               )}
             >
               {day}
@@ -170,7 +170,7 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
             onSelect("");
             onClose();
           }}
-          className="w-full mt-4 py-2 text-sm text-gray-400 hover:text-white transition-colors border-t border-gray-700 pt-4"
+          className="w-full mt-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors border-t border-border pt-4"
         >
           Limpiar fecha
         </button>

@@ -3,7 +3,7 @@
  * Permite seleccionar tipo de usuario y autenticarse
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   SlidePanel,
@@ -24,17 +24,43 @@ import { validations } from "@/lib/validations";
 import { USER_ROLES, type UserRole } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
 import logoImage from "@/assets/Silbatazo-bordes.png";
-import { LogIn, UserPlus, Mail, User, Lock, Users, X, Shield, Star, ArrowRight, CheckCircle } from "lucide-react";
+import {
+  LogIn,
+  UserPlus,
+  Mail,
+  User,
+  Lock,
+  Users,
+  X,
+  Shield,
+  Star,
+  ArrowRight,
+  CheckCircle,
+} from "lucide-react";
 
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultRole?: UserRole;
+  /** Si es "register", el panel se abre en modo Crear Cuenta */
+  initialMode?: "login" | "register";
 }
 
-export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps) {
-  const [isLogin, setIsLogin] = useState(true);
+export function AuthDialog({
+  open,
+  onOpenChange,
+  defaultRole,
+  initialMode = "login",
+}: AuthDialogProps) {
+  const [isLogin, setIsLogin] = useState(initialMode === "register" ? false : true);
   const [searchParams] = useSearchParams();
+
+  // Sincronizar modo (login/registro) cuando se abre el panel
+  useEffect(() => {
+    if (open) {
+      setIsLogin(initialMode === "register" ? false : true);
+    }
+  }, [open, initialMode]);
   const redirectTo = searchParams.get("redirect");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -200,11 +226,11 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
 
   return (
     <SlidePanel open={open} onOpenChange={onOpenChange}>
-      <SlidePanelContent className="w-full sm:max-w-md">
-        <SlidePanelHeader className="pb-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-4 flex-1">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-ios shrink-0 p-2">
+      <SlidePanelContent className="w-full max-w-md mx-auto max-h-[90dvh] md:max-h-none overflow-y-auto rounded-b-2xl sm:rounded-b-xl shadow-xl">
+        <SlidePanelHeader className="pb-3 sm:pb-4 md:pb-3 px-4 sm:px-6">
+          <div className="flex items-start justify-between gap-3 sm:gap-4">
+            <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+              <div className="flex h-10 w-10 sm:h-11 md:h-10 sm:w-11 md:w-10 items-center justify-center rounded-xl sm:rounded-2xl bg-white shadow-ios shrink-0 p-2">
                 <img
                   src={logoImage}
                   alt="Silbatazo Logo"
@@ -212,132 +238,143 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <SlidePanelTitle className="text-2xl sm:text-3xl font-bold mb-2">
-                {isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
-              </SlidePanelTitle>
-                <SlidePanelDescription className="text-base">
-                {isLogin
-                  ? "Ingresa tus credenciales para continuar"
+                <SlidePanelTitle className="text-xl sm:text-2xl md:text-2xl font-bold mb-1 sm:mb-2 leading-tight">
+                  {isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
+                </SlidePanelTitle>
+                <SlidePanelDescription className="text-sm sm:text-base text-muted-foreground">
+                  {isLogin
+                    ? "Ingresa tus credenciales para continuar"
                     : "Completa el formulario para comenzar"}
-              </SlidePanelDescription>
+                </SlidePanelDescription>
               </div>
             </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => onOpenChange(false)}
-              className="h-9 w-9 shrink-0"
+              className="h-9 w-9 shrink-0 touch-manipulation"
+              aria-label="Cerrar"
             >
               <X className="h-5 w-5" />
             </Button>
           </div>
         </SlidePanelHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5 px-6 pb-6">
-          {!isLogin && (
+        <form onSubmit={handleSubmit} className="px-4 sm:px-6 pb-6 sm:pb-8">
+          {/* Campos en 2 columnas en escritorio para que todo quepa sin scroll */}
+          <div className="md:grid md:grid-cols-2 md:gap-x-4 md:gap-y-3 space-y-4 sm:space-y-5 md:space-y-0">
+            {!isLogin && (
+              <FormField
+                label="Email"
+                name="email"
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (fieldErrors.email) {
+                    setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                  }
+                }}
+                error={fieldErrors.email}
+                disabled={isLoading}
+                autoComplete="email"
+                required
+                leftIcon={<Mail className="h-4 w-4" />}
+              />
+            )}
+
             <FormField
-              label="Email"
-              name="email"
-              type="email"
-              value={email}
+              label="Usuario"
+              name="username"
+              value={username}
               onChange={(e) => {
-                setEmail(e.target.value);
-                if (fieldErrors.email) {
-                  setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                setUsername(e.target.value);
+                if (fieldErrors.username) {
+                  setFieldErrors((prev) => ({ ...prev, username: undefined }));
                 }
               }}
-              error={fieldErrors.email}
+              error={fieldErrors.username}
               disabled={isLoading}
-              autoComplete="email"
+              autoComplete="username"
               required
-              leftIcon={<Mail className="h-4 w-4" />}
+              leftIcon={<User className="h-4 w-4" />}
             />
-          )}
 
-          <FormField
-            label="Usuario"
-            name="username"
-            value={username}
-            onChange={(e) => {
-              setUsername(e.target.value);
-              if (fieldErrors.username) {
-                setFieldErrors((prev) => ({ ...prev, username: undefined }));
-              }
-            }}
-            error={fieldErrors.username}
-            disabled={isLoading}
-            autoComplete="username"
-            required
-            leftIcon={<User className="h-4 w-4" />}
-          />
-
-          <FormField
-            label="Contraseña"
-            name="password"
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (fieldErrors.password) {
-                setFieldErrors((prev) => ({ ...prev, password: undefined }));
-              }
-            }}
-            error={fieldErrors.password}
-            disabled={isLoading}
-            autoComplete={isLogin ? "current-password" : "new-password"}
-            required
-            leftIcon={<Lock className="h-4 w-4" />}
-          />
-
-          {!isLogin && (
-            <>
             <FormField
-              label="Confirmar Contraseña"
-              name="password_confirm"
+              label="Contraseña"
+              name="password"
               type="password"
-              value={passwordConfirm}
+              value={password}
               onChange={(e) => {
-                setPasswordConfirm(e.target.value);
-                if (fieldErrors.password_confirm) {
-                  setFieldErrors((prev) => ({ ...prev, password_confirm: undefined }));
+                setPassword(e.target.value);
+                if (fieldErrors.password) {
+                  setFieldErrors((prev) => ({ ...prev, password: undefined }));
                 }
               }}
-              error={fieldErrors.password_confirm}
+              error={fieldErrors.password}
               disabled={isLoading}
-              autoComplete="new-password"
+              autoComplete={isLogin ? "current-password" : "new-password"}
               required
-                leftIcon={<Lock className="h-4 w-4" />}
+              leftIcon={<Lock className="h-4 w-4" />}
             />
-            </>
-          )}
 
-{!isLogin && showRoleSelector && (
-            <Card variant="outlined" className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/10">
-              <div className="space-y-4">
+            {!isLogin && (
+              <FormField
+                label="Confirmar Contraseña"
+                name="password_confirm"
+                type="password"
+                value={passwordConfirm}
+                onChange={(e) => {
+                  setPasswordConfirm(e.target.value);
+                  if (fieldErrors.password_confirm) {
+                    setFieldErrors((prev) => ({ ...prev, password_confirm: undefined }));
+                  }
+                }}
+                error={fieldErrors.password_confirm}
+                disabled={isLoading}
+                autoComplete="new-password"
+                required
+                leftIcon={<Lock className="h-4 w-4" />}
+              />
+            )}
+          </div>
+
+          {!isLogin && showRoleSelector && (
+            <Card
+              variant="outlined"
+              className="mt-4 sm:mt-5 md:mt-3 p-3 sm:p-4 md:p-3 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/10"
+            >
+              <div className="space-y-2 md:space-y-3">
                 <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Users className="h-4 w-4 text-primary" />
+                  <Users className="h-4 w-4 text-primary shrink-0" />
                   ¿Quién eres?
                 </label>
-                
-                <div className="grid gap-3">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
                   <button
                     type="button"
                     onClick={() => setUserRole(USER_ROLES.CLIENTE)}
-                    className={`relative p-4 rounded-lg border-2 transition-all duration-200 ${
+                    className={`relative p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 touch-manipulation ${
                       userRole === USER_ROLES.CLIENTE
-                        ? 'border-primary bg-primary/10 shadow-md'
-                        : 'border-border bg-card hover:border-primary/50 hover:bg-primary/5'
+                        ? "border-primary bg-primary/10 shadow-md"
+                        : "border-border bg-card hover:border-primary/50 hover:bg-primary/5"
                     }`}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${
-                        userRole === USER_ROLES.CLIENTE ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                      }`}>
-                        <User className="h-5 w-5" />
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <div
+                        className={`p-2 rounded-lg shrink-0 ${
+                          userRole === USER_ROLES.CLIENTE
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted"
+                        }`}
+                      >
+                        <User className="h-4 w-4 sm:h-5 sm:w-5" />
                       </div>
-                      <div className="flex-1 text-left">
-                        <h3 className="font-semibold text-foreground">Cliente</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
+                      <div className="flex-1 min-w-0 text-left">
+                        <h3 className="font-semibold text-foreground text-sm sm:text-base">
+                          Cliente
+                        </h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                           Organizo partidos y necesito árbitros
                         </p>
                         <div className="flex items-center gap-2 mt-2">
@@ -358,21 +395,27 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
                   <button
                     type="button"
                     onClick={() => setUserRole(USER_ROLES.ARBITRO)}
-                    className={`relative p-4 rounded-lg border-2 transition-all duration-200 ${
+                    className={`relative p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 touch-manipulation ${
                       userRole === USER_ROLES.ARBITRO
-                        ? 'border-primary bg-primary/10 shadow-md'
-                        : 'border-border bg-card hover:border-primary/50 hover:bg-primary/5'
+                        ? "border-primary bg-primary/10 shadow-md"
+                        : "border-border bg-card hover:border-primary/50 hover:bg-primary/5"
                     }`}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${
-                        userRole === USER_ROLES.ARBITRO ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                      }`}>
-                        <Shield className="h-5 w-5" />
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <div
+                        className={`p-2 rounded-lg shrink-0 ${
+                          userRole === USER_ROLES.ARBITRO
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted"
+                        }`}
+                      >
+                        <Shield className="h-4 w-4 sm:h-5 sm:w-5" />
                       </div>
-                      <div className="flex-1 text-left">
-                        <h3 className="font-semibold text-foreground">Árbitro</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
+                      <div className="flex-1 min-w-0 text-left">
+                        <h3 className="font-semibold text-foreground text-sm sm:text-base">
+                          Árbitro
+                        </h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                           Ofrezco mis servicios como árbitro
                         </p>
                         <div className="flex items-center gap-2 mt-2">
@@ -415,7 +458,7 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
           )}
 
           {error && (
-            <Alert variant="destructive" className="border-2">
+            <Alert variant="destructive" className="border-2 mt-4 md:mt-3">
               <div className="flex items-start gap-3">
                 <div className="shrink-0 mt-0.5">
                   <svg
@@ -453,11 +496,11 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
             </Alert>
           )}
 
-          <div className="flex flex-col gap-4 pt-6">
+          <div className="flex flex-col gap-3 sm:gap-4 pt-4 sm:pt-5 md:pt-4">
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full shadow-lg hover:shadow-xl transition-all duration-300 text-lg py-3"
+              className="w-full shadow-lg hover:shadow-xl transition-all duration-300 text-base sm:text-lg py-3 min-h-12 sm:min-h-[3rem] touch-manipulation"
               size="lg"
             >
               {isLoading ? (
@@ -489,7 +532,9 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
                 <span className="w-full border-t border-border/50" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-background px-3 text-muted-foreground font-medium">o continúa con</span>
+                <span className="bg-background px-3 text-muted-foreground font-medium">
+                  o continúa con
+                </span>
               </div>
             </div>
 
@@ -498,19 +543,25 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
               variant="outline"
               onClick={toggleMode}
               disabled={isLoading}
-              className="w-full border-2 hover:bg-primary/5 hover:border-primary transition-all duration-200 group"
+              className="w-full border-2 hover:bg-primary/5 hover:border-primary transition-all duration-200 group min-h-11 sm:min-h-12 touch-manipulation"
               size="lg"
             >
               <span className="flex items-center gap-2">
                 {isLogin ? (
                   <>
                     <UserPlus className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-                    <span>¿No tienes cuenta? <span className="font-semibold text-primary">Crear una</span></span>
+                    <span>
+                      ¿No tienes cuenta?{" "}
+                      <span className="font-semibold text-primary">Crear una</span>
+                    </span>
                   </>
                 ) : (
                   <>
                     <LogIn className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-                    <span>¿Ya tienes cuenta? <span className="font-semibold text-primary">Iniciar sesión</span></span>
+                    <span>
+                      ¿Ya tienes cuenta?{" "}
+                      <span className="font-semibold text-primary">Iniciar sesión</span>
+                    </span>
                   </>
                 )}
               </span>
@@ -519,7 +570,9 @@ export function AuthDialog({ open, onOpenChange, defaultRole }: AuthDialogProps)
             {/* Benefits section */}
             {!isLogin && (
               <div className="mt-4 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/10">
-                <p className="text-xs font-medium text-muted-foreground mb-2">✨ Beneficios de registrarte:</p>
+                <p className="text-xs font-medium text-muted-foreground mb-2">
+                  ✨ Beneficios de registrarte:
+                </p>
                 <div className="grid grid-cols-1 gap-1 text-xs text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-3 w-3 text-green-500" />

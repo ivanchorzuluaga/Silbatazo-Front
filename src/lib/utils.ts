@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -12,9 +12,9 @@ export function cn(...inputs: ClassValue[]) {
  * @returns Date object en la zona horaria local
  */
 export function parseLocalDate(fechaStr: string): Date {
-  const [year, month, day] = fechaStr.split('-').map(Number)
+  const [year, month, day] = fechaStr.split("-").map(Number);
   // month es 0-indexed en JavaScript (0 = enero, 11 = diciembre)
-  return new Date(year, month - 1, day)
+  return new Date(year, month - 1, day);
 }
 
 /**
@@ -22,11 +22,11 @@ export function parseLocalDate(fechaStr: string): Date {
  * @returns String en formato "YYYY-MM-DD"
  */
 export function getTodayLocalDate(): string {
-  const hoy = new Date()
-  const year = hoy.getFullYear()
-  const month = String(hoy.getMonth() + 1).padStart(2, '0')
-  const day = String(hoy.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+  const hoy = new Date();
+  const year = hoy.getFullYear();
+  const month = String(hoy.getMonth() + 1).padStart(2, "0");
+  const day = String(hoy.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 /**
@@ -36,9 +36,9 @@ export function getTodayLocalDate(): string {
  * @returns -1 si fecha1 < fecha2, 0 si son iguales, 1 si fecha1 > fecha2
  */
 export function compareDates(fecha1: string, fecha2: string): number {
-  if (fecha1 < fecha2) return -1
-  if (fecha1 > fecha2) return 1
-  return 0
+  if (fecha1 < fecha2) return -1;
+  if (fecha1 > fecha2) return 1;
+  return 0;
 }
 
 /**
@@ -48,41 +48,58 @@ export function compareDates(fecha1: string, fecha2: string): number {
  * @returns String en formato "YYYY-MM-DD" o string vacío si no es válida
  */
 export function normalizeDateForInput(fecha: string | Date | null | undefined): string {
-  if (!fecha) return ""
-  
+  if (!fecha) return "";
+
   // Si ya es un string en formato YYYY-MM-DD, devolverlo directamente
   if (typeof fecha === "string") {
     // Verificar si es formato YYYY-MM-DD
     if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
-      return fecha
+      return fecha;
     }
     // Si es un string ISO, extraer solo la parte de la fecha
-    const dateMatch = fecha.match(/^(\d{4}-\d{2}-\d{2})/)
+    const dateMatch = fecha.match(/^(\d{4}-\d{2}-\d{2})/);
     if (dateMatch) {
-      return dateMatch[1]
+      return dateMatch[1];
     }
     // Intentar parsear como fecha
     try {
-      const date = new Date(fecha)
+      const date = new Date(fecha);
       if (!isNaN(date.getTime())) {
-        const year = date.getFullYear()
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        return `${year}-${month}-${day}`
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
       }
     } catch {
-      return ""
+      return "";
     }
   }
-  
+
   // Si es un Date object, convertir a string YYYY-MM-DD
   if (fecha instanceof Date) {
-    if (isNaN(fecha.getTime())) return ""
-    const year = fecha.getFullYear()
-    const month = String(fecha.getMonth() + 1).padStart(2, '0')
-    const day = String(fecha.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
+    if (isNaN(fecha.getTime())) return "";
+    const year = fecha.getFullYear();
+    const month = String(fecha.getMonth() + 1).padStart(2, "0");
+    const day = String(fecha.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   }
-  
-  return ""
+
+  return "";
+}
+
+/**
+ * Formatea un monto en pesos colombianos (COP).
+ * Usa locale es-CO: miles con punto (.), decimales con coma (,), símbolo $.
+ * @param value - Número o string numérico
+ * @param options.decimals - Si true, muestra 2 decimales (ej: 70.000,50). Por defecto 0 decimales (ej: 70.000)
+ */
+export function formatCop(value: number | string, options?: { decimals?: boolean }): string {
+  const num = typeof value === "string" ? parseFloat(value) : value;
+  if (Number.isNaN(num)) return "";
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: options?.decimals ? 2 : 0,
+    maximumFractionDigits: options?.decimals ? 2 : 0,
+  }).format(num);
 }

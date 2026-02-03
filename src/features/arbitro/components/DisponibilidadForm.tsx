@@ -1,5 +1,6 @@
 /**
  * Componente para crear/editar disponibilidad de árbitro
+ * Si se pasa municipiosPerfil, no se muestra selector de municipios y se usan esos (los del perfil).
  */
 
 import { useState, useEffect } from "react";
@@ -16,6 +17,8 @@ import type {
 
 interface DisponibilidadFormProps {
   disponibilidad?: DisponibilidadArbitro;
+  /** Municipios del perfil del árbitro. Si se pasan, no se pregunta por municipios y se usan estos. */
+  municipiosPerfil?: { id: number }[];
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -32,6 +35,7 @@ const DIAS_SEMANA: { value: DiaSemana; label: string }[] = [
 
 export function DisponibilidadForm({
   disponibilidad,
+  municipiosPerfil,
   onSuccess,
   onCancel,
 }: DisponibilidadFormProps) {
@@ -39,12 +43,17 @@ export function DisponibilidadForm({
     useDisponibilidad();
   const { municipios } = useMunicipios();
 
+  const usarMunicipiosPerfil = municipiosPerfil !== undefined;
+
   const [diaSemana, setDiaSemana] = useState<DiaSemana>(disponibilidad?.dia_semana || "lunes");
   const [horaInicio, setHoraInicio] = useState(disponibilidad?.hora_inicio || "08:00");
   const [horaFin, setHoraFin] = useState(disponibilidad?.hora_fin || "18:00");
-  const [municipiosSeleccionados, setMunicipiosSeleccionados] = useState<number[]>(
-    disponibilidad?.municipios.map((m) => m.id) || []
-  );
+  const [municipiosSeleccionados, setMunicipiosSeleccionados] = useState<number[]>(() => {
+    if (usarMunicipiosPerfil) {
+      return (municipiosPerfil ?? []).map((m) => m.id);
+    }
+    return disponibilidad?.municipios.map((m) => m.id) || [];
+  });
   const [activo, setActivo] = useState(disponibilidad?.activo ?? true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -53,10 +62,19 @@ export function DisponibilidadForm({
       setDiaSemana(disponibilidad.dia_semana);
       setHoraInicio(disponibilidad.hora_inicio);
       setHoraFin(disponibilidad.hora_fin);
-      setMunicipiosSeleccionados(disponibilidad.municipios.map((m) => m.id));
+      if (!usarMunicipiosPerfil) {
+        setMunicipiosSeleccionados(disponibilidad.municipios.map((m) => m.id));
+      }
       setActivo(disponibilidad.activo);
     }
-  }, [disponibilidad]);
+  }, [disponibilidad, usarMunicipiosPerfil]);
+
+  // Sincronizar municipios del perfil cuando cambian (ej. usuario editó su perfil)
+  useEffect(() => {
+    if (usarMunicipiosPerfil) {
+      setMunicipiosSeleccionados((municipiosPerfil ?? []).map((m) => m.id));
+    }
+  }, [usarMunicipiosPerfil, municipiosPerfil]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,6 +86,11 @@ export function DisponibilidadForm({
       return;
     }
 
+    const idsMunicipios =
+      usarMunicipiosPerfil && municipiosPerfil?.length
+        ? municipiosPerfil.map((m) => m.id)
+        : municipiosSeleccionados;
+
     setIsSubmitting(true);
     try {
       const data: DisponibilidadCreateData = {
@@ -75,7 +98,7 @@ export function DisponibilidadForm({
         hora_inicio: horaInicio,
         hora_fin: horaFin,
         activo,
-        municipios_ids: municipiosSeleccionados.length > 0 ? municipiosSeleccionados : undefined,
+        municipios_ids: idsMunicipios.length > 0 ? idsMunicipios : undefined,
       };
 
       if (disponibilidad) {
@@ -89,7 +112,7 @@ export function DisponibilidadForm({
         setDiaSemana("lunes");
         setHoraInicio("08:00");
         setHoraFin("18:00");
-        setMunicipiosSeleccionados([]);
+        if (!usarMunicipiosPerfil) setMunicipiosSeleccionados([]);
         setActivo(true);
       }
 
@@ -162,37 +185,44 @@ export function DisponibilidadForm({
         </div>
       </div>
 
-      <div>
-        <label className="text-sm font-medium text-foreground block mb-2">
-          Municipios específicos (opcional)
-        </label>
-        <p className="text-xs text-muted-foreground mb-2">
-          Si no seleccionas ninguno, aplicará a todos tus municipios
-        </p>
-        <div className="max-h-40 overflow-y-auto border rounded-lg p-2 space-y-2">
-          {municipios.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Cargando municipios...</p>
-          ) : (
-            municipios.map((municipio) => (
-              <label
-                key={municipio.id}
-                className="flex items-center space-x-2 cursor-pointer hover:bg-accent/50 p-2 rounded"
-              >
-                <input
-                  type="checkbox"
-                  checked={municipiosSeleccionados.includes(municipio.id)}
-                  onChange={() => toggleMunicipio(municipio.id)}
-                  className="rounded border-gray-300"
-                />
-                <span className="text-sm">
-                  {municipio.nombre}
-                  {municipio.departamento && `, ${municipio.departamento}`}
-                </span>
-              </label>
-            ))
-          )}
+      {!usarMunicipiosPerfil && (
+        <div>
+          <label className="text-sm font-medium text-foreground block mb-2">
+            Municipios específicos (opcional)
+          </label>
+          <p className="text-xs text-muted-foreground mb-2">
+            Si no seleccionas ninguno, aplicará a todos tus municipios
+          </p>
+          <div className="max-h-40 overflow-y-auto border rounded-lg p-2 space-y-2">
+            {municipios.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Cargando municipios...</p>
+            ) : (
+              municipios.map((municipio) => (
+                <label
+                  key={municipio.id}
+                  className="flex items-center space-x-2 cursor-pointer hover:bg-accent/50 p-2 rounded"
+                >
+                  <input
+                    type="checkbox"
+                    checked={municipiosSeleccionados.includes(municipio.id)}
+                    onChange={() => toggleMunicipio(municipio.id)}
+                    className="rounded border-gray-300"
+                  />
+                  <span className="text-sm">
+                    {municipio.nombre}
+                    {municipio.departamento && `, ${municipio.departamento}`}
+                  </span>
+                </label>
+              ))
+            )}
+          </div>
         </div>
-      </div>
+      )}
+      {usarMunicipiosPerfil && (
+        <p className="text-sm text-muted-foreground">
+          Esta disponibilidad aplicará a los mismos municipios configurados en tu perfil.
+        </p>
+      )}
 
       <div>
         <label className="flex items-center space-x-2 cursor-pointer">

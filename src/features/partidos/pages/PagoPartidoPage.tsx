@@ -6,6 +6,7 @@
 import { useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { usePagoPartido } from "../hooks/usePagoPartido";
 import { ROUTES } from "@/lib/constants";
 import logoImage from "@/assets/Silbatazo-bordes.png";
@@ -80,9 +81,9 @@ export function PagoPartidoPage() {
     return (
       <PageContainer>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center">
+          <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-8 text-center">
             <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-            <p className="text-lg font-medium text-white">Cargando información del pago...</p>
+            <p className="text-lg font-medium text-foreground">Cargando información del pago...</p>
           </div>
         </div>
       </PageContainer>
@@ -94,10 +95,10 @@ export function PagoPartidoPage() {
     return (
       <PageContainer>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="bg-red-500/10 backdrop-blur-md rounded-2xl border border-red-500/20 p-8 text-center max-w-md">
-            <XCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <p className="text-lg font-medium text-white mb-2">Error</p>
-            <p className="text-white/70 mb-6">{error || "Partido no encontrado"}</p>
+          <div className="bg-destructive/10 backdrop-blur-md rounded-2xl border border-destructive/20 p-8 text-center max-w-md">
+            <XCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
+            <p className="text-lg font-medium text-foreground mb-2">Error</p>
+            <p className="text-muted-foreground mb-6">{error || "Partido no encontrado"}</p>
             <Button onClick={navigateToDashboard}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Volver al Dashboard
@@ -113,10 +114,10 @@ export function PagoPartidoPage() {
     return (
       <PageContainer>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="bg-red-500/10 backdrop-blur-md rounded-2xl border border-red-500/20 p-8 text-center max-w-md">
-            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <p className="text-lg font-medium text-white mb-2">Acceso Denegado</p>
-            <p className="text-white/70 mb-6">No tienes permiso para ver este pago</p>
+          <div className="bg-destructive/10 backdrop-blur-md rounded-2xl border border-destructive/20 p-8 text-center max-w-md">
+            <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
+            <p className="text-lg font-medium text-foreground mb-2">Acceso Denegado</p>
+            <p className="text-muted-foreground mb-6">No tienes permiso para ver este pago</p>
             <Button onClick={navigateToDashboard}>Volver al Dashboard</Button>
           </div>
         </div>
@@ -128,17 +129,23 @@ export function PagoPartidoPage() {
     <PageContainer>
       {/* Header */}
       <header className="mb-8">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={navigateToDashboard}
-          className="mb-4 bg-white/10 border border-white/20 text-white hover:bg-white/20"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Volver al Dashboard
-        </Button>
-        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Pago del Partido</h1>
-        <p className="text-white/60">Completa el pago para confirmar tu solicitud</p>
+        <div className="flex items-center justify-between mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={navigateToDashboard}
+            className="text-foreground hover:bg-muted"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Volver al Dashboard
+          </Button>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Tema</span>
+            <ThemeToggle size="sm" />
+          </div>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Pago del Partido</h1>
+        <p className="text-muted-foreground">Completa el pago para confirmar tu solicitud</p>
       </header>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -159,9 +166,9 @@ export function PagoPartidoPage() {
               <InfoRow icon={Clock} label="Hora" value={partido.hora.substring(0, 5)} />
               <InfoRow icon={MapPin} label="Municipio" value={partido.municipio.nombre} />
               <InfoRow icon={Trophy} label="Categoría" value={partido.categoria.nombre} />
-              <div className="pt-3 border-t border-white/10">
+              <div className="pt-3 border-t border-border">
                 <div className="flex items-center justify-between">
-                  <span className="text-white/60 text-sm">Código:</span>
+                  <span className="text-muted-foreground text-sm">Código:</span>
                   <code className="text-primary font-mono text-sm">{referencia}</code>
                 </div>
               </div>
@@ -177,10 +184,10 @@ export function PagoPartidoPage() {
               <div className="p-2 bg-primary/20 rounded-lg">
                 <Banknote className="w-5 h-5 text-primary" />
               </div>
-              <span className="font-semibold text-white">Total a Pagar</span>
+              <span className="font-semibold text-foreground">Total a Pagar</span>
             </div>
             <p className="text-4xl font-bold text-primary">{formatCurrency(monto)}</p>
-            <p className="text-white/50 text-sm mt-2">COP - Pesos Colombianos</p>
+            <p className="text-muted-foreground text-sm mt-2">COP - Pesos Colombianos</p>
           </div>
         </div>
 
@@ -189,14 +196,14 @@ export function PagoPartidoPage() {
           {!yaPagado ? (
             <div className="space-y-6">
               {/* Sección de pago con Nequi */}
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6">
+              <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 bg-[#E61D73]/20 rounded-lg">
                     <Smartphone className="w-5 h-5 text-[#E61D73]" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">Pagar con Nequi</h2>
-                    <p className="text-white/60 text-sm">Transferencia rápida y segura</p>
+                    <h2 className="text-xl font-bold text-foreground">Pagar con Nequi</h2>
+                    <p className="text-muted-foreground text-sm">Transferencia rápida y segura</p>
                   </div>
                 </div>
 
@@ -213,7 +220,7 @@ export function PagoPartidoPage() {
                         }}
                       />
                     </div>
-                    <p className="text-white/60 text-sm text-center">
+                    <p className="text-muted-foreground text-sm text-center">
                       Escanea el código QR con la app de Nequi
                     </p>
                   </div>
@@ -229,7 +236,7 @@ export function PagoPartidoPage() {
                     <CopyField
                       label="Monto"
                       value={formatCurrency(monto)}
-                      onCopy={() => handleCopy(monto.toString())}
+                      onCopy={() => handleCopy(formatCurrency(monto))}
                     />
                     <CopyField label="Referencia" value={referencia} onCopy={handleCopy} mono />
                   </div>
@@ -237,9 +244,9 @@ export function PagoPartidoPage() {
               </div>
 
               {/* Instrucciones */}
-              <div className="bg-blue-500/10 backdrop-blur-md rounded-2xl border border-blue-500/20 p-6">
-                <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-blue-400" />
+              <div className="bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20 p-6">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-primary" />
                   Instrucciones para pagar
                 </h3>
                 <ol className="space-y-3">
@@ -254,24 +261,24 @@ export function PagoPartidoPage() {
                     "Sube la captura y confirma tu pago",
                   ].map((step, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-medium">
+                      <span className="shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-sm font-medium">
                         {index + 1}
                       </span>
-                      <span className="text-white/80 text-sm">{step}</span>
+                      <span className="text-foreground text-sm">{step}</span>
                     </li>
                   ))}
                 </ol>
               </div>
 
               {/* Subir comprobante */}
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6">
+              <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-primary/20 rounded-lg">
                     <Upload className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white">Subir Comprobante de Pago</h3>
-                    <p className="text-white/60 text-sm">
+                    <h3 className="font-semibold text-foreground">Subir Comprobante de Pago</h3>
+                    <p className="text-muted-foreground text-sm">
                       Sube una captura de pantalla de la transferencia
                     </p>
                   </div>
@@ -297,13 +304,13 @@ export function PagoPartidoPage() {
                       />
                       <button
                         onClick={handleRemoveComprobante}
-                        className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 rounded-full transition-colors"
+                        className="absolute top-2 right-2 p-2 bg-destructive hover:bg-destructive/90 rounded-full transition-colors"
                       >
-                        <X className="w-4 h-4 text-white" />
+                        <X className="w-4 h-4 text-destructive-foreground" />
                       </button>
                     </div>
-                    <p className="text-center text-white/60 text-sm mt-3">
-                      <CheckCircle className="w-4 h-4 inline-block mr-1 text-green-400" />
+                    <p className="text-center text-muted-foreground text-sm mt-3">
+                      <CheckCircle className="w-4 h-4 inline-block mr-1 text-success" />
                       Comprobante cargado: {comprobante?.name}
                     </p>
                   </div>
@@ -314,19 +321,19 @@ export function PagoPartidoPage() {
                       "w-full p-8 border-2 border-dashed rounded-xl transition-all",
                       "hover:border-primary/50 hover:bg-primary/5",
                       comprobanteError
-                        ? "border-red-500/50 bg-red-500/5"
-                        : "border-white/20 bg-white/5",
+                        ? "border-destructive/50 bg-destructive/5"
+                        : "border-border bg-muted/50"
                     )}
                   >
                     <div className="flex flex-col items-center gap-3">
-                      <div className="p-4 bg-white/10 rounded-full">
-                        <ImageIcon className="w-8 h-8 text-white/60" />
+                      <div className="p-4 bg-muted rounded-full">
+                        <ImageIcon className="w-8 h-8 text-muted-foreground" />
                       </div>
                       <div className="text-center">
-                        <p className="text-white font-medium">
+                        <p className="text-foreground font-medium">
                           Haz clic para seleccionar la captura
                         </p>
-                        <p className="text-white/50 text-sm mt-1">
+                        <p className="text-muted-foreground text-sm mt-1">
                           JPG, PNG, WebP o GIF (máx. 5MB)
                         </p>
                       </div>
@@ -336,7 +343,7 @@ export function PagoPartidoPage() {
 
                 {/* Error del comprobante */}
                 {comprobanteError && (
-                  <p className="text-red-400 text-sm mt-3 flex items-center gap-2">
+                  <p className="text-destructive text-sm mt-3 flex items-center gap-2">
                     <AlertCircle className="w-4 h-4" />
                     {comprobanteError}
                   </p>
@@ -344,8 +351,8 @@ export function PagoPartidoPage() {
               </div>
 
               {/* Botón de confirmación */}
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6 text-center">
-                <p className="text-white/60 text-sm mb-6 max-w-md mx-auto">
+              <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-6 text-center">
+                <p className="text-muted-foreground text-sm mb-6 max-w-md mx-auto">
                   Una vez que hayas subido el comprobante, confirma tu pago para que podamos
                   verificarlo.
                 </p>
@@ -355,7 +362,7 @@ export function PagoPartidoPage() {
                   size="lg"
                   className={cn(
                     "h-14 px-8 text-lg shadow-lg shadow-primary/25",
-                    !comprobante && "opacity-50 cursor-not-allowed",
+                    !comprobante && "opacity-50 cursor-not-allowed"
                   )}
                 >
                   {isMarkingAsPaid ? (
@@ -371,7 +378,7 @@ export function PagoPartidoPage() {
                   )}
                 </Button>
                 {!comprobante && (
-                  <p className="text-amber-400/80 text-xs mt-3">
+                  <p className="text-warning text-xs mt-3">
                     Debes subir el comprobante para confirmar
                   </p>
                 )}
@@ -405,11 +412,13 @@ export function PagoPartidoPage() {
 
 function PageContainer({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen relative">
-      {/* Fondo */}
-      <div className="fixed inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-background" />
-      <div className="fixed top-0 right-0 h-96 w-96 bg-primary/20 rounded-full blur-[128px] pointer-events-none" />
-      <div className="fixed bottom-0 left-0 h-64 w-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+    <div className="min-h-screen relative bg-background">
+      {/* Fondo con gradiente adaptativo */}
+      <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-primary/10 dark:from-background dark:via-background dark:to-primary/20" />
+
+      {/* Efectos de luz - solo en modo oscuro */}
+      <div className="fixed top-0 right-0 h-96 w-96 bg-primary/20 rounded-full blur-[128px] pointer-events-none dark:block hidden" />
+      <div className="fixed bottom-0 left-0 h-64 w-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none dark:block hidden" />
 
       {/* Logo de fondo */}
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
@@ -430,12 +439,12 @@ interface InfoCardProps {
 
 function InfoCard({ icon: Icon, title, children }: InfoCardProps) {
   return (
-    <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6">
+    <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className="p-2 bg-primary/20 rounded-lg">
           <Icon className="w-5 h-5 text-primary" />
         </div>
-        <h2 className="font-semibold text-white">{title}</h2>
+        <h2 className="font-semibold text-foreground">{title}</h2>
       </div>
       {children}
     </div>
@@ -451,11 +460,11 @@ interface InfoRowProps {
 function InfoRow({ icon: Icon, label, value }: InfoRowProps) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-white/60 text-sm flex items-center gap-2">
+      <span className="text-muted-foreground text-sm flex items-center gap-2">
         <Icon className="w-4 h-4" />
         {label}
       </span>
-      <span className="text-white font-medium text-sm">{value}</span>
+      <span className="text-foreground font-medium text-sm">{value}</span>
     </div>
   );
 }
@@ -471,17 +480,19 @@ interface CopyFieldProps {
 function CopyField({ label, value, onCopy, sublabel, mono }: CopyFieldProps) {
   return (
     <div className="space-y-1">
-      <label className="text-white/60 text-sm">{label}</label>
-      <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg p-3">
-        <span className={cn("flex-1 text-white font-medium", mono && "font-mono")}>{value}</span>
+      <label className="text-muted-foreground text-sm">{label}</label>
+      <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-lg p-3">
+        <span className={cn("flex-1 text-foreground font-medium", mono && "font-mono")}>
+          {value}
+        </span>
         <button
           onClick={() => onCopy(typeof value === "string" ? value : String(value))}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          className="p-2 hover:bg-muted rounded-lg transition-colors"
         >
-          <Copy className="w-4 h-4 text-white/60" />
+          <Copy className="w-4 h-4 text-muted-foreground" />
         </button>
       </div>
-      {sublabel && <p className="text-white/40 text-xs">{sublabel}</p>}
+      {sublabel && <p className="text-muted-foreground text-xs">{sublabel}</p>}
     </div>
   );
 }
@@ -499,29 +510,29 @@ function PaymentStatusCard({ estadoPago, notasPago }: PaymentStatusCardProps) {
     <div
       className={cn(
         "backdrop-blur-md rounded-2xl border p-6",
-        isAprobado && "bg-green-500/10 border-green-500/20",
-        isEnRevision && "bg-amber-500/10 border-amber-500/20",
-        !isAprobado && !isEnRevision && "bg-red-500/10 border-red-500/20",
+        isAprobado && "bg-success/10 border-success/20",
+        isEnRevision && "bg-warning/10 border-warning/20",
+        !isAprobado && !isEnRevision && "bg-destructive/10 border-destructive/20"
       )}
     >
       <div className="flex items-start gap-4">
         {isAprobado ? (
-          <CheckCircle className="w-8 h-8 text-green-400 shrink-0" />
+          <CheckCircle className="w-8 h-8 text-success shrink-0" />
         ) : isEnRevision ? (
-          <Loader2 className="w-8 h-8 text-amber-400 animate-spin shrink-0" />
+          <Loader2 className="w-8 h-8 text-warning animate-spin shrink-0" />
         ) : (
-          <XCircle className="w-8 h-8 text-red-400 shrink-0" />
+          <XCircle className="w-8 h-8 text-destructive shrink-0" />
         )}
         <div>
-          <p className="font-semibold text-white mb-1">
+          <p className="font-semibold text-foreground mb-1">
             {isAprobado ? "Pago Aprobado" : isEnRevision ? "Pago en Revisión" : "Pago Rechazado"}
           </p>
-          <p className="text-white/70 text-sm">
+          <p className="text-muted-foreground text-sm">
             {isAprobado
               ? "Tu pago ha sido verificado y aprobado."
               : isEnRevision
-                ? "Tu pago está siendo revisado por el administrador."
-                : notasPago || "El pago fue rechazado. Por favor, verifica la información."}
+              ? "Tu pago está siendo revisado por el administrador."
+              : notasPago || "El pago fue rechazado. Por favor, verifica la información."}
           </p>
         </div>
       </div>
@@ -538,32 +549,32 @@ function PaymentCompletedView({ estadoPago }: PaymentCompletedViewProps) {
   const isEnRevision = estadoPago === "en_revision";
 
   return (
-    <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center">
+    <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-8 text-center">
       <div
         className={cn(
           "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6",
-          isAprobado && "bg-green-500/20",
-          isEnRevision && "bg-amber-500/20",
-          !isAprobado && !isEnRevision && "bg-red-500/20",
+          isAprobado && "bg-success/20",
+          isEnRevision && "bg-warning/20",
+          !isAprobado && !isEnRevision && "bg-destructive/20"
         )}
       >
         {isAprobado ? (
-          <CheckCircle className="w-10 h-10 text-green-400" />
+          <CheckCircle className="w-10 h-10 text-success" />
         ) : isEnRevision ? (
-          <Loader2 className="w-10 h-10 text-amber-400 animate-spin" />
+          <Loader2 className="w-10 h-10 text-warning animate-spin" />
         ) : (
-          <XCircle className="w-10 h-10 text-red-400" />
+          <XCircle className="w-10 h-10 text-destructive" />
         )}
       </div>
-      <h2 className="text-2xl font-bold text-white mb-3">
+      <h2 className="text-2xl font-bold text-foreground mb-3">
         {isAprobado ? "¡Pago Confirmado!" : isEnRevision ? "Pago en Revisión" : "Pago Rechazado"}
       </h2>
-      <p className="text-white/70 max-w-md mx-auto mb-8">
+      <p className="text-muted-foreground max-w-md mx-auto mb-8">
         {isAprobado
           ? "Tu pago ha sido verificado exitosamente. El árbitro ha sido notificado y tu partido está confirmado."
           : isEnRevision
-            ? "Tu pago está siendo revisado por nuestro equipo. Te notificaremos cuando sea aprobado."
-            : "Hubo un problema con tu pago. Por favor, contacta a soporte o intenta nuevamente."}
+          ? "Tu pago está siendo revisado por nuestro equipo. Te notificaremos cuando sea aprobado."
+          : "Hubo un problema con tu pago. Por favor, contacta a soporte o intenta nuevamente."}
       </p>
       <Link to={ROUTES.CLIENTE_DASHBOARD}>
         <Button size="lg" className="px-8">

@@ -23,8 +23,10 @@ export interface UseClienteDashboardReturn {
   user: ReturnType<typeof useAuth>["user"];
   username: string;
 
-  // Estado de carga
+  // Estado de carga y error
   isLoading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
 
   // Estadísticas
   stats: DashboardStats;
@@ -45,7 +47,7 @@ export interface UseClienteDashboardReturn {
 export function useClienteDashboard(): UseClienteDashboardReturn {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { partidos, isLoading } = usePartidos();
+  const { partidos, isLoading, error, refetch } = usePartidos();
 
   // Nombre del usuario
   const username = user?.username || "Cliente";
@@ -54,7 +56,7 @@ export function useClienteDashboard(): UseClienteDashboardReturn {
   const stats = useMemo<DashboardStats>(() => {
     const total = partidos.length;
     const pendientes = partidos.filter(
-      (p) => p.estado === "pendiente" || p.estado === "buscando_arbitro",
+      (p) => p.estado === "pendiente" || p.estado === "buscando_arbitro"
     ).length;
     const aceptados = partidos.filter((p) => p.estado === "aceptado").length;
     const completados = partidos.filter((p) => p.estado === "completado").length;
@@ -102,6 +104,8 @@ export function useClienteDashboard(): UseClienteDashboardReturn {
     user,
     username,
     isLoading,
+    error,
+    refetch,
     stats,
     proximosPartidos,
     partidosRecientes,

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/forms";
 import { Select } from "@/components/ui/select";
+import { formatCop } from "@/lib/utils";
 import { useRetiros } from "../hooks/useRetiros";
 import type { RetiroCreateData, TipoCuenta, SaldoDisponible } from "../types/arbitro.types";
 
@@ -45,11 +46,11 @@ export function RetiroForm({ saldo, onSuccess, onCancel }: RetiroFormProps) {
       errors.monto = "El monto debe ser mayor a cero";
     } else if (saldo) {
       if (montoNum < 10000) {
-        errors.monto = "El monto mínimo de retiro es $10,000 COP";
+        errors.monto = `El monto mínimo de retiro es ${formatCop(10000)}`;
       } else if (montoNum > saldo.saldo_real_disponible) {
-        errors.monto = `El monto excede el saldo disponible (${saldo.saldo_real_disponible.toLocaleString(
-          "es-CO"
-        )} COP)`;
+        errors.monto = `El monto excede el saldo disponible (${formatCop(
+          saldo.saldo_real_disponible
+        )})`;
       }
     }
 
@@ -93,12 +94,10 @@ export function RetiroForm({ saldo, onSuccess, onCancel }: RetiroFormProps) {
       {saldo && (
         <div className="rounded-lg border bg-card p-4 space-y-2">
           <p className="text-sm text-muted-foreground">Saldo disponible</p>
-          <p className="text-2xl font-bold text-primary">
-            ${saldoDisponible.toLocaleString("es-CO")} COP
-          </p>
+          <p className="text-2xl font-bold text-primary">{formatCop(saldoDisponible)}</p>
           {saldo.saldo_pendiente > 0 && (
             <p className="text-xs text-muted-foreground">
-              ${saldo.saldo_pendiente.toLocaleString("es-CO")} COP pendientes de retiro
+              {formatCop(saldo.saldo_pendiente)} pendientes de retiro
             </p>
           )}
         </div>

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES, USER_ROLES, APP_NAME } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import logoImage from "@/assets/Silbatazo-bordes.png";
 import {
   Home,
@@ -139,7 +140,7 @@ export function Sidebar({ className }: SidebarProps) {
     <aside
       className={cn(
         "hidden sm:flex sm:flex-col sm:fixed sm:left-0 sm:top-0 sm:h-screen sm:w-64 sm:border-r sm:bg-card/50 sm:backdrop-blur-sm sm:z-40",
-        className,
+        className
       )}
     >
       {/* Header con Logo */}
@@ -194,8 +195,7 @@ export function Sidebar({ className }: SidebarProps) {
                         className={cn(
                           "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-ios",
                           "hover:bg-accent hover:text-accent-foreground",
-                          isActive &&
-                            "bg-primary/10 text-primary font-semibold hover:bg-primary/15",
+                          isActive && "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
                         )}
                       >
                         <Icon className="size-4 shrink-0" />
@@ -216,7 +216,11 @@ export function Sidebar({ className }: SidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="border-t p-4 flex-shrink-0">
+      <div className="border-t p-4 flex-shrink-0 space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-xs text-muted-foreground">Tema</span>
+          <ThemeToggle size="sm" />
+        </div>
         <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
           <LogOut className="mr-2 size-4" />
           Cerrar Sesión

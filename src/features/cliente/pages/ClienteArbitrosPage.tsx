@@ -12,13 +12,17 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Button } from "@/components/ui/button";
 import logoImage from "@/assets/Silbatazo-bordes.png";
 import { getRefereeImage } from "@/lib/referee-images";
-import { getClienteArbitroDetailRoute } from "@/lib/constants";
+import { getClienteArbitroDetailRoute, CATEGORIAS_PARTIDO } from "@/lib/constants";
 import { Users, RefreshCw, SearchX, Loader2, Star, MapPin, Trophy, ArrowRight } from "lucide-react";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
 export function ClienteArbitrosPage() {
   const { municipios } = useMunicipios();
-  const { categorias } = useCategorias();
+  const { categorias: todasLasCategorias } = useCategorias();
+  // Filtrar solo las categorías de partido (las mismas que se usan en el formulario)
+  const categorias = todasLasCategorias.filter((c) =>
+    (CATEGORIAS_PARTIDO as readonly string[]).includes(c.nombre)
+  );
   const { arbitros, isLoading, error, filtros, setFiltros, limpiarFiltros, recargar } =
     useArbitrosSearch();
 
@@ -34,8 +38,8 @@ export function ClienteArbitrosPage() {
                 <Users className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white">Buscar Árbitros</h1>
-                <p className="text-white/60 text-sm">
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Buscar Árbitros</h1>
+                <p className="text-sm text-muted-foreground">
                   Encuentra el árbitro perfecto para tu partido
                 </p>
               </div>
@@ -44,7 +48,7 @@ export function ClienteArbitrosPage() {
 
           {/* Filtros */}
           <section className="mb-8">
-            <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-4 sm:p-6 overflow-visible">
+            <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-4 sm:p-6 overflow-visible">
               <FiltrosArbitros
                 municipios={municipios}
                 categorias={categorias}
@@ -79,11 +83,12 @@ export function ClienteArbitrosPage() {
 
 function PageContainer({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen relative">
-      {/* Fondo */}
-      <div className="fixed inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-background" />
-      <div className="fixed top-0 right-0 h-96 w-96 bg-primary/20 rounded-full blur-[128px] pointer-events-none" />
-      <div className="fixed bottom-0 left-0 h-64 w-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+    <div className="min-h-screen relative bg-background">
+      {/* Fondo con gradiente adaptativo */}
+      <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-primary/10 dark:from-background dark:via-background dark:to-primary/20" />
+      {/* Efectos de luz solo en oscuro */}
+      <div className="fixed top-0 right-0 h-96 w-96 bg-primary/20 rounded-full blur-[128px] pointer-events-none dark:block hidden" />
+      <div className="fixed bottom-0 left-0 h-64 w-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none dark:block hidden" />
 
       {/* Logo de fondo */}
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
@@ -99,10 +104,10 @@ function PageContainer({ children }: { children: React.ReactNode }) {
 function LoadingState() {
   return (
     <div className="flex flex-col items-center justify-center py-16">
-      <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center">
+      <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-8 text-center">
         <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-        <p className="text-lg font-medium text-white mb-2">Cargando árbitros...</p>
-        <p className="text-sm text-white/60">Buscando los mejores profesionales</p>
+        <p className="text-lg font-medium text-foreground mb-2">Cargando árbitros...</p>
+        <p className="text-sm text-muted-foreground">Buscando los mejores profesionales</p>
       </div>
     </div>
   );
@@ -116,16 +121,16 @@ interface ErrorStateProps {
 function ErrorState({ error, onRetry }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16">
-      <div className="bg-red-500/10 backdrop-blur-md rounded-2xl border border-red-500/20 p-8 text-center max-w-md">
-        <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <SearchX className="w-8 h-8 text-red-400" />
+      <div className="bg-destructive/10 backdrop-blur-md rounded-2xl border border-destructive/20 p-8 text-center max-w-md">
+        <div className="w-16 h-16 bg-destructive/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <SearchX className="w-8 h-8 text-destructive" />
         </div>
-        <p className="text-lg font-medium text-white mb-2">Error al cargar</p>
-        <p className="text-sm text-white/60 mb-6">{error}</p>
+        <p className="text-lg font-medium text-foreground mb-2">Error al cargar</p>
+        <p className="text-sm text-muted-foreground mb-6">{error}</p>
         <Button
           onClick={onRetry}
           variant="outline"
-          className="border-red-500/30 hover:bg-red-500/10"
+          className="border-destructive/30 hover:bg-destructive/10"
         >
           <RefreshCw className="w-4 h-4 mr-2" />
           Reintentar
@@ -142,12 +147,14 @@ interface EmptyStateProps {
 function EmptyState({ onClearFilters }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16">
-      <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center max-w-md">
+      <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-8 text-center max-w-md">
         <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
           <SearchX className="w-8 h-8 text-primary" />
         </div>
-        <p className="text-lg font-medium text-white mb-2">No se encontraron árbitros</p>
-        <p className="text-sm text-white/60 mb-6">Intenta ajustar los filtros de búsqueda</p>
+        <p className="text-lg font-medium text-foreground mb-2">No se encontraron árbitros</p>
+        <p className="text-sm text-muted-foreground mb-6">
+          Intenta ajustar los filtros de búsqueda
+        </p>
         <Button onClick={onClearFilters} variant="outline">
           <RefreshCw className="w-4 h-4 mr-2" />
           Limpiar filtros
@@ -167,8 +174,8 @@ function ArbitrosList({ arbitros }: ArbitrosListProps) {
       {/* Contador */}
       <div className="flex items-center gap-2 mb-6">
         <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-        <p className="text-sm text-white/60">
-          <span className="font-semibold text-white">{arbitros.length}</span>{" "}
+        <p className="text-sm text-muted-foreground">
+          <span className="font-semibold text-foreground">{arbitros.length}</span>{" "}
           {arbitros.length === 1 ? "árbitro encontrado" : "árbitros encontrados"}
         </p>
       </div>
@@ -192,16 +199,10 @@ function ArbitroCard({ arbitro }: ArbitroCardProps) {
   const imagen = getRefereeImage(arbitro.foto_perfil, arbitro.id, arbitro.experiencia_anos, nombre);
   const rating = arbitro.calificacion_promedio || 0;
 
-  // Calcular precio promedio de las categorías
-  const precioPromedio =
-    arbitro.categorias && arbitro.categorias.length > 0 && arbitro.categorias[0].tarifa
-      ? parseFloat(String(arbitro.categorias[0].tarifa))
-      : parseFloat(arbitro.tarifa || "0");
-
   return (
     <Link
       to={getClienteArbitroDetailRoute(arbitro.id)}
-      className="group block bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden hover:border-primary/30 hover:bg-white/10 transition-all duration-300"
+      className="group block bg-card backdrop-blur-sm rounded-xl border border-border overflow-hidden hover:border-primary/30 hover:bg-muted transition-all duration-300"
     >
       {/* Imagen */}
       <div className="relative aspect-[4/3] overflow-hidden">
@@ -233,27 +234,22 @@ function ArbitroCard({ arbitro }: ArbitroCardProps) {
       {/* Contenido */}
       <div className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2 text-white/60 text-sm">
+          <div className="flex items-center gap-2 text-muted-foreground text-sm">
             <Trophy className="w-4 h-4" />
             <span>{arbitro.categorias?.length || 0} categorías</span>
           </div>
-          {precioPromedio > 0 && (
-            <span className="text-primary font-bold">
-              ${precioPromedio.toLocaleString("es-CO")}
-            </span>
-          )}
         </div>
 
         <div className="flex items-center justify-between">
           {/* Disponibilidad */}
           {arbitro.disponibilidades && arbitro.disponibilidades.length > 0 && (
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-xs text-green-400">Disponible</span>
+              <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
+              <span className="text-xs text-success">Disponible</span>
             </div>
           )}
 
-          <span className="text-xs text-white/40 group-hover:text-primary flex items-center gap-1 transition-colors">
+          <span className="text-xs text-muted-foreground group-hover:text-primary flex items-center gap-1 transition-colors">
             Ver perfil <ArrowRight className="w-3 h-3" />
           </span>
         </div>

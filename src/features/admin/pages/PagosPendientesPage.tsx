@@ -17,23 +17,14 @@ import {
 import { Loader2, CheckCircle2, XCircle, Eye, AlertCircle } from "lucide-react";
 import { usePagosPendientes } from "../hooks/usePagosPendientes";
 import { ROUTES, getPartidoDetailRoute } from "@/lib/constants";
+import { formatCop } from "@/lib/utils";
 import type { Partido, EstadoPago } from "@/features/partidos/types/partido.types";
-
-// Utilidad para formatear moneda
-function formatCurrency(value: string | number): string {
-  const num = typeof value === "string" ? parseFloat(value) : value;
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    minimumFractionDigits: 0,
-  }).format(num);
-}
 
 // Badge de estado de pago
 function EstadoPagoBadge({ estado }: { estado: EstadoPago }) {
   const config: Record<EstadoPago, { className: string; label: string }> = {
     pendiente: {
-      className: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
+      className: "bg-muted text-foreground dark:bg-muted dark:text-foreground",
       label: "Pendiente",
     },
     en_revision: {
@@ -52,7 +43,9 @@ function EstadoPagoBadge({ estado }: { estado: EstadoPago }) {
 
   const { className, label } = config[estado];
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${className}`}>
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${className}`}
+    >
       {label}
     </span>
   );
@@ -72,9 +65,7 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar }: PagoCardProp
       <div className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg sm:text-xl font-semibold mb-1">
-              Partido #{partido.id}
-            </h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-1">Partido #{partido.id}</h3>
             {partido.codigo && (
               <p className="text-xs sm:text-sm font-mono text-muted-foreground mb-2">
                 {partido.codigo}
@@ -112,8 +103,10 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar }: PagoCardProp
           </div>
           <div>
             <p className="text-muted-foreground text-xs sm:text-sm mb-1">Monto</p>
-            <p className="font-medium text-primary text-base sm:text-lg">
-              {formatCurrency(partido.tarifa)}
+            <p className="font-medium text-primary text-base sm:text-lg tabular-nums">
+              {partido.monto_total != null || partido.tipo_partido?.monto != null
+                ? formatCop(partido.monto_total ?? partido.tipo_partido?.monto ?? 0)
+                : "—"}
             </p>
           </div>
         </div>

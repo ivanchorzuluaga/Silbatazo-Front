@@ -1,118 +1,56 @@
 /**
- * Utilidad para asignar imágenes de árbitros basándose en sus características
- * Usa las imágenes del marketplace cuando no hay foto de perfil
+ * Utilidad para mostrar imagen de árbitro.
+ * Si existe foto_perfil (subida por el usuario), se usa esa URL.
+ * Mientras no haya foto, se muestra un placeholder por árbitro (inicial + color).
+ * Cuando se implemente la subida de foto, no hará falta cambiar nada aquí.
  */
 
-// Lista de imágenes disponibles del marketplace
-const REFEREE_IMAGES = [
-  "/experienced-female-referee-sports-portrait.jpg",
-  "/experienced-male-referee-portrait-stadium-backgrou.jpg",
-  "/female-referee-professional-portrait-stadium.jpg",
-  "/female-soccer-referee-portrait-professional.jpg",
-  "/male-referee-in-black-uniform-portrait.jpg",
-  "/male-soccer-referee-portrait-confident-pose.jpg",
-  "/professional-male-referee-portrait-in-black-unifor.jpg",
-  "/professional-soccer-referee-in-black-uniform-blowi.jpg",
-  "/young-male-soccer-referee-portrait.jpg",
-];
-
-// Imágenes para árbitros femeninos
-const FEMALE_IMAGES = [
-  "/experienced-female-referee-sports-portrait.jpg",
-  "/female-referee-professional-portrait-stadium.jpg",
-  "/female-soccer-referee-portrait-professional.jpg",
-];
-
-// Imágenes para árbitros masculinos
-const MALE_IMAGES = [
-  "/experienced-male-referee-portrait-stadium-backgrou.jpg",
-  "/male-referee-in-black-uniform-portrait.jpg",
-  "/male-soccer-referee-portrait-confident-pose.jpg",
-  "/professional-male-referee-portrait-in-black-unifor.jpg",
-  "/professional-soccer-referee-in-black-uniform-blowi.jpg",
-  "/young-male-soccer-referee-portrait.jpg",
-];
-
-// Imágenes para árbitros experimentados
-const EXPERIENCED_IMAGES = [
-  "/experienced-female-referee-sports-portrait.jpg",
-  "/experienced-male-referee-portrait-stadium-backgrou.jpg",
-  "/professional-male-referee-portrait-in-black-unifor.jpg",
-  "/professional-soccer-referee-in-black-uniform-blowi.jpg",
-];
-
-// Imágenes para árbitros jóvenes
-const YOUNG_IMAGES = [
-  "/young-male-soccer-referee-portrait.jpg",
-  "/female-soccer-referee-portrait-professional.jpg",
+/** Colores para el placeholder (uno por árbitro, determinista) */
+const PLACEHOLDER_COLORS = [
+  "10b981", // emerald
+  "6366f1", // indigo
+  "f59e0b", // amber
+  "ec4899", // pink
+  "8b5cf6", // violet
+  "06b6d4", // cyan
+  "84cc16", // lime
+  "ef4444", // red
 ];
 
 /**
- * Obtiene una imagen de árbitro basándose en las características proporcionadas
+ * Genera un placeholder SVG como data URL (inicial + color por árbitro).
+ * Se usa cuando el árbitro aún no tiene foto_perfil subida.
+ */
+function getPlaceholderDataUrl(arbitroId: number, nombre?: string): string {
+  const initial = nombre?.trim().charAt(0)?.toUpperCase() || "A";
+  const colorIndex = arbitroId % PLACEHOLDER_COLORS.length;
+  const hex = PLACEHOLDER_COLORS[colorIndex];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="#${hex}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui,sans-serif" font-size="80" font-weight="600" fill="white">${initial}</text></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
+/**
+ * Devuelve la URL de imagen a mostrar para un árbitro.
+ * - Si tiene foto_perfil válida (URL subida), se devuelve esa URL.
+ * - Si no, se devuelve un placeholder (inicial + color) hasta que suba foto.
  */
 export function getRefereeImage(
   fotoPerfil: string | null | undefined,
   arbitroId: number,
-  experienciaAnos?: number,
+  _experienciaAnos?: number,
   nombre?: string
 ): string {
-  // Si hay foto de perfil válida, usarla
   if (fotoPerfil && fotoPerfil.trim() !== "" && !fotoPerfil.includes("placeholder")) {
     return fotoPerfil;
   }
-
-  // Determinar género basándose en el nombre (si está disponible)
-  const nombreLower = nombre?.toLowerCase() || "";
-  const femaleNames = [
-    "andrea", "lucía", "patricia", "maría", "ana", "sofía", 
-    "carmen", "laura", "natalia", "diana", "carolina", "valentina",
-    "juliana", "paula", "daniela", "mariana", "catalina"
-  ];
-  const isFemale = femaleNames.some(name => nombreLower.includes(name));
-
-  // Seleccionar imagen basándose en características
-  let imagePool: string[];
-
-  if (isFemale) {
-    // Para árbitros femeninos
-    if (experienciaAnos && experienciaAnos >= 5) {
-      imagePool = FEMALE_IMAGES.filter(img => 
-        img.includes("experienced") || img.includes("professional")
-      );
-      if (imagePool.length === 0) imagePool = FEMALE_IMAGES;
-    } else {
-      imagePool = FEMALE_IMAGES;
-    }
-  } else {
-    // Para árbitros masculinos (por defecto)
-    if (experienciaAnos && experienciaAnos >= 10) {
-      imagePool = EXPERIENCED_IMAGES.filter(img => 
-        img.includes("experienced") || img.includes("professional")
-      );
-      if (imagePool.length === 0) imagePool = MALE_IMAGES;
-    } else if (experienciaAnos && experienciaAnos < 3) {
-      imagePool = YOUNG_IMAGES.filter(img => img.includes("young"));
-      if (imagePool.length === 0) imagePool = MALE_IMAGES;
-    } else {
-      imagePool = MALE_IMAGES;
-    }
-  }
-
-  // Si no hay imágenes en el pool, usar todas las disponibles
-  if (imagePool.length === 0) {
-    imagePool = REFEREE_IMAGES;
-  }
-
-  // Seleccionar imagen basándose en el ID del árbitro (para consistencia)
-  // Esto asegura que el mismo árbitro siempre tenga la misma imagen
-  const imageIndex = arbitroId % imagePool.length;
-  return imagePool[imageIndex] || "/placeholder.jpg";
+  return getPlaceholderDataUrl(arbitroId, nombre);
 }
 
 /**
- * Obtiene una imagen aleatoria de árbitro (útil para previews)
+ * Placeholder aleatorio por árbitro (útil para previews donde no hay id).
+ * Usa un índice numérico para variar el color.
  */
-export function getRandomRefereeImage(): string {
-  const randomIndex = Math.floor(Math.random() * REFEREE_IMAGES.length);
-  return REFEREE_IMAGES[randomIndex] || "/placeholder.jpg";
+export function getRandomRefereeImage(seed?: number): string {
+  const id = seed ?? Math.floor(Math.random() * 1000);
+  return getPlaceholderDataUrl(id, "Á");
 }

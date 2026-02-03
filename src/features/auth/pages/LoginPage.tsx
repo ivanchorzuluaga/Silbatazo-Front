@@ -4,21 +4,26 @@
  */
 
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLogin } from "../hooks/useLogin";
-import { ROUTES, APP_NAME } from "@/lib/constants";
+import { ROUTES, APP_NAME, USER_ROLES } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
 import { Button } from "@/components/ui/button";
 import { validations } from "@/lib/validations";
+import { AuthDialog } from "../components/AuthDialog";
 import logoImage from "@/assets/Silbatazo-bordes.png";
 import { User, Lock, LogIn, ArrowLeft, AlertCircle } from "lucide-react";
 
 export function LoginPage() {
   const { isAuthenticated, user, login: setAuth } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirect");
+  const roleParam = searchParams.get("role");
+  const isRegisterPage = location.pathname === ROUTES.REGISTER;
+  const defaultRoleRegister = roleParam === "arbitro" ? USER_ROLES.ARBITRO : USER_ROLES.CLIENTE;
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -81,7 +86,7 @@ export function LoginPage() {
         authResponse.user.role,
         authResponse.user.username,
         authResponse.user.email,
-        authResponse.user.id,
+        authResponse.user.id
       );
 
       // Redirigir
@@ -100,6 +105,18 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden">
+      {/* Panel de registro: se muestra cuando la ruta es /register */}
+      {isRegisterPage && (
+        <AuthDialog
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) navigate(ROUTES.LOGIN);
+          }}
+          initialMode="register"
+          defaultRole={defaultRoleRegister}
+        />
+      )}
+
       {/* Fondo con gradiente oscuro */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-black" />
 
@@ -136,153 +153,159 @@ export function LoginPage() {
 
         {/* Formulario */}
         <div className="w-full max-w-md">
-        {/* Card glassmorphism */}
-        <div className="relative rounded-3xl border border-white/10 shadow-2xl p-6 md:p-10 overflow-hidden">
-          {/* Logo de fondo dentro de la card - Solo visible en móvil */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none md:hidden">
-            <img
-              src={logoImage}
-              alt=""
-              className="w-64 h-64 object-contain opacity-15"
-            />
-          </div>
-
-          {/* Contenido del formulario */}
-          <div className="relative z-10">
-          {/* Título */}
-          <div className="text-center mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg mb-1">Bienvenido</h1>
-            <p className="text-sm md:text-base text-white/90 drop-shadow-md">Ingresa tus credenciales para continuar</p>
-          </div>
-
-          {/* Formulario */}
-          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
-            {/* Usuario */}
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-white drop-shadow-md">Usuario</label>
-              <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70">
-                  <User className="h-5 w-5" />
-                </div>
-                <input
-                  type="text"
-                  name="username"
-                  value={username}
-                  onChange={(e) => {
-                    setUsername(e.target.value);
-                    if (fieldErrors.username) {
-                      setFieldErrors((prev) => ({ ...prev, username: undefined }));
-                    }
-                    clearError();
-                  }}
-                  placeholder="Tu nombre de usuario"
-                  disabled={isLoading}
-                  autoComplete="username"
-                  className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"
-                />
-              </div>
-              {fieldErrors.username && (
-                <p className="text-sm text-red-400 font-medium drop-shadow-md">{fieldErrors.username}</p>
-              )}
+          {/* Card glassmorphism */}
+          <div className="relative rounded-3xl border border-white/10 shadow-2xl p-6 md:p-10 overflow-hidden">
+            {/* Logo de fondo dentro de la card - Solo visible en móvil */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none md:hidden">
+              <img src={logoImage} alt="" className="w-64 h-64 object-contain opacity-15" />
             </div>
 
-            {/* Contraseña */}
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-white drop-shadow-md">Contraseña</label>
-              <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70">
-                  <Lock className="h-5 w-5" />
-                </div>
-                <input
-                  type="password"
-                  name="password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (fieldErrors.password) {
-                      setFieldErrors((prev) => ({ ...prev, password: undefined }));
-                    }
-                    clearError();
-                  }}
-                  placeholder="Tu contraseña"
-                  disabled={isLoading}
-                  autoComplete="current-password"
-                  className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"
-                />
+            {/* Contenido del formulario */}
+            <div className="relative z-10">
+              {/* Título */}
+              <div className="text-center mb-6 md:mb-8">
+                <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg mb-1">
+                  Bienvenido
+                </h1>
+                <p className="text-sm md:text-base text-white/90 drop-shadow-md">
+                  Ingresa tus credenciales para continuar
+                </p>
               </div>
-              {fieldErrors.password && (
-                <p className="text-sm text-red-400 font-medium drop-shadow-md">{fieldErrors.password}</p>
-              )}
-            </div>
 
-            {/* Recuperar contraseña */}
-            <div className="flex justify-end">
-              <Link
-                to="/recuperar-contrasena"
-                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              {/* Formulario */}
+              <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
+                {/* Usuario */}
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-white drop-shadow-md">Usuario</label>
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70">
+                      <User className="h-5 w-5" />
+                    </div>
+                    <input
+                      type="text"
+                      name="username"
+                      value={username}
+                      onChange={(e) => {
+                        setUsername(e.target.value);
+                        if (fieldErrors.username) {
+                          setFieldErrors((prev) => ({ ...prev, username: undefined }));
+                        }
+                        clearError();
+                      }}
+                      placeholder="Tu nombre de usuario"
+                      disabled={isLoading}
+                      autoComplete="username"
+                      className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"
+                    />
+                  </div>
+                  {fieldErrors.username && (
+                    <p className="text-sm text-red-400 font-medium drop-shadow-md">
+                      {fieldErrors.username}
+                    </p>
+                  )}
+                </div>
+
+                {/* Contraseña */}
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-white drop-shadow-md">
+                    Contraseña
+                  </label>
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70">
+                      <Lock className="h-5 w-5" />
+                    </div>
+                    <input
+                      type="password"
+                      name="password"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (fieldErrors.password) {
+                          setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                        }
+                        clearError();
+                      }}
+                      placeholder="Tu contraseña"
+                      disabled={isLoading}
+                      autoComplete="current-password"
+                      className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"
+                    />
+                  </div>
+                  {fieldErrors.password && (
+                    <p className="text-sm text-red-400 font-medium drop-shadow-md">
+                      {fieldErrors.password}
+                    </p>
+                  )}
+                </div>
+
+                {/* Recuperar contraseña */}
+                <div className="flex justify-end">
+                  <Link
+                    to="/recuperar-contrasena"
+                    className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </Link>
+                </div>
+
+                {/* Error */}
+                {error && (
+                  <div className="flex items-center gap-2 p-3 bg-red-500/20 border border-red-500/30 rounded-xl">
+                    <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
+                    <p className="text-sm text-red-300">{error}</p>
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-11 md:h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
+                  size="lg"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center gap-3">
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                      Iniciando sesión...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <LogIn className="h-5 w-5" />
+                      Iniciar Sesión
+                    </span>
+                  )}
+                </Button>
+              </form>
+
+              {/* Divider */}
+              <div className="relative my-4 md:my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-white/30" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-gray-900/80 px-3 text-white/80 font-medium rounded">
+                    ¿No tienes cuenta?
+                  </span>
+                </div>
+              </div>
+
+              {/* Register Link */}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate(ROUTES.REGISTER)}
+                className="w-full h-11 md:h-12 bg-black/40 border-2 border-white/30 text-white font-semibold hover:bg-white/20 hover:border-white/50 rounded-xl transition-all duration-200"
+                size="lg"
               >
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
-
-            {/* Error */}
-            {error && (
-              <div className="flex items-center gap-2 p-3 bg-red-500/20 border border-red-500/30 rounded-xl">
-                <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
-                <p className="text-sm text-red-300">{error}</p>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full h-11 md:h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
-              size="lg"
-            >
-              {isLoading ? (
-                <span className="flex items-center gap-3">
-                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-                  Iniciando sesión...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <LogIn className="h-5 w-5" />
-                  Iniciar Sesión
-                </span>
-              )}
-            </Button>
-          </form>
-
-          {/* Divider */}
-          <div className="relative my-4 md:my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-white/30" />
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-gray-900/80 px-3 text-white/80 font-medium rounded">
-                ¿No tienes cuenta?
-              </span>
+                Crear una cuenta nueva
+              </Button>
             </div>
           </div>
 
-          {/* Register Link */}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate(ROUTES.HOME)}
-            className="w-full h-11 md:h-12 bg-black/40 border-2 border-white/30 text-white font-semibold hover:bg-white/20 hover:border-white/50 rounded-xl transition-all duration-200"
-            size="lg"
-          >
-            Crear una cuenta nueva
-          </Button>
-          </div>
-        </div>
-
-        {/* Texto de copyright */}
-        <p className="text-center text-white/70 text-xs md:text-sm mt-4 md:mt-6 drop-shadow-md">
-          © 2026 {APP_NAME}. Todos los derechos reservados.
-        </p>
+          {/* Texto de copyright */}
+          <p className="text-center text-white/70 text-xs md:text-sm mt-4 md:mt-6 drop-shadow-md">
+            © 2026 {APP_NAME}. Todos los derechos reservados.
+          </p>
         </div>
       </div>
     </div>

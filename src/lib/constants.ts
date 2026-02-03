@@ -5,6 +5,9 @@
 export const APP_NAME = "Silbatazo";
 export const APP_SLOGAN = "Árbitros de Confianza";
 
+/** Solo estas 4 categorías se muestran en partidos y tarifas */
+export const CATEGORIAS_PARTIDO = ["Libre", "Veteranos", "Juvenil", "Infantil"] as const;
+
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: "access_token",
   REFRESH_TOKEN: "refresh_token",

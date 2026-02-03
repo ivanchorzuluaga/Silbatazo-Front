@@ -10,18 +10,14 @@ import { useRetiros } from "../hooks/useRetiros";
 import { RetiroForm } from "../components/RetiroForm";
 import { RetiroCard } from "../components/RetiroCard";
 import { ROUTES } from "@/lib/constants";
+import { formatCop } from "@/lib/utils";
 
 export function BilleteraPage() {
-  const {
-    retiros,
-    saldo,
-    isLoading,
-    error,
-    listarRetiros,
-    obtenerSaldo,
-  } = useRetiros();
+  const { retiros, saldo, isLoading, error, listarRetiros, obtenerSaldo } = useRetiros();
   const [showFormModal, setShowFormModal] = useState(false);
-  const [filtroEstado, setFiltroEstado] = useState<"pendiente" | "procesado" | "rechazado" | "todos">("todos");
+  const [filtroEstado, setFiltroEstado] = useState<
+    "pendiente" | "procesado" | "rechazado" | "todos"
+  >("todos");
 
   useEffect(() => {
     obtenerSaldo();
@@ -35,9 +31,7 @@ export function BilleteraPage() {
   };
 
   const retirosFiltrados =
-    filtroEstado === "todos"
-      ? retiros
-      : retiros.filter((r) => r.estado === filtroEstado);
+    filtroEstado === "todos" ? retiros : retiros.filter((r) => r.estado === filtroEstado);
 
   return (
     <PageLayout
@@ -52,15 +46,13 @@ export function BilleteraPage() {
             <div className="rounded-lg border bg-card p-4 shadow-sm">
               <p className="text-sm text-muted-foreground mb-1">Saldo Disponible</p>
               <p className="text-2xl font-bold text-primary">
-                ${saldo.saldo_real_disponible.toLocaleString("es-CO")}
+                {formatCop(saldo.saldo_real_disponible)}
               </p>
               <p className="text-xs text-muted-foreground mt-1">COP</p>
             </div>
             <div className="rounded-lg border bg-card p-4 shadow-sm">
               <p className="text-sm text-muted-foreground mb-1">Total Ingresos</p>
-              <p className="text-2xl font-bold text-green-600">
-                ${saldo.total_ingresos.toLocaleString("es-CO")}
-              </p>
+              <p className="text-2xl font-bold text-green-600">{formatCop(saldo.total_ingresos)}</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {saldo.partidos_completados} partidos
               </p>
@@ -68,7 +60,7 @@ export function BilleteraPage() {
             <div className="rounded-lg border bg-card p-4 shadow-sm">
               <p className="text-sm text-muted-foreground mb-1">Total Retirado</p>
               <p className="text-2xl font-bold text-muted-foreground">
-                ${saldo.total_retirado.toLocaleString("es-CO")}
+                {formatCop(saldo.total_retirado)}
               </p>
               <p className="text-xs text-muted-foreground mt-1">COP</p>
             </div>
@@ -162,10 +154,13 @@ export function BilleteraPage() {
           <DialogHeader>
             <DialogTitle>Solicitar Retiro</DialogTitle>
           </DialogHeader>
-          <RetiroForm saldo={saldo} onSuccess={handleFormSuccess} onCancel={() => setShowFormModal(false)} />
+          <RetiroForm
+            saldo={saldo}
+            onSuccess={handleFormSuccess}
+            onCancel={() => setShowFormModal(false)}
+          />
         </DialogContent>
       </Dialog>
     </PageLayout>
   );
 }
-

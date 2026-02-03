@@ -10,13 +10,18 @@ import { RefereeCard } from "@/components/marketplace/RefereeCard";
 import { FiltrosArbitros, type FiltrosArbitrosType } from "../components/FiltrosArbitros";
 import { Header, Footer } from "@/components/marketplace";
 import { Button } from "@/components/ui/button";
+import { CATEGORIAS_PARTIDO } from "@/lib/constants";
 import logoImage from "@/assets/Silbatazo-bordes.png";
 import { Users, RefreshCw, SearchX, Loader2 } from "lucide-react";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
 export function ArbitrosListPage() {
   const { municipios } = useMunicipios();
-  const { categorias } = useCategorias();
+  const { categorias: todasLasCategorias } = useCategorias();
+  // Filtrar solo las categorías de partido (las mismas que se usan en el formulario)
+  const categorias = todasLasCategorias.filter((c) =>
+    (CATEGORIAS_PARTIDO as readonly string[]).includes(c.nombre)
+  );
 
   const [arbitros, setArbitros] = useState<Arbitro[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,7 +103,7 @@ export function ArbitrosListPage() {
 
       const response = await fetch(
         `${API_URL}/api/arbitros/${queryParams.toString() ? `?${queryParams.toString()}` : ""}`,
-        { headers },
+        { headers }
       );
 
       if (!response.ok) {

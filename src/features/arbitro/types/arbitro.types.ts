@@ -14,7 +14,13 @@ export interface Categoria {
   nombre: string;
   descripcion?: string;
   nivel?: string;
-  tarifa: string;
+  activo: boolean;
+}
+
+export interface RolArbitro {
+  id: number;
+  nombre: string;
+  descripcion?: string;
   activo: boolean;
 }
 
@@ -22,7 +28,6 @@ export interface CategoriaCreateData {
   nombre: string;
   descripcion?: string;
   nivel?: string;
-  tarifa: number;
   activo?: boolean;
 }
 
@@ -30,7 +35,6 @@ export interface CategoriaUpdateData {
   nombre?: string;
   descripcion?: string;
   nivel?: string;
-  tarifa?: number;
   activo?: boolean;
 }
 
@@ -71,10 +75,10 @@ export interface Arbitro {
   fecha_nacimiento?: string;
   documento_identidad?: string;
   biografia?: string;
-  tarifa: string;
   experiencia_anos: number;
   municipios: Municipio[];
   categorias: Categoria[];
+  roles: RolArbitro[];
   estado_verificacion: EstadoVerificacion;
   estado_verificacion_display: string;
   esta_aprobado: boolean;
@@ -98,10 +102,10 @@ export interface ArbitroCreateData {
   fecha_nacimiento?: string;
   documento_identidad?: string;
   biografia?: string;
-  tarifa?: number; // Opcional - ahora la tarifa viene de la categoría
   experiencia_anos: number;
   municipios_ids: number[];
   categorias_ids: number[];
+  roles_ids: number[];
 }
 
 export type ArbitroUpdateData = Partial<ArbitroCreateData>;

@@ -10,7 +10,11 @@ import { useCategoriasAdmin } from "../hooks/useCategoriasAdmin";
 import { CategoriaCard } from "../components/CategoriaCard";
 import { CategoriaForm } from "../components/CategoriaForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { Categoria, CategoriaCreateData, CategoriaUpdateData } from "@/features/arbitro/types/arbitro.types";
+import type {
+  Categoria,
+  CategoriaCreateData,
+  CategoriaUpdateData,
+} from "@/features/arbitro/types/arbitro.types";
 
 export function CategoriasPage() {
   const {
@@ -75,9 +79,7 @@ export function CategoriasPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold">Categorías</h1>
-            <p className="text-muted-foreground mt-1">
-              Gestiona las categorías de arbitraje y sus tarifas
-            </p>
+            <p className="text-muted-foreground mt-1">Gestiona las categorías de arbitraje</p>
           </div>
           <Button onClick={handleCreate} disabled={isLoading}>
             Crear Categoría
@@ -145,4 +147,3 @@ export function CategoriasPage() {
     </PageLayout>
   );
 }
-

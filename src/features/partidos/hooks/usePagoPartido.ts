@@ -10,6 +10,7 @@ import { partidoEndpoints } from "@/api/endpoints/partido.endpoints";
 import { authService } from "@/features/auth/services/auth.service";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES, getPartidoDetailRoute } from "@/lib/constants";
+import { formatCop } from "@/lib/utils";
 
 // Configuración de Nequi
 const NEQUI_QR_URL = import.meta.env.VITE_NEQUI_QR_URL || "/nequi_qr.jpeg";
@@ -79,11 +80,22 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
   const estadoPago = partido?.estado_pago || "pendiente";
   const yaPagado = estadoPago !== "pendiente";
 
-  // Información de pago
-  const monto = partido ? parseFloat(partido.tarifa) : 0;
+  // Información de pago: monto del partido (tipo_partido o monto_total)
+  const monto =
+    partido?.monto_total != null
+      ? Number(partido.monto_total)
+      : partido?.tipo_partido?.monto != null
+      ? partido.tipo_partido.monto
+      : 0;
   const referencia = partido?.codigo || `PARTIDO-${partido?.id || ""}`;
   const descripcion = partido
-    ? `Partido ${referencia} - ${partido.categoria.nombre} - ${partido.municipio.nombre}`
+    ? [
+        `Partido ${referencia}`,
+        partido.tipo_partido?.nombre ?? partido.categoria?.nombre,
+        partido.municipio?.nombre,
+      ]
+        .filter(Boolean)
+        .join(" - ")
     : "";
 
   // Configuración de Nequi
@@ -158,16 +170,6 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
     navigator.clipboard.writeText(text);
   }, []);
 
-  // Formatear moneda
-  const formatCurrency = useCallback((value: string | number) => {
-    const num = typeof value === "string" ? parseFloat(value) : value;
-    return new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-      minimumFractionDigits: 0,
-    }).format(num);
-  }, []);
-
   // Navegación
   const navigateToDetail = useCallback(() => {
     if (partido) {
@@ -198,7 +200,7 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
     handleMarcarComoPagado,
     handleComprobanteChange,
     handleCopy,
-    formatCurrency,
+    formatCurrency: formatCop,
     navigateToDetail,
     navigateToDashboard,
   };

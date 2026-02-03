@@ -18,12 +18,6 @@ export function RefereeCard({ arbitro }: RefereeCardProps) {
   const imagen = getRefereeImage(arbitro.foto_perfil, arbitro.id, arbitro.experiencia_anos, nombre);
   const municipio = arbitro.municipios.length > 0 ? arbitro.municipios[0].nombre : "Ubicación";
 
-  // Calcular precio promedio de las categorías
-  const precioPromedio =
-    arbitro.categorias.length > 0 && arbitro.categorias[0].tarifa
-      ? parseFloat(String(arbitro.categorias[0].tarifa))
-      : 0;
-
   return (
     <Link
       to={getArbitroDetailRoute(arbitro.id)}
@@ -65,16 +59,6 @@ export function RefereeCard({ arbitro }: RefereeCardProps) {
               <Star className="w-3 h-3 fill-yellow-500 text-yellow-500 mr-1 shrink-0" />
               <span className="text-xs font-semibold">{rating.toFixed(1)}</span>
             </Badge>
-          </div>
-        )}
-
-        {/* Gradiente de precio en la parte inferior */}
-        {precioPromedio > 0 && (
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 z-10">
-            <p className="text-white font-bold text-2xl">
-              ${precioPromedio.toLocaleString()}
-              <span className="text-sm font-normal opacity-80">/partido</span>
-            </p>
           </div>
         )}
       </div>

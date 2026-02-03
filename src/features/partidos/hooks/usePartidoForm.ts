@@ -9,8 +9,10 @@ import { usePartido } from "./usePartido";
 import { useMunicipios } from "@/features/arbitro/hooks/useMunicipios";
 import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
 import { getTodayLocalDate, compareDates } from "@/lib/utils";
-import { getPartidoPagoRoute } from "@/lib/constants";
+import { getPartidoPagoRoute, CATEGORIAS_PARTIDO } from "@/lib/constants";
+import { partidoService } from "../services/partido.service";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
+import type { TipoPartido } from "../types/partido.types";
 import type { Municipio } from "@/features/arbitro/types/arbitro.types";
 import type { Categoria } from "@/features/arbitro/types/arbitro.types";
 
@@ -22,6 +24,7 @@ interface FormState {
   lugar: string;
   direccion: string;
   notasCliente: string;
+  tipoPartidoId: string;
 }
 
 interface PartidoCreado {
@@ -42,17 +45,23 @@ export interface UsePartidoFormReturn {
   municipiosLoading: boolean;
   categoriasLoading: boolean;
 
-  // Datos filtrados
+  // Datos filtrados (solo 4 categorías: Libre, Veteranos, Juvenil, Infantil)
   municipiosDisponibles: Municipio[];
   categoriasDisponibles: Categoria[];
   categoriaSeleccionada: Categoria | undefined;
-  tarifa: number;
+
+  // Tipo de partido (selector único con precio fijo)
+  tiposPartido: TipoPartido[];
+  loadingTipos: boolean;
+  errorTipos: string | null;
+  tipoPartidoSeleccionado: TipoPartido | undefined;
+  montoTotal: number | null;
+  setTipoPartidoId: (id: string) => void;
 
   // Acciones del formulario
   setFecha: (fecha: string) => void;
   setHora: (hora: string) => void;
   setMunicipioId: (id: string) => void;
-  setCategoriaId: (id: string) => void;
   setLugar: (lugar: string) => void;
   setDireccion: (direccion: string) => void;
   setNotasCliente: (notas: string) => void;
@@ -67,7 +76,7 @@ export interface UsePartidoFormReturn {
 export function usePartidoForm(
   arbitro: Arbitro,
   open: boolean,
-  onClose: () => void,
+  onClose: () => void
 ): UsePartidoFormReturn {
   const navigate = useNavigate();
   const { crearPartido, isLoading, error, clearError } = usePartido();
@@ -83,28 +92,51 @@ export function usePartidoForm(
     lugar: "",
     direccion: "",
     notasCliente: "",
+    tipoPartidoId: "",
   });
+
+  const [tiposPartido, setTiposPartido] = useState<TipoPartido[]>([]);
+  const [loadingTipos, setLoadingTipos] = useState(true);
+  const [errorTipos, setErrorTipos] = useState<string | null>(null);
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
   const [showSuccess, setShowSuccess] = useState(false);
   const [partidoCreado, setPartidoCreado] = useState<PartidoCreado | null>(null);
 
-  // Filtrar municipios y categorías según el árbitro
+  // Filtrar municipios y categorías según el árbitro; solo 4 categorías (Libre, Veteranos, Juvenil, Infantil)
   const municipiosDisponibles = municipios.filter((municipio) =>
-    arbitro.municipios.some((m) => m.id === municipio.id),
+    arbitro.municipios.some((m) => m.id === municipio.id)
   );
 
-  const categoriasDisponibles = categorias.filter((categoria) =>
-    arbitro.categorias.some((c) => c.id === categoria.id),
-  );
+  const categoriasDisponibles = categorias
+    .filter((c) => (CATEGORIAS_PARTIDO as readonly string[]).includes(c.nombre))
+    .filter((categoria) => arbitro.categorias.some((c) => c.id === categoria.id));
 
-  // Categoría seleccionada y tarifa
+  // Categoría seleccionada
   const categoriaSeleccionada = categoriasDisponibles.find(
-    (c) => c.id === parseInt(formState.categoriaId),
+    (c) => c.id === parseInt(formState.categoriaId)
   );
-  const tarifa = categoriaSeleccionada ? parseFloat(categoriaSeleccionada.tarifa) : 0;
 
-  // Funciones para actualizar campos individuales
+  const tipoPartidoSeleccionado = tiposPartido.find(
+    (t) => t.id === parseInt(formState.tipoPartidoId)
+  );
+  const montoTotal = tipoPartidoSeleccionado ? tipoPartidoSeleccionado.monto : null;
+
+  // Cargar tipos de partido al montar (cuando se abre el modal)
+  useEffect(() => {
+    if (!open) return;
+    setLoadingTipos(true);
+    setErrorTipos(null);
+    partidoService
+      .listarTiposPartido()
+      .then(setTiposPartido)
+      .catch((err) => {
+        setTiposPartido([]);
+        setErrorTipos(err instanceof Error ? err.message : "Error al cargar tipos de partido");
+      })
+      .finally(() => setLoadingTipos(false));
+  }, [open]);
+
   const setFecha = useCallback((fecha: string) => {
     setFormState((prev) => ({ ...prev, fecha }));
     setFieldErrors((prev) => ({ ...prev, fecha: undefined }));
@@ -125,6 +157,11 @@ export function usePartidoForm(
     setFieldErrors((prev) => ({ ...prev, categoria_id: undefined }));
   }, []);
 
+  const setTipoPartidoId = useCallback((id: string) => {
+    setFormState((prev) => ({ ...prev, tipoPartidoId: id }));
+    setFieldErrors((prev) => ({ ...prev, tipo_partido_id: undefined }));
+  }, []);
+
   const setLugar = useCallback((lugar: string) => {
     setFormState((prev) => ({ ...prev, lugar }));
     setFieldErrors((prev) => ({ ...prev, lugar: undefined }));
@@ -138,7 +175,6 @@ export function usePartidoForm(
     setFormState((prev) => ({ ...prev, notasCliente }));
   }, []);
 
-  // Reset del formulario
   const resetForm = useCallback(() => {
     setFormState({
       fecha: "",
@@ -148,6 +184,7 @@ export function usePartidoForm(
       lugar: "",
       direccion: "",
       notasCliente: "",
+      tipoPartidoId: "",
     });
     setFieldErrors({});
   }, []);
@@ -170,7 +207,7 @@ export function usePartidoForm(
       const diaSemana = diasMap[diaNumero];
 
       const disponibilidades = arbitro.disponibilidades?.filter(
-        (disp) => disp.dia_semana === diaSemana && disp.activo,
+        (disp) => disp.dia_semana === diaSemana && disp.activo
       );
 
       if (!disponibilidades || disponibilidades.length === 0) {
@@ -204,7 +241,7 @@ export function usePartidoForm(
 
       return {};
     },
-    [arbitro.disponibilidades],
+    [arbitro.disponibilidades]
   );
 
   // Submit del formulario
@@ -214,15 +251,27 @@ export function usePartidoForm(
       clearError();
       setFieldErrors({});
 
-      const { fecha, hora, municipioId, categoriaId, lugar, direccion, notasCliente } = formState;
+      const {
+        fecha,
+        hora,
+        municipioId,
+        categoriaId,
+        lugar,
+        direccion,
+        notasCliente,
+        tipoPartidoId,
+      } = formState;
 
-      // Validaciones básicas
+      const defaultCategoriaId = categoriasDisponibles[0]?.id;
       const errors: Record<string, string> = {};
       if (!fecha) errors.fecha = "La fecha es requerida";
       if (!hora) errors.hora = "La hora es requerida";
       if (!municipioId) errors.municipio_id = "Selecciona un municipio";
-      if (!categoriaId) errors.categoria_id = "Selecciona una categoría";
+      if (!tipoPartidoId)
+        errors.tipo_partido_id = "Selecciona el tipo de partido que se acomoda a tu partido";
       if (!lugar.trim()) errors.lugar = "El lugar es requerido";
+      if (!defaultCategoriaId)
+        errors.categoria_id = "No hay categoría disponible. Intenta más tarde.";
 
       // Validar fecha futura
       if (fecha) {
@@ -237,13 +286,8 @@ export function usePartidoForm(
         errors.municipio_id = "El árbitro no trabaja en este municipio";
       }
 
-      // Validar categoría disponible
-      if (categoriaId && !categoriasDisponibles.some((c) => c.id === parseInt(categoriaId))) {
-        errors.categoria_id = "El árbitro no tiene esta categoría";
-      }
-
       // Validar disponibilidad del árbitro
-      if (fecha && hora && municipioId && categoriaId) {
+      if (fecha && hora && municipioId && defaultCategoriaId) {
         const dispErrors = validarDisponibilidad(fecha, hora);
         if (dispErrors.fechaError) errors.fecha = dispErrors.fechaError;
         if (dispErrors.horaError) errors.hora = dispErrors.horaError;
@@ -255,14 +299,19 @@ export function usePartidoForm(
       }
 
       try {
+        const categoriaIdToSend = formState.categoriaId
+          ? parseInt(formState.categoriaId)
+          : categoriasDisponibles[0]?.id;
         const data = {
           arbitro_id: arbitro.id,
           fecha,
           hora: hora.length === 5 ? hora : hora.substring(0, 5),
           municipio_id: parseInt(municipioId),
-          categoria_id: parseInt(categoriaId),
+          categoria_id: categoriaIdToSend ?? 0,
           lugar: lugar.trim(),
           direccion: direccion.trim() || undefined,
+          tipo_partido_id: tipoPartidoId ? parseInt(tipoPartidoId) : undefined,
+          monto_total: tipoPartidoSeleccionado?.monto ?? undefined,
           notas_cliente: notasCliente.trim() || undefined,
         };
 
@@ -276,6 +325,7 @@ export function usePartidoForm(
     },
     [
       formState,
+      tipoPartidoSeleccionado,
       clearError,
       municipiosDisponibles,
       categoriasDisponibles,
@@ -283,7 +333,7 @@ export function usePartidoForm(
       arbitro.id,
       crearPartido,
       resetForm,
-    ],
+    ]
   );
 
   // Cerrar modal
@@ -337,13 +387,19 @@ export function usePartidoForm(
     municipiosDisponibles,
     categoriasDisponibles,
     categoriaSeleccionada,
-    tarifa,
+
+    // Tipo de partido
+    tiposPartido,
+    loadingTipos,
+    errorTipos,
+    tipoPartidoSeleccionado,
+    montoTotal,
+    setTipoPartidoId,
 
     // Acciones del formulario
     setFecha,
     setHora,
     setMunicipioId,
-    setCategoriaId,
     setLugar,
     setDireccion,
     setNotasCliente,

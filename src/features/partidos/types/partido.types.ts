@@ -18,7 +18,6 @@ export interface ArbitroInfo {
   id: number;
   username: string;
   full_name: string;
-  tarifa: string;
 }
 
 export interface Partido {
@@ -38,7 +37,8 @@ export interface Partido {
   categoria: Categoria;
   lugar: string;
   direccion?: string;
-  tarifa: string;
+  tipo_partido?: TipoPartido | null;
+  monto_total?: number | null;
   estado: EstadoPartido;
   estado_display: string;
   estado_pago: EstadoPago;
@@ -72,6 +72,15 @@ export interface PartidoDetail extends Partido {
   postulaciones?: PostulacionArbitro[];
 }
 
+/** Tipo de partido con precio fijo (selector único) */
+export interface TipoPartido {
+  id: number;
+  slug: string;
+  nombre: string;
+  duracion_referencial: string;
+  monto: number;
+}
+
 export interface PartidoCreateData {
   arbitro_id?: number | null; // Opcional: si es null, busca árbitro
   fecha: string; // YYYY-MM-DD
@@ -80,6 +89,8 @@ export interface PartidoCreateData {
   categoria_id: number;
   lugar: string;
   direccion?: string;
+  tipo_partido_id?: number | null;
+  monto_total?: number | null;
   notas_cliente?: string;
 }
 
@@ -130,7 +141,6 @@ export interface PostulacionArbitro {
     full_name: string;
     email: string;
     experiencia_anos: number;
-    tarifa: string;
   };
   mensaje?: string;
   estado: EstadoPostulacion;
@@ -178,4 +188,36 @@ export interface PromedioArbitro {
   arbitro_id: number;
   promedio: number | null;
   total_calificaciones: number;
+}
+
+// Tipos para eventos (agrupación de partidos)
+export interface Evento {
+  id: number;
+  cliente: number;
+  estado?: string;
+  estado_pago?: string;
+  partidos?: Partido[];
+  created_at: string;
+  updated_at: string;
+  [key: string]: unknown;
+}
+
+export interface EventoDetail extends Evento {
+  partidos: Partido[];
+}
+
+export interface EventoCreateData {
+  partidos: PartidoCreateData[];
+  [key: string]: unknown;
+}
+
+export interface EventoUpdateData {
+  [key: string]: unknown;
+}
+
+export interface EventosListParams {
+  estado?: string;
+  estado_pago?: string;
+  fecha_desde?: string;
+  fecha_hasta?: string;
 }

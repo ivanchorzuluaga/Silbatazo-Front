@@ -24,10 +24,12 @@ function formatHora(hora: string): string {
 }
 
 interface DisponibilidadListProps {
+  /** Municipios del perfil del árbitro. Si se pasan, el formulario no pregunta por municipios. */
+  municipiosPerfil?: { id: number }[];
   onRefresh?: () => void;
 }
 
-export function DisponibilidadList({ onRefresh }: DisponibilidadListProps) {
+export function DisponibilidadList({ municipiosPerfil, onRefresh }: DisponibilidadListProps) {
   const {
     disponibilidades,
     isLoading,
@@ -115,6 +117,7 @@ export function DisponibilidadList({ onRefresh }: DisponibilidadListProps) {
         </h3>
         <DisponibilidadForm
           disponibilidad={disponibilidadEditando}
+          municipiosPerfil={municipiosPerfil}
           onSuccess={handleFormSuccess}
           onCancel={handleFormCancel}
         />

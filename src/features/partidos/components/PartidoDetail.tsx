@@ -2,7 +2,10 @@
  * Componente para mostrar el detalle completo de un partido
  */
 
-import { parseLocalDate } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { parseLocalDate, formatCop } from "@/lib/utils";
+import { useCalificaciones } from "../hooks/useCalificaciones";
+import { Star } from "lucide-react";
 import type { PartidoDetail as PartidoDetailType } from "../types/partido.types";
 
 interface PartidoDetailProps {
@@ -26,6 +29,14 @@ const estadoPagoColors: Record<string, string> = {
 
 export function PartidoDetail({ partido }: PartidoDetailProps) {
   const estadoColor = estadoColors[partido.estado] || estadoColors.pendiente;
+  const { promedio, obtenerPromedio, isLoading: isLoadingPromedio } = useCalificaciones();
+
+  // Cargar promedio de calificaciones del árbitro si hay árbitro asignado
+  useEffect(() => {
+    if (partido.arbitro_info?.id) {
+      obtenerPromedio(partido.arbitro_info.id);
+    }
+  }, [partido.arbitro_info?.id, obtenerPromedio]);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -96,14 +107,25 @@ export function PartidoDetail({ partido }: PartidoDetailProps) {
               {partido.municipio.departamento && `, ${partido.municipio.departamento}`}
             </p>
           </div>
+          {partido.tipo_partido && (
+            <div>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Tipo de partido</p>
+              <p className="font-medium text-sm sm:text-base">{partido.tipo_partido.nombre}</p>
+              {partido.tipo_partido.duracion_referencial && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {partido.tipo_partido.duracion_referencial}
+                </p>
+              )}
+            </div>
+          )}
           <div>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-1">Categoría</p>
-            <p className="font-medium text-sm sm:text-base">{partido.categoria.nombre}</p>
-          </div>
-          <div>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-1">Tarifa</p>
-            <p className="font-medium text-lg sm:text-xl text-primary">
-              ${parseFloat(partido.tarifa).toLocaleString("es-CO")} COP
+            <p className="text-xs sm:text-sm text-muted-foreground mb-1">Valor a cobrar</p>
+            <p className="font-medium text-sm sm:text-base">
+              {partido.monto_total != null
+                ? formatCop(partido.monto_total)
+                : partido.tipo_partido
+                ? formatCop(partido.tipo_partido.monto)
+                : "—"}
             </p>
           </div>
         </div>
@@ -132,6 +154,25 @@ export function PartidoDetail({ partido }: PartidoDetailProps) {
                 <p className="text-xs sm:text-sm text-muted-foreground">
                   @{partido.arbitro_info.username}
                 </p>
+                {/* Calificaciones del árbitro */}
+                {isLoadingPromedio ? (
+                  <p className="text-xs text-muted-foreground mt-2">Cargando calificaciones...</p>
+                ) : promedio && promedio.promedio != null ? (
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <span className="text-sm font-semibold text-foreground">
+                        {promedio.promedio.toFixed(1)}
+                      </span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      ({promedio.total_calificaciones}{" "}
+                      {promedio.total_calificaciones === 1 ? "calificación" : "calificaciones"})
+                    </span>
+                  </div>
+                ) : promedio && promedio.total_calificaciones === 0 ? (
+                  <p className="text-xs text-muted-foreground mt-2">Sin calificaciones aún</p>
+                ) : null}
               </>
             ) : (
               <p className="font-medium text-sm sm:text-base text-muted-foreground">

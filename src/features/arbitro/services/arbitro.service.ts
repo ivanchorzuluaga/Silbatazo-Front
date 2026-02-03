@@ -15,6 +15,7 @@ import type {
   DocumentoCreateData,
   Municipio,
   Categoria,
+  RolArbitro,
   ArbitroVerificacionData,
   DisponibilidadArbitro,
   DisponibilidadCreateData,
@@ -35,8 +36,6 @@ export const arbitroService = {
   async listarArbitros(params?: {
     municipio?: number;
     categoria?: number;
-    tarifa_min?: number;
-    tarifa_max?: number;
     search?: string;
     ordering?: string;
     estado?: string;
@@ -148,6 +147,23 @@ export const arbitroService = {
   },
 
   /**
+   * Subir foto de perfil del árbitro
+   */
+  async subirFotoPerfil(file: File): Promise<Arbitro> {
+    const token = this.getToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await arbitroEndpoints.subirFotoPerfil(token, file);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al subir la foto");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
    * Cargar documento
    */
   async cargarDocumento(data: DocumentoCreateData): Promise<DocumentoArbitro> {
@@ -217,6 +233,17 @@ export const arbitroService = {
       return await arbitroEndpoints.listarCategorias();
     } catch {
       throw new Error("Error al obtener categorías");
+    }
+  },
+
+  /**
+   * Listar roles de árbitro
+   */
+  async listarRoles(): Promise<RolArbitro[]> {
+    try {
+      return await arbitroEndpoints.listarRoles();
+    } catch {
+      throw new Error("Error al obtener roles");
     }
   },
 
@@ -302,8 +329,6 @@ export const arbitroService = {
     estado?: string;
     municipio?: number;
     categoria?: number;
-    tarifa_min?: number;
-    tarifa_max?: number;
     search?: string;
     ordering?: string;
   }): Promise<Arbitro[]> {

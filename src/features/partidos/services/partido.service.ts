@@ -23,6 +23,7 @@ import type {
   Calificacion,
   CalificacionCreateData,
   PromedioArbitro,
+  TipoPartido,
 } from "../types/partido.types";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
@@ -93,6 +94,22 @@ export const partidoService = {
           throw new Error("Solo los clientes pueden crear partidos");
         }
         throw new Error(extractErrorMessage(error.data) || "Error al crear partido");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
+   * Lista de tipos de partido con precio fijo (selector único)
+   */
+  async listarTiposPartido(): Promise<TipoPartido[]> {
+    const token = this.getToken();
+    if (!token) throw new Error("No estás autenticado");
+    try {
+      return await partidoEndpoints.listarTiposPartido(token);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al obtener tipos de partido");
       }
       throw new Error("Error de conexión. Intenta nuevamente.");
     }
@@ -394,14 +411,12 @@ export const partidoService = {
   },
 
   /**
-   * Listar calificaciones recibidas por un árbitro
+   * Listar calificaciones recibidas por un árbitro (puede llamarse con o sin sesión).
    */
   async listarCalificacionesArbitro(arbitroId: number): Promise<Calificacion[]> {
     const token = this.getToken();
-    if (!token) throw new Error("No estás autenticado");
-
     try {
-      return await partidoEndpoints.listarCalificacionesArbitro(token, arbitroId);
+      return await partidoEndpoints.listarCalificacionesArbitro(arbitroId, token);
     } catch (error) {
       if (error instanceof ApiException) {
         throw new Error(extractErrorMessage(error.data) || "Error al obtener calificaciones");
@@ -411,14 +426,12 @@ export const partidoService = {
   },
 
   /**
-   * Obtener el promedio de calificaciones de un árbitro
+   * Obtener el promedio de calificaciones de un árbitro (puede llamarse con o sin sesión).
    */
   async obtenerPromedioArbitro(arbitroId: number): Promise<PromedioArbitro> {
     const token = this.getToken();
-    if (!token) throw new Error("No estás autenticado");
-
     try {
-      return await partidoEndpoints.obtenerPromedioArbitro(token, arbitroId);
+      return await partidoEndpoints.obtenerPromedioArbitro(arbitroId, token);
     } catch (error) {
       if (error instanceof ApiException) {
         throw new Error(extractErrorMessage(error.data) || "Error al obtener promedio");

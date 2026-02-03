@@ -4,7 +4,6 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
@@ -84,7 +83,7 @@ export function PageHeader({
             {title && <h1 className="text-lg font-semibold">{title}</h1>}
           </div>
 
-          {/* Lado derecho: Dashboard, acciones adicionales y ThemeToggle */}
+          {/* Lado derecho: Dashboard y acciones adicionales (tema solo en navbar) */}
           <div className="flex items-center gap-3">
             {showDashboard && isAuthenticated && (
               <Button variant="outline" size="sm" onClick={() => navigate(dashboardRoute)}>
@@ -92,7 +91,6 @@ export function PageHeader({
               </Button>
             )}
             {rightActions}
-            <ThemeToggle />
           </div>
         </div>
       </div>

@@ -14,7 +14,13 @@ interface CategoriaCardProps {
 
 export function CategoriaCard({ categoria, onEdit, onDelete, isLoading }: CategoriaCardProps) {
   const handleDelete = () => {
-    if (confirm(`¿Estás seguro de que quieres ${categoria.activo ? "desactivar" : "activar"} la categoría "${categoria.nombre}"?`)) {
+    if (
+      confirm(
+        `¿Estás seguro de que quieres ${
+          categoria.activo ? "desactivar" : "activar"
+        } la categoría "${categoria.nombre}"?`
+      )
+    ) {
       onDelete(categoria.id);
     }
   };
@@ -46,10 +52,6 @@ export function CategoriaCard({ categoria, onEdit, onDelete, isLoading }: Catego
                 <span className="font-medium">Nivel:</span> {categoria.nivel}
               </p>
             )}
-            <p className="text-primary font-semibold">
-              <span className="font-medium text-foreground">Tarifa:</span> $
-              {parseFloat(categoria.tarifa).toLocaleString("es-CO")} COP
-            </p>
           </div>
         </div>
 
@@ -75,4 +77,3 @@ export function CategoriaCard({ categoria, onEdit, onDelete, isLoading }: Catego
     </div>
   );
 }
-
