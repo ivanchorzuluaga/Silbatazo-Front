@@ -34,7 +34,8 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
       <div
         ref={ref}
         className={cn(
-          "relative z-50 w-full max-w-lg rounded-lg border border-border bg-card text-card-foreground p-6 shadow-lg",
+          "relative z-50 w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-lg border border-border bg-card text-card-foreground p-4 sm:p-6 shadow-lg mx-4 sm:mx-6",
+          "overscroll-contain",
           className
         )}
         {...props}

@@ -1,11 +1,10 @@
 /**
- * Página de lista de partidos
+ * Página de lista de partidos con tabs por estado
  */
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageLayout } from "@/components/layout";
 import { usePartidos } from "../hooks/usePartidos";
@@ -14,21 +13,25 @@ import { PartidoCardSkeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
 import type { EstadoPartido, PartidosListParams } from "../types/partido.types";
-import { Calendar, Filter, Plus, Search, CheckCircle, Shield, Star } from "lucide-react";
+import { Calendar, Plus, Search, CheckCircle, Shield, Star } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const TABS: { value: "" | EstadoPartido; label: string }[] = [
+  { value: "", label: "Todos" },
+  { value: "buscando_arbitro", label: "Buscando árbitro" },
+  { value: "pendiente", label: "Pendiente" },
+  { value: "aceptado", label: "Aceptado" },
+  { value: "completado", label: "Completado" },
+  { value: "rechazado", label: "Rechazado" },
+  { value: "cancelado", label: "Cancelado" },
+];
 
 export function PartidosListPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [filtros, setFiltros] = useState<PartidosListParams>({});
+  const [tabEstado, setTabEstado] = useState<"" | EstadoPartido>("");
+  const filtros: PartidosListParams = tabEstado ? { estado: tabEstado } : {};
   const { partidos, isLoading, error } = usePartidos(filtros);
-
-  const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const estado = e.target.value as EstadoPartido | "";
-    setFiltros((prev) => ({
-      ...prev,
-      estado: estado || undefined,
-    }));
-  };
 
   return (
     <PageLayout
@@ -53,8 +56,8 @@ export function PartidosListPage() {
             </p>
           </div>
           {user?.role === "cliente" && (
-            <Button 
-              onClick={() => navigate(ROUTES.PARTIDOS_CREAR)} 
+            <Button
+              onClick={() => navigate(ROUTES.PARTIDOS_CREAR)}
               size="lg"
               className="shadow-lg hover:shadow-xl transition-all duration-300"
             >
@@ -65,30 +68,27 @@ export function PartidosListPage() {
         </div>
       </div>
 
-      {/* Filtros mejorados */}
-      <Card className="mb-6 border-0 bg-gradient-to-br from-card to-card/80">
-        <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="flex items-center gap-2 mb-2 sm:mb-0">
-              <Filter className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold text-lg">Filtros</h3>
-            </div>
-            <div className="flex-1 max-w-xs">
-              <label htmlFor="estado" className="text-sm font-medium mb-2 block">
-                Estado del partido
-              </label>
-              <Select id="estado" value={filtros.estado || ""} onChange={handleEstadoChange}>
-                <option value="">Todos los estados</option>
-                <option value="pendiente">⏳ Pendiente</option>
-                <option value="aceptado">✅ Aceptado</option>
-                <option value="rechazado">❌ Rechazado</option>
-                <option value="completado">🏆 Completado</option>
-                <option value="cancelado">🚫 Cancelado</option>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Tabs por estado */}
+      <div className="mb-6">
+        <p className="text-sm font-medium text-muted-foreground mb-3">Filtrar por estado</p>
+        <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto scrollbar-hide -mx-1 px-1">
+          {TABS.map((tab) => (
+            <button
+              key={tab.value || "todos"}
+              type="button"
+              onClick={() => setTabEstado(tab.value)}
+              className={cn(
+                "shrink-0 px-4 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-10",
+                tabEstado === tab.value
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Error */}
       {error && (
@@ -126,44 +126,58 @@ export function PartidosListPage() {
                     <Calendar className="size-12 text-white" />
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
                   <h3 className="text-2xl font-bold text-foreground">
-                    {user?.role === "cliente" 
-                      ? "¡Aún no tienes partidos!" 
-                      : "No hay partidos asignados"
-                    }
+                    {tabEstado
+                      ? `No hay partidos en "${TABS.find((t) => t.value === tabEstado)?.label}"`
+                      : user?.role === "cliente"
+                      ? "¡Aún no tienes partidos!"
+                      : "No hay partidos asignados"}
                   </h3>
                   <p className="text-muted-foreground text-lg max-w-md mx-auto">
-                    {user?.role === "cliente"
-                      ? "Crea tu primer partido y conecta con árbitros profesionales certificados"
-                      : "Espera a que te asignen nuevos partidos"
-                    }
+                    {tabEstado
+                      ? "Prueba con otro estado o vuelve a Todos para ver la lista completa."
+                      : user?.role === "cliente"
+                      ? "Crea tu primer partido y conecta con árbitros certificados y garantizados"
+                      : "Espera a que te asignen nuevos partidos"}
                   </p>
                 </div>
-                
-                {user?.role === "cliente" && (
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button 
-                      onClick={() => navigate(ROUTES.PARTIDOS_CREAR)} 
-                      size="lg"
-                      className="shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                      <Plus className="w-5 h-5 mr-2" />
-                      Crear mi primer partido
-                    </Button>
-                    <Button 
-                      onClick={() => navigate(ROUTES.ARBITROS)} 
-                      size="lg"
-                      variant="outline"
-                      className="border-2 hover:border-primary/50"
-                    >
-                      <Search className="w-5 h-5 mr-2" />
-                      Explorar árbitros
-                    </Button>
-                  </div>
+
+                {tabEstado ? (
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setTabEstado("")}
+                    className="border-2 hover:border-primary/50"
+                  >
+                    <Calendar className="w-5 h-5 mr-2" />
+                    Ver todos los partidos
+                  </Button>
+                ) : (
+                  user?.role === "cliente" && (
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <Button
+                        onClick={() => navigate(ROUTES.PARTIDOS_CREAR)}
+                        size="lg"
+                        className="shadow-lg hover:shadow-xl transition-all duration-300"
+                      >
+                        <Plus className="w-5 h-5 mr-2" />
+                        Crear mi primer partido
+                      </Button>
+                      <Button
+                        onClick={() => navigate(ROUTES.ARBITROS)}
+                        size="lg"
+                        variant="outline"
+                        className="border-2 hover:border-primary/50"
+                      >
+                        <Search className="w-5 h-5 mr-2" />
+                        Explorar árbitros
+                      </Button>
+                    </div>
+                  )
                 )}
-                
+
                 {/* Trust indicators */}
                 <div className="flex items-center justify-center gap-8 pt-6">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -186,14 +200,14 @@ export function PartidosListPage() {
               {/* Results count */}
               <div className="flex items-center justify-between">
                 <p className="text-muted-foreground">
-                  Mostrando <span className="font-semibold text-foreground">{partidos.length}</span> partido{partidos.length !== 1 ? 's' : ''}
+                  Mostrando <span className="font-semibold text-foreground">{partidos.length}</span>{" "}
+                  partido{partidos.length !== 1 ? "s" : ""}
+                  {tabEstado && (
+                    <span className="ml-1">({TABS.find((t) => t.value === tabEstado)?.label})</span>
+                  )}
                 </p>
-                <Button variant="outline" size="sm">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Más filtros
-                </Button>
               </div>
-              
+
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {partidos.map((partido) => (
                   <PartidoCard key={partido.id} partido={partido} />

@@ -1,7 +1,8 @@
 /**
- * Página para que el admin revise y apruebe/rechace pagos pendientes
+ * Página para que el admin revise y apruebe/rechace pagos (historial por estado en tabs)
  */
 
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/layout";
@@ -14,11 +15,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, CheckCircle2, XCircle, Eye, AlertCircle } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Eye, AlertCircle, ImageIcon } from "lucide-react";
+import { usePartidos } from "@/features/partidos/hooks/usePartidos";
 import { usePagosPendientes } from "../hooks/usePagosPendientes";
 import { ROUTES, getPartidoDetailRoute } from "@/lib/constants";
-import { formatCop } from "@/lib/utils";
+import { formatCop, cn } from "@/lib/utils";
 import type { Partido, EstadoPago } from "@/features/partidos/types/partido.types";
+
+const TABS_PAGO: { value: EstadoPago; label: string }[] = [
+  { value: "pendiente", label: "Pendiente" },
+  { value: "en_revision", label: "En Revisión" },
+  { value: "aprobado", label: "Aprobado" },
+  { value: "rechazado", label: "Rechazado" },
+];
 
 // Badge de estado de pago
 function EstadoPagoBadge({ estado }: { estado: EstadoPago }) {
@@ -125,6 +134,30 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar }: PagoCardProp
           </div>
         )}
 
+        {partido.comprobante_pago_url && (
+          <div className="pt-3 border-t">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2 font-medium">
+              Comprobante de transferencia
+            </p>
+            <a
+              href={partido.comprobante_pago_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+            >
+              <ImageIcon className="h-4 w-4 shrink-0" />
+              Ver captura del comprobante
+            </a>
+            <div className="mt-2 rounded-lg border bg-muted/30 overflow-hidden max-h-40 w-full max-w-xs">
+              <img
+                src={partido.comprobante_pago_url}
+                alt="Comprobante de pago"
+                className="w-full h-full object-contain object-left-top"
+              />
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t">
           <Button
             variant="outline"
@@ -135,24 +168,28 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar }: PagoCardProp
             <Eye className="mr-2 h-4 w-4" />
             Ver Detalle
           </Button>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={onAprobar}
-            className="h-11 sm:h-9 touch-manipulation flex-1 sm:flex-none"
-          >
-            <CheckCircle2 className="mr-2 h-4 w-4" />
-            Aprobar
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={onRechazar}
-            className="h-11 sm:h-9 touch-manipulation flex-1 sm:flex-none"
-          >
-            <XCircle className="mr-2 h-4 w-4" />
-            Rechazar
-          </Button>
+          {partido.estado_pago === "en_revision" && (
+            <>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={onAprobar}
+                className="h-11 sm:h-9 touch-manipulation flex-1 sm:flex-none"
+              >
+                <CheckCircle2 className="mr-2 h-4 w-4" />
+                Aprobar
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={onRechazar}
+                className="h-11 sm:h-9 touch-manipulation flex-1 sm:flex-none"
+              >
+                <XCircle className="mr-2 h-4 w-4" />
+                Rechazar
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -181,15 +218,42 @@ function AprobarModal({
 }: AprobarModalProps) {
   return (
     <Dialog open={open} onOpenChange={onCancelar}>
-      <DialogContent className="max-w-md mx-4">
+      <DialogContent className="max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg sm:text-xl">Aprobar Pago</DialogTitle>
           <DialogDescription className="text-sm sm:text-base">
-            ¿Estás seguro de que deseas aprobar el pago del partido{" "}
-            {partido?.codigo || `#${partido?.id}`}?
+            Revisa el comprobante y confirma la aprobación del pago del partido{" "}
+            {partido?.codigo || `#${partido?.id}`}.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
+          {partido?.comprobante_pago_url ? (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">
+                Comprobante de transferencia (captura subida por el cliente)
+              </p>
+              <a
+                href={partido.comprobante_pago_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-primary hover:underline mb-2"
+              >
+                <ImageIcon className="h-4 w-4 shrink-0" />
+                Abrir en nueva pestaña
+              </a>
+              <div className="rounded-lg border bg-muted/30 overflow-hidden">
+                <img
+                  src={partido.comprobante_pago_url}
+                  alt="Comprobante de pago"
+                  className="w-full max-h-64 object-contain object-top"
+                />
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Este partido no tiene comprobante de pago subido.
+            </p>
+          )}
           <FormField
             label="Notas (opcional)"
             name="notas_aprobar"
@@ -254,15 +318,42 @@ function RechazarModal({
 }: RechazarModalProps) {
   return (
     <Dialog open={open} onOpenChange={onCancelar}>
-      <DialogContent className="max-w-md mx-4">
+      <DialogContent className="max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg sm:text-xl">Rechazar Pago</DialogTitle>
           <DialogDescription className="text-sm sm:text-base">
-            Proporciona un motivo para rechazar el pago del partido{" "}
+            Revisa el comprobante y proporciona el motivo para rechazar el pago del partido{" "}
             {partido?.codigo || `#${partido?.id}`}.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
+          {partido?.comprobante_pago_url ? (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">
+                Comprobante de transferencia (captura subida por el cliente)
+              </p>
+              <a
+                href={partido.comprobante_pago_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-primary hover:underline mb-2"
+              >
+                <ImageIcon className="h-4 w-4 shrink-0" />
+                Abrir en nueva pestaña
+              </a>
+              <div className="rounded-lg border bg-muted/30 overflow-hidden">
+                <img
+                  src={partido.comprobante_pago_url}
+                  alt="Comprobante de pago"
+                  className="w-full max-h-64 object-contain object-top"
+                />
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Este partido no tiene comprobante de pago subido.
+            </p>
+          )}
           <FormField
             label="Motivo del rechazo *"
             name="motivo_rechazar"
@@ -310,10 +401,16 @@ function RechazarModal({
 // Componente principal
 export function PagosPendientesPage() {
   const navigate = useNavigate();
+  const [tabPago, setTabPago] = useState<EstadoPago>("en_revision");
+
+  const filtros = { estado_pago: tabPago };
+  const { partidos: pagos, isLoading, error, refetch } = usePartidos(filtros);
+
+  const onPagoProcesado = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
   const {
-    pagos,
-    isLoading,
-    error,
     partidoSeleccionado,
     showAprobarModal,
     showRechazarModal,
@@ -327,15 +424,37 @@ export function PagosPendientesPage() {
     setMotivoRechazar,
     handleAprobar,
     handleRechazar,
-  } = usePagosPendientes();
+  } = usePagosPendientes(onPagoProcesado);
 
   return (
     <PageLayout
       backButton={{ label: "Dashboard", to: ROUTES.ADMIN_DASHBOARD }}
-      title="Pagos Pendientes de Revisión"
+      title="Pagos de Partidos"
       contentClassName="container mx-auto px-4 py-6 max-w-7xl"
     >
       <div className="space-y-6">
+        {/* Tabs por estado de pago */}
+        <div>
+          <p className="text-sm font-medium text-muted-foreground mb-3">Estado del pago</p>
+          <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto">
+            {TABS_PAGO.map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => setTabPago(tab.value)}
+                className={cn(
+                  "shrink-0 px-4 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-10",
+                  tabPago === tab.value
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Error */}
         {error && (
           <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4">
@@ -352,16 +471,18 @@ export function PagosPendientesPage() {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : pagos.length === 0 ? (
-          /* Empty State */
           <div className="rounded-lg border bg-card p-12 text-center">
             <CheckCircle2 className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-lg font-semibold mb-2">No hay pagos pendientes</p>
+            <p className="text-lg font-semibold mb-2">
+              No hay pagos en &quot;{TABS_PAGO.find((t) => t.value === tabPago)?.label}&quot;
+            </p>
             <p className="text-sm text-muted-foreground">
-              Todos los pagos han sido revisados o no hay pagos en revisión.
+              {tabPago === "en_revision"
+                ? "No hay pagos en revisión en este momento."
+                : "Cambia de pestaña para ver otros estados."}
             </p>
           </div>
         ) : (
-          /* Lista de pagos */
           <div className="space-y-4">
             {pagos.map((partido) => (
               <PagoCard
@@ -376,7 +497,6 @@ export function PagosPendientesPage() {
         )}
       </div>
 
-      {/* Modal Aprobar */}
       <AprobarModal
         open={showAprobarModal}
         partido={partidoSeleccionado}
@@ -387,7 +507,6 @@ export function PagosPendientesPage() {
         isProcessing={isProcessing}
       />
 
-      {/* Modal Rechazar */}
       <RechazarModal
         open={showRechazarModal}
         partido={partidoSeleccionado}

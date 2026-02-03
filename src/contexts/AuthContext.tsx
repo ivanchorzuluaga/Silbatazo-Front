@@ -20,8 +20,10 @@ interface AuthContextValue {
     role?: User["role"],
     username?: string,
     email?: string,
-    userId?: number,
+    userId?: number
   ) => void;
+  /** Actualiza el usuario en contexto (p. ej. tras editar perfil) */
+  updateUser: (user: User) => void;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
 }
@@ -107,7 +109,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       role?: User["role"],
       username?: string,
       email?: string,
-      userId?: number,
+      userId?: number
     ) => {
       localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
       localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
@@ -120,8 +122,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       };
       setUser(newUser);
     },
-    [],
+    []
   );
+
+  const updateUser = useCallback((nextUser: User) => {
+    setUser((prev) => (prev ? { ...prev, ...nextUser } : nextUser));
+  }, []);
 
   const logout = useCallback(async () => {
     await authService.logout();
@@ -139,10 +145,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isAuthenticated: !!user && authService.isAuthenticated(),
       isLoading,
       login,
+      updateUser,
       logout,
       logoutAll,
     }),
-    [user, isLoading, login, logout, logoutAll],
+    [user, isLoading, login, updateUser, logout, logoutAll]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

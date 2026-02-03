@@ -32,6 +32,8 @@ export interface UserResponse {
   email?: string;
   first_name?: string;
   last_name?: string;
+  telefono?: string;
+  documento_identidad?: string;
   role: "cliente" | "arbitro" | "admin";
   date_joined: string;
   is_active: boolean;

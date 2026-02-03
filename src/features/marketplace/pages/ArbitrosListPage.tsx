@@ -145,7 +145,10 @@ export function ArbitrosListPage() {
           <div className="flex justify-center mb-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium text-primary backdrop-blur-sm">
               <Users className="w-4 h-4" />
-              <span className="font-semibold">+50</span> árbitros certificados
+              <span className="font-semibold tabular-nums">
+                {landingStats?.arbitros_total ?? "—"}
+              </span>{" "}
+              árbitros certificados
             </div>
           </div>
 
@@ -155,8 +158,8 @@ export function ArbitrosListPage() {
               Nuestros Árbitros
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Encuentra el árbitro perfecto para tu partido. Todos nuestros profesionales están
-              certificados y listos para garantizar un juego limpio.
+              Encuentra el árbitro perfecto para tu partido. Todos nuestros árbitros están
+              certificados, son de calidad y listos para garantizar un juego limpio.
             </p>
           </div>
 
@@ -187,7 +190,7 @@ export function ArbitrosListPage() {
                 <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
                 <p className="text-lg font-medium text-foreground mb-2">Cargando árbitros...</p>
                 <p className="text-sm text-muted-foreground">
-                  Buscando los mejores profesionales para ti
+                  Buscando los mejores árbitros para ti
                 </p>
               </div>
             </div>

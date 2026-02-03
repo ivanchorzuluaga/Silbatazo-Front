@@ -1,6 +1,6 @@
 /**
  * Página de gestión completa de partidos (Panel de administrador)
- * Permite ver todos los partidos, filtrar por estado, fecha, cliente, árbitro, municipio, categoría
+ * Tabs por estado y filtros adicionales
  */
 
 import { useState } from "react";
@@ -13,15 +13,16 @@ import { PartidoCard } from "@/features/partidos/components/PartidoCard";
 import { useMunicipios } from "@/features/arbitro/hooks/useMunicipios";
 import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
 import { ROUTES } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import type { PartidosListParams, EstadoPartido } from "@/features/partidos/types/partido.types";
 
-const ESTADOS_PARTIDO: { value: EstadoPartido | ""; label: string }[] = [
-  { value: "", label: "Todos los estados" },
-  { value: "buscando_arbitro", label: "Buscando Árbitro" },
+const TABS_ESTADO: { value: "" | EstadoPartido; label: string }[] = [
+  { value: "", label: "Todos" },
+  { value: "buscando_arbitro", label: "Buscando árbitro" },
   { value: "pendiente", label: "Pendiente" },
   { value: "aceptado", label: "Aceptado" },
-  { value: "rechazado", label: "Rechazado" },
   { value: "completado", label: "Completado" },
+  { value: "rechazado", label: "Rechazado" },
   { value: "cancelado", label: "Cancelado" },
 ];
 
@@ -29,8 +30,8 @@ export function GestionPartidosPage() {
   const { municipios } = useMunicipios();
   const { categorias } = useCategorias();
 
-  // Filtros
-  const [estado, setEstado] = useState<EstadoPartido | "">("");
+  // Filtros: estado por tab, resto en panel
+  const [tabEstado, setTabEstado] = useState<"" | EstadoPartido>("");
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
   const [municipioId, setMunicipioId] = useState("");
@@ -38,9 +39,8 @@ export function GestionPartidosPage() {
   const [clienteId, setClienteId] = useState("");
   const [arbitroId, setArbitroId] = useState("");
 
-  // Construir filtros para la API
   const filtros: PartidosListParams = {};
-  if (estado) filtros.estado = estado;
+  if (tabEstado) filtros.estado = tabEstado;
   if (fechaDesde) filtros.fecha_desde = fechaDesde;
   if (fechaHasta) filtros.fecha_hasta = fechaHasta;
   if (municipioId) filtros.municipio_id = parseInt(municipioId);
@@ -50,12 +50,8 @@ export function GestionPartidosPage() {
 
   const { partidos, isLoading, error } = usePartidos(filtros);
 
-  const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setEstado(e.target.value as EstadoPartido | "");
-  };
-
   const handleLimpiarFiltros = () => {
-    setEstado("");
+    setTabEstado("");
     setFechaDesde("");
     setFechaHasta("");
     setMunicipioId("");
@@ -64,7 +60,6 @@ export function GestionPartidosPage() {
     setArbitroId("");
   };
 
-
   return (
     <PageLayout
       backButton={{ label: "Dashboard", to: ROUTES.ADMIN_DASHBOARD }}
@@ -72,28 +67,32 @@ export function GestionPartidosPage() {
       contentClassName="container mx-auto px-4 py-6 max-w-7xl"
     >
       <div className="space-y-6">
-        {/* Filtros */}
-        <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">Filtros</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Estado */}
-            <div className="space-y-2">
-              <label htmlFor="estado" className="text-sm font-medium">
-                Estado
-              </label>
-              <Select
-                id="estado"
-                value={estado}
-                onChange={handleEstadoChange}
+        {/* Tabs por estado */}
+        <div>
+          <p className="text-sm font-medium text-muted-foreground mb-3">Estado del partido</p>
+          <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto">
+            {TABS_ESTADO.map((tab) => (
+              <button
+                key={tab.value || "todos"}
+                type="button"
+                onClick={() => setTabEstado(tab.value)}
+                className={cn(
+                  "shrink-0 px-4 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-10",
+                  tabEstado === tab.value
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
               >
-                {ESTADOS_PARTIDO.map((estado) => (
-                  <option key={estado.value} value={estado.value}>
-                    {estado.label}
-                  </option>
-                ))}
-              </Select>
-            </div>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
+        {/* Filtros adicionales */}
+        <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
+          <h2 className="text-lg font-semibold mb-4">Filtros adicionales</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {/* Fecha Desde */}
             <div className="space-y-2">
               <label htmlFor="fechaDesde" className="text-sm font-medium">
@@ -212,9 +211,7 @@ export function GestionPartidosPage() {
         {!isLoading && !error && (
           <>
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">
-                Partidos ({partidos.length})
-              </h2>
+              <h2 className="text-lg font-semibold">Partidos ({partidos.length})</h2>
             </div>
 
             {partidos.length === 0 ? (
@@ -239,4 +236,3 @@ export function GestionPartidosPage() {
     </PageLayout>
   );
 }
-

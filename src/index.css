@@ -21,7 +21,8 @@
 
 :root {
   /* Tipografía iOS-style */
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -30,41 +31,41 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
   /* Border radius más generosos tipo iOS */
   --radius: 1rem;
-  
+
   /* ============================================
      PALETA DE COLORES SILBATAZO
      Diseño deportivo, moderno y profesional
      ============================================ */
-  
+
   /* Colores base de marca */
   --color-white: oklch(0.995 0 0);
   --color-black: oklch(0.13 0.02 260);
-  
+
   /* Verde Esmeralda - El campo, la energía deportiva */
   --color-emerald: oklch(0.72 0.17 162);
   --color-emerald-dark: oklch(0.55 0.15 162);
   --color-emerald-light: oklch(0.92 0.05 162);
-  
+
   /* Azul Índigo - Autoridad, confianza, profesionalismo */
-  --color-indigo: oklch(0.50 0.18 264);
+  --color-indigo: oklch(0.5 0.18 264);
   --color-indigo-dark: oklch(0.35 0.15 264);
   --color-indigo-light: oklch(0.92 0.03 264);
-  
+
   /* Ámbar/Dorado - Premium, silbatos, excelencia */
-  --color-amber: oklch(0.80 0.16 75);
+  --color-amber: oklch(0.8 0.16 75);
   --color-amber-dark: oklch(0.65 0.18 55);
-  
+
   /* Colores semánticos */
-  --color-red: oklch(0.60 0.22 25);
+  --color-red: oklch(0.6 0.22 25);
   --color-green-success: oklch(0.72 0.15 155);
-  
+
   /* ============================================
      MODO CLARO - Limpio, fresco, profesional
      ============================================ */
-  
+
   /* Fondos */
   --background: oklch(0.985 0.002 260);
   --foreground: var(--color-black);
@@ -72,47 +73,47 @@
   --card-foreground: var(--color-black);
   --popover: var(--color-white);
   --popover-foreground: var(--color-black);
-  
+
   /* Primary: Verde Esmeralda - Acción principal, CTAs */
   --primary: var(--color-emerald);
   --primary-foreground: var(--color-white);
-  
+
   /* Secondary: Índigo suave - Acciones secundarias */
   --secondary: var(--color-indigo-light);
   --secondary-foreground: var(--color-indigo);
-  
+
   /* Muted: Gris con toque frío */
   --muted: oklch(0.955 0.005 260);
   --muted-foreground: oklch(0.45 0.02 260);
-  
+
   /* Accent: Ámbar - Destacados, badges, notificaciones */
   --accent: var(--color-amber);
   --accent-foreground: var(--color-black);
-  
+
   /* Success: Verde claro */
   --success: var(--color-green-success);
   --success-foreground: var(--color-white);
-  
+
   /* Destructive: Rojo */
   --destructive: var(--color-red);
   --destructive-foreground: var(--color-white);
-  
+
   /* Warning: Ámbar */
   --warning: var(--color-amber);
   --warning-foreground: var(--color-black);
-  
+
   /* Borders e inputs - Sutiles con toque de color */
-  --border: oklch(0.90 0.01 260);
+  --border: oklch(0.9 0.01 260);
   --input: oklch(0.97 0.005 260);
   --ring: var(--color-emerald);
-  
+
   /* Charts - Paleta variada y armónica */
   --chart-1: var(--color-emerald);
   --chart-2: var(--color-indigo);
   --chart-3: var(--color-amber);
   --chart-4: oklch(0.65 0.15 330);
-  --chart-5: oklch(0.70 0.12 200);
-  
+  --chart-5: oklch(0.7 0.12 200);
+
   /* Sidebar - Elegante con el color de marca */
   --sidebar: var(--color-white);
   --sidebar-foreground: var(--color-black);
@@ -129,7 +130,8 @@ body {
   min-width: 320px;
   min-height: 100vh;
   /* Safe areas para iOS (notch, home indicator) */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
 }
 
 @theme inline {
@@ -182,7 +184,7 @@ body {
   /* ============================================
      MODO OSCURO - Elegante, inmersivo
      ============================================ */
-  
+
   /* Fondos - Negro con sutil tono azulado */
   --background: oklch(0.14 0.015 260);
   --foreground: oklch(0.95 0 0);
@@ -190,54 +192,54 @@ body {
   --card-foreground: oklch(0.95 0 0);
   --popover: oklch(0.18 0.015 260);
   --popover-foreground: oklch(0.95 0 0);
-  
+
   /* Primary: Verde Esmeralda más luminoso */
   --primary: oklch(0.75 0.18 162);
   --primary-foreground: oklch(0.15 0.02 162);
-  
+
   /* Secondary: Índigo suave */
   --secondary: oklch(0.25 0.05 264);
-  --secondary-foreground: oklch(0.80 0.08 264);
-  
+  --secondary-foreground: oklch(0.8 0.08 264);
+
   /* Muted: Gris oscuro con tono */
   --muted: oklch(0.22 0.01 260);
   --muted-foreground: oklch(0.65 0.01 260);
-  
+
   /* Accent: Ámbar vibrante */
   --accent: oklch(0.78 0.16 75);
   --accent-foreground: oklch(0.15 0.02 75);
-  
+
   /* Success: Verde más brillante */
   --success: oklch(0.75 0.16 155);
   --success-foreground: oklch(0.15 0 155);
-  
+
   /* Destructive: Rojo más brillante */
   --destructive: oklch(0.68 0.22 25);
   --destructive-foreground: var(--color-white);
-  
+
   /* Warning: Ámbar */
   --warning: oklch(0.78 0.16 75);
   --warning-foreground: oklch(0.15 0.02 75);
-  
+
   /* Borders e inputs */
   --border: oklch(0.28 0.015 260);
   --input: oklch(0.22 0.01 260);
   --ring: oklch(0.75 0.18 162);
-  
+
   /* Charts - Colores vibrantes para modo oscuro */
   --chart-1: oklch(0.75 0.18 162);
   --chart-2: oklch(0.65 0.18 264);
   --chart-3: oklch(0.78 0.16 75);
-  --chart-4: oklch(0.70 0.15 330);
+  --chart-4: oklch(0.7 0.15 330);
   --chart-5: oklch(0.72 0.12 200);
-  
+
   /* Sidebar - Oscuro elegante */
   --sidebar: oklch(0.12 0.015 260);
   --sidebar-foreground: oklch(0.92 0 0);
   --sidebar-primary: oklch(0.75 0.18 162);
   --sidebar-primary-foreground: oklch(0.15 0.02 162);
-  --sidebar-accent: oklch(0.20 0.03 162);
-  --sidebar-accent-foreground: oklch(0.80 0.10 162);
+  --sidebar-accent: oklch(0.2 0.03 162);
+  --sidebar-accent-foreground: oklch(0.8 0.1 162);
   --sidebar-border: oklch(0.25 0.015 260);
   --sidebar-ring: oklch(0.75 0.18 162);
 }
@@ -315,6 +317,11 @@ body {
     left: calc(1rem + env(safe-area-inset-left));
   }
 
+  /* Padding inferior para contenido sobre BottomNav en móvil */
+  .pb-nav-mobile {
+    padding-bottom: max(4rem, calc(4rem + env(safe-area-inset-bottom)));
+  }
+
   /* Mejorar interacción táctil */
   .touch-manipulation {
     touch-action: manipulation;
@@ -323,29 +330,21 @@ body {
 
   /* Sombras tipo iOS (múltiples capas) */
   .shadow-ios {
-    box-shadow: 
-      0 1px 3px rgba(0, 0, 0, 0.1),
-      0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   }
 
   .shadow-ios-md {
-    box-shadow: 
-      0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06),
       0 0 0 1px rgba(0, 0, 0, 0.05);
   }
 
   .shadow-ios-lg {
-    box-shadow: 
-      0 10px 15px -3px rgba(0, 0, 0, 0.1),
-      0 4px 6px -2px rgba(0, 0, 0, 0.05),
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05),
       0 0 0 1px rgba(0, 0, 0, 0.05);
   }
 
   .shadow-ios-xl {
-    box-shadow: 
-      0 20px 25px -5px rgba(0, 0, 0, 0.1),
-      0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04),
       0 0 0 1px rgba(0, 0, 0, 0.05);
   }
 

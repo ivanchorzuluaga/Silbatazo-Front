@@ -5,6 +5,10 @@
 export const APP_NAME = "Silbatazo";
 export const APP_SLOGAN = "Árbitros de Confianza";
 
+/** Número de WhatsApp para contacto (código país + número sin + ni espacios). Ej: 573001234567 */
+export const CONTACT_WHATSAPP_NUMBER =
+  (import.meta.env.VITE_WHATSAPP_NUMBER as string) || "573001234567";
+
 /** Solo estas 4 categorías se muestran en partidos y tarifas */
 export const CATEGORIAS_PARTIDO = ["Libre", "Veteranos", "Juvenil", "Infantil"] as const;
 
@@ -20,9 +24,11 @@ export const ROUTES = {
   DASHBOARD: "/dashboard",
   // Rutas específicas por rol
   CLIENTE_DASHBOARD: "/cliente/dashboard",
+  CLIENTE_PERFIL: "/cliente/perfil",
   CLIENTE_ARBITROS: "/cliente/arbitros",
   CLIENTE_ARBITRO_DETALLE: "/cliente/arbitros/:id",
   ARBITRO_DASHBOARD: "/arbitro/dashboard",
+  ARBITRO_ONBOARDING: "/arbitro/onboarding",
   ARBITRO_PERFIL: "/arbitro/perfil",
   ARBITRO_BILLETERA: "/arbitro/billetera",
   ADMIN_DASHBOARD: "/admin/dashboard",
@@ -32,6 +38,7 @@ export const ROUTES = {
   ADMIN_GESTION_ARBITROS: "/admin/arbitros",
   ADMIN_GESTION_PARTIDOS: "/admin/partidos",
   ADMIN_CATEGORIAS: "/admin/categorias",
+  ADMIN_TIPOS_PARTIDO: "/admin/tipos-partido",
   ADMIN_ASIGNACION_PARTIDOS: "/admin/partidos/asignacion",
   ADMIN_PAGOS_PENDIENTES: "/admin/pagos/pendientes",
   // Marketplace (público)

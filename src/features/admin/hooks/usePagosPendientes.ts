@@ -11,7 +11,7 @@ interface UsePagosPendientesReturn {
   pagos: Partido[];
   isLoading: boolean;
   error: string | null;
-  
+
   // Modal state
   partidoSeleccionado: Partido | null;
   showAprobarModal: boolean;
@@ -19,7 +19,7 @@ interface UsePagosPendientesReturn {
   notasAprobar: string;
   motivoRechazar: string;
   isProcessing: boolean;
-  
+
   // Acciones
   cargarPagosPendientes: () => Promise<void>;
   abrirModalAprobar: (partido: Partido) => void;
@@ -32,7 +32,9 @@ interface UsePagosPendientesReturn {
   clearError: () => void;
 }
 
-export function usePagosPendientes(): UsePagosPendientesReturn {
+export function usePagosPendientes(
+  onPagoProcesado?: () => void | Promise<void>
+): UsePagosPendientesReturn {
   // Estados de datos
   const [pagos, setPagos] = useState<Partido[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,9 +62,10 @@ export function usePagosPendientes(): UsePagosPendientesReturn {
       const data = await partidoEndpoints.listarPagosPendientes(token);
       setPagos(data);
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error 
-        ? err.message 
-        : (err as { detail?: string })?.detail || "Error al cargar pagos pendientes";
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : (err as { detail?: string })?.detail || "Error al cargar pagos pendientes";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -106,13 +109,14 @@ export function usePagosPendientes(): UsePagosPendientesReturn {
 
       cerrarModales();
       await cargarPagosPendientes();
+      await onPagoProcesado?.();
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Error al aprobar el pago";
       setError(errorMessage);
     } finally {
       setIsProcessing(false);
     }
-  }, [partidoSeleccionado, notasAprobar, cerrarModales, cargarPagosPendientes]);
+  }, [partidoSeleccionado, notasAprobar, cerrarModales, cargarPagosPendientes, onPagoProcesado]);
 
   // Rechazar pago
   const handleRechazar = useCallback(async () => {
@@ -132,13 +136,14 @@ export function usePagosPendientes(): UsePagosPendientesReturn {
 
       cerrarModales();
       await cargarPagosPendientes();
+      await onPagoProcesado?.();
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Error al rechazar el pago";
       setError(errorMessage);
     } finally {
       setIsProcessing(false);
     }
-  }, [partidoSeleccionado, motivoRechazar, cerrarModales, cargarPagosPendientes]);
+  }, [partidoSeleccionado, motivoRechazar, cerrarModales, cargarPagosPendientes, onPagoProcesado]);
 
   const clearError = useCallback(() => setError(null), []);
 
@@ -151,14 +156,14 @@ export function usePagosPendientes(): UsePagosPendientesReturn {
     pagos,
     isLoading,
     error,
-    
+
     partidoSeleccionado,
     showAprobarModal,
     showRechazarModal,
     notasAprobar,
     motivoRechazar,
     isProcessing,
-    
+
     cargarPagosPendientes,
     abrirModalAprobar,
     abrirModalRechazar,

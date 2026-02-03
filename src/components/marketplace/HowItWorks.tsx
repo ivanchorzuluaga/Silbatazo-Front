@@ -1,8 +1,15 @@
 import { Link } from "react-router-dom";
 import { Search, Calendar, CreditCard, Trophy, ArrowRight } from "lucide-react";
 import { ROUTES } from "@/lib/constants";
+import { useLandingStats } from "@/features/marketplace/hooks/useLandingStats";
 
 export function HowItWorks() {
+  const { stats } = useLandingStats();
+  const arbitrosLabel =
+    stats && stats.arbitros_total > 0
+      ? `${stats.arbitros_total} árbitros certificados`
+      : "Árbitros certificados";
+
   const steps = [
     {
       number: "01",
@@ -11,7 +18,7 @@ export function HowItWorks() {
         "Explora nuestro catálogo de árbitros certificados y filtra por deporte, experiencia y ubicación.",
       icon: Search,
       action: "Explorar árbitros",
-      details: ["Más de 50 árbitros", "Filtros avanzados", "Perfiles verificados"],
+      details: [arbitrosLabel, "Filtros avanzados", "Perfiles verificados"],
     },
     {
       number: "02",
@@ -58,8 +65,8 @@ export function HowItWorks() {
             ¿Cómo Funciona?
           </h2>
           <p className="text-black/70 text-lg max-w-3xl mx-auto">
-            Reservar un árbitro profesional nunca fue tan fácil. Completa todo el proceso en menos
-            de 5 minutos.
+            Reservar un árbitro de calidad nunca fue tan fácil. Completa todo el proceso en menos de
+            5 minutos.
           </p>
         </div>
 

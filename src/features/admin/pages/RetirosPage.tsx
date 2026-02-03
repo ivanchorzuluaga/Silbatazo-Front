@@ -1,33 +1,35 @@
 /**
- * Página de gestión de retiros para administradores
+ * Página de gestión de retiros para administradores (historial en tabs)
  */
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/layout";
 import { useRetiros } from "@/features/arbitro/hooks/useRetiros";
 import { RetiroCard } from "../components/RetiroCard";
 import { ROUTES } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import type { Retiro, RetiroProcesarData } from "@/features/arbitro/types/arbitro.types";
 
+type FiltroRetiro = "pendiente" | "procesado" | "rechazado" | "todos";
+
+const TABS_RETIRO: { value: FiltroRetiro; label: string }[] = [
+  { value: "todos", label: "Todos" },
+  { value: "pendiente", label: "Pendientes" },
+  { value: "procesado", label: "Procesados" },
+  { value: "rechazado", label: "Rechazados" },
+];
+
 export function RetirosPage() {
-  const {
-    retiros,
-    isLoading,
-    error,
-    listarRetiros,
-    procesarRetiro,
-  } = useRetiros();
-  const [filtroEstado, setFiltroEstado] = useState<"pendiente" | "procesado" | "rechazado" | "todos">("pendiente");
+  const { retiros, isLoading, error, listarRetiros, procesarRetiro } = useRetiros();
+  const [tabEstado, setTabEstado] = useState<FiltroRetiro>("pendiente");
 
   useEffect(() => {
-    listarRetiros({ estado: filtroEstado === "todos" ? undefined : filtroEstado });
-  }, [listarRetiros, filtroEstado]);
+    listarRetiros({ estado: tabEstado === "todos" ? undefined : tabEstado });
+  }, [listarRetiros, tabEstado]);
 
   const handleProcesar = async (retiro: Retiro, data: RetiroProcesarData) => {
     await procesarRetiro(retiro.id, data);
-    // Refrescar lista
-    listarRetiros({ estado: filtroEstado === "todos" ? undefined : filtroEstado });
+    listarRetiros({ estado: tabEstado === "todos" ? undefined : tabEstado });
   };
 
   const retirosPendientes = retiros.filter((r) => r.estado === "pendiente").length;
@@ -61,36 +63,26 @@ export function RetirosPage() {
           </div>
         </div>
 
-        {/* Filtros */}
-        <div className="flex gap-2 flex-wrap">
-          <Button
-            variant={filtroEstado === "todos" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFiltroEstado("todos")}
-          >
-            Todos
-          </Button>
-          <Button
-            variant={filtroEstado === "pendiente" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFiltroEstado("pendiente")}
-          >
-            Pendientes
-          </Button>
-          <Button
-            variant={filtroEstado === "procesado" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFiltroEstado("procesado")}
-          >
-            Procesados
-          </Button>
-          <Button
-            variant={filtroEstado === "rechazado" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFiltroEstado("rechazado")}
-          >
-            Rechazados
-          </Button>
+        {/* Tabs por estado */}
+        <div>
+          <p className="text-sm font-medium text-muted-foreground mb-3">Estado</p>
+          <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto">
+            {TABS_RETIRO.map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => setTabEstado(tab.value)}
+                className={cn(
+                  "shrink-0 px-4 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-10",
+                  tabEstado === tab.value
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Error */}
@@ -112,9 +104,9 @@ export function RetirosPage() {
             {retiros.length === 0 ? (
               <div className="text-center py-12 rounded-lg border bg-card">
                 <p className="text-muted-foreground">
-                  {filtroEstado === "todos"
+                  {tabEstado === "todos"
                     ? "No hay retiros registrados."
-                    : `No hay retiros ${filtroEstado}.`}
+                    : `No hay retiros ${tabEstado}.`}
                 </p>
               </div>
             ) : (
@@ -135,4 +127,3 @@ export function RetirosPage() {
     </PageLayout>
   );
 }
-

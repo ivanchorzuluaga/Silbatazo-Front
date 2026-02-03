@@ -8,6 +8,8 @@ export interface User {
   email?: string;
   first_name?: string;
   last_name?: string;
+  telefono?: string;
+  documento_identidad?: string;
   full_name?: string;
   role?: "cliente" | "arbitro" | "admin";
 }
@@ -16,6 +18,8 @@ export interface UserUpdateData {
   email?: string;
   first_name?: string;
   last_name?: string;
+  telefono?: string;
+  documento_identidad?: string;
 }
 
 export interface AuthState {

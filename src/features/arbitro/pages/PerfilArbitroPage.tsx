@@ -193,9 +193,9 @@ export function PerfilArbitroPage() {
               )}
             </div>
 
-            {/* Información profesional */}
+            {/* Experiencia y categorías */}
             <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">Información Profesional</h2>
+              <h2 className="text-lg font-semibold mb-4">Experiencia y categorías</h2>
               <div className="grid gap-4 sm:grid-cols-2 mb-4">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Años de Experiencia</p>

@@ -44,6 +44,8 @@ export interface Partido {
   estado_pago: EstadoPago;
   estado_pago_display: string;
   fecha_pago?: string;
+  /** URL del comprobante de pago (captura de transferencia) subido por el cliente */
+  comprobante_pago_url?: string | null;
   notas_pago?: string;
   notas_cliente?: string;
   notas_arbitro?: string;
@@ -79,6 +81,30 @@ export interface TipoPartido {
   nombre: string;
   duracion_referencial: string;
   monto: number;
+}
+
+/** Tipo de partido con campos de admin (activo, orden) */
+export interface TipoPartidoAdmin extends TipoPartido {
+  activo: boolean;
+  orden: number;
+}
+
+export interface TipoPartidoCreateData {
+  slug: string;
+  nombre: string;
+  duracion_referencial?: string;
+  monto: number;
+  activo?: boolean;
+  orden?: number;
+}
+
+export interface TipoPartidoUpdateData {
+  slug?: string;
+  nombre?: string;
+  duracion_referencial?: string;
+  monto?: number;
+  activo?: boolean;
+  orden?: number;
 }
 
 export interface PartidoCreateData {
@@ -120,6 +146,7 @@ export interface PartidoCompletarData {
 
 export interface PartidosListParams {
   estado?: EstadoPartido;
+  estado_pago?: EstadoPago; // Solo admin
   fecha_desde?: string; // YYYY-MM-DD
   fecha_hasta?: string; // YYYY-MM-DD
   cliente_id?: number; // Solo admin o árbitro

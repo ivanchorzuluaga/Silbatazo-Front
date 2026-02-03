@@ -2,7 +2,7 @@
  * Hook para gestionar disponibilidad de árbitro
  */
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { arbitroService } from "../services/arbitro.service";
 import type {
   DisponibilidadArbitro,
@@ -26,7 +26,7 @@ export function useDisponibilidad(): UseDisponibilidadReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const listarDisponibilidades = async () => {
+  const listarDisponibilidades = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -40,9 +40,9 @@ export function useDisponibilidad(): UseDisponibilidadReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const crearDisponibilidad = async (data: DisponibilidadCreateData) => {
+  const crearDisponibilidad = useCallback(async (data: DisponibilidadCreateData) => {
     setIsLoading(true);
     setError(null);
 
@@ -56,26 +56,31 @@ export function useDisponibilidad(): UseDisponibilidadReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const actualizarDisponibilidad = async (id: number, data: DisponibilidadUpdateData) => {
-    setIsLoading(true);
-    setError(null);
+  const actualizarDisponibilidad = useCallback(
+    async (id: number, data: DisponibilidadUpdateData) => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const disponibilidadActualizada = await arbitroService.actualizarDisponibilidad(id, data);
-      setDisponibilidades((prev) => prev.map((d) => (d.id === id ? disponibilidadActualizada : d)));
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error al actualizar disponibilidad";
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      try {
+        const disponibilidadActualizada = await arbitroService.actualizarDisponibilidad(id, data);
+        setDisponibilidades((prev) =>
+          prev.map((d) => (d.id === id ? disponibilidadActualizada : d))
+        );
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Error al actualizar disponibilidad";
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
-  const eliminarDisponibilidad = async (id: number) => {
+  const eliminarDisponibilidad = useCallback(async (id: number) => {
     setIsLoading(true);
     setError(null);
 
@@ -89,11 +94,11 @@ export function useDisponibilidad(): UseDisponibilidadReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const clearError = () => {
+  const clearError = useCallback(() => {
     setError(null);
-  };
+  }, []);
 
   return {
     disponibilidades,

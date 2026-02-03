@@ -5,10 +5,12 @@
 import { createBrowserRouter } from "react-router-dom";
 import { HomePage } from "@/features/auth/pages/HomePage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
-import { ClienteDashboardPage } from "@/features/cliente/pages/ClienteDashboardPage";
+import { ClienteDashboardGuard } from "@/features/cliente/components/ClienteDashboardGuard";
 import { ClienteArbitrosPage } from "@/features/cliente/pages/ClienteArbitrosPage";
 import { ClienteArbitroDetailPage } from "@/features/cliente/pages/ClienteArbitroDetailPage";
-import { ArbitroDashboardPage } from "@/features/arbitro/pages/ArbitroDashboardPage";
+import { PerfilClientePage } from "@/features/cliente/pages/PerfilClientePage";
+import { ArbitroDashboardGuard } from "@/features/arbitro/components/ArbitroDashboardGuard";
+import { ArbitroOnboardingPage } from "@/features/arbitro/pages/ArbitroOnboardingPage";
 import { AdminDashboardPage } from "@/features/admin/pages/AdminDashboardPage";
 import { PerfilArbitroPage } from "@/features/arbitro/pages/PerfilArbitroPage";
 import { ArbitrosListPage } from "@/features/marketplace/pages/ArbitrosListPage";
@@ -18,6 +20,7 @@ import { VerificarArbitroDetailPage } from "@/features/admin/pages/VerificarArbi
 import { GestionArbitrosPage } from "@/features/admin/pages/GestionArbitrosPage";
 import { GestionPartidosPage } from "@/features/admin/pages/GestionPartidosPage";
 import { CategoriasPage } from "@/features/admin/pages/CategoriasPage";
+import { TiposPartidoPage } from "@/features/admin/pages/TiposPartidoPage";
 import { AsignacionPartidosPage } from "@/features/admin/pages/AsignacionPartidosPage";
 import { PagosPendientesPage } from "@/features/admin/pages/PagosPendientesPage";
 import { RetirosPage } from "@/features/admin/pages/RetirosPage";
@@ -78,12 +81,21 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  // Dashboard específico para clientes
+  // Dashboard específico para clientes (redirige a perfil si no está completo)
   {
     path: ROUTES.CLIENTE_DASHBOARD,
     element: (
       <ProtectedRoute allowedRoles={[USER_ROLES.CLIENTE]}>
-        <ClienteDashboardPage />
+        <ClienteDashboardGuard />
+      </ProtectedRoute>
+    ),
+  },
+  // Perfil del cliente (completar nombre y email)
+  {
+    path: ROUTES.CLIENTE_PERFIL,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.CLIENTE]}>
+        <PerfilClientePage />
       </ProtectedRoute>
     ),
   },
@@ -105,12 +117,21 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  // Dashboard específico para árbitros
+  // Dashboard específico para árbitros (redirige a onboarding si perfil incompleto)
   {
     path: ROUTES.ARBITRO_DASHBOARD,
     element: (
       <ProtectedRoute allowedRoles={[USER_ROLES.ARBITRO]}>
-        <ArbitroDashboardPage />
+        <ArbitroDashboardGuard />
+      </ProtectedRoute>
+    ),
+  },
+  // Onboarding para árbitros nuevos (perfil, foto, disponibilidad)
+  {
+    path: ROUTES.ARBITRO_ONBOARDING,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ARBITRO]}>
+        <ArbitroOnboardingPage />
       </ProtectedRoute>
     ),
   },
@@ -182,6 +203,15 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
         <CategoriasPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Tipos de partido (admin)
+  {
+    path: ROUTES.ADMIN_TIPOS_PARTIDO,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+        <TiposPartidoPage />
       </ProtectedRoute>
     ),
   },

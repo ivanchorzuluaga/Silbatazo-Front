@@ -104,7 +104,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center overflow-hidden">
+    <div className="min-h-screen relative flex items-center justify-center overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       {/* Panel de registro: se muestra cuando la ruta es /register */}
       {isRegisterPage && (
         <AuthDialog
@@ -126,12 +126,12 @@ export function LoginPage() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 bg-emerald-500/10 rounded-full blur-[100px]" />
 
       {/* Top navigation bar */}
-      <div className="absolute top-4 left-4 z-50">
+      <div className="absolute top-4 left-4 right-4 z-50 flex justify-start">
         <Button
           variant="ghost"
           size="sm"
           asChild
-          className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 hover:text-white"
+          className="min-h-10 touch-manipulation bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 hover:text-white"
         >
           <Link to={ROUTES.HOME}>
             <ArrowLeft className="h-4 w-4 mr-2" />

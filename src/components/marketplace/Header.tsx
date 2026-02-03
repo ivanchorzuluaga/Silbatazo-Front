@@ -25,25 +25,27 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm">
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm pt-[env(safe-area-inset-top)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between min-h-14 sm:h-16">
           {/* Logo */}
-          <Link 
-            to={ROUTES.HOME} 
+          <Link
+            to={ROUTES.HOME}
             className="flex items-center gap-3 hover:opacity-90 transition-all duration-200 group"
             onClick={() => setMobileMenuOpen(false)}
           >
             <div className="relative">
-              <img 
-                src="/silbatazo-logo.png" 
+              <img
+                src="/silbatazo-logo.png"
                 alt={`${APP_NAME} Logo`}
                 className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  const fallback = target.parentElement?.querySelector('.logo-fallback') as HTMLElement;
-                  if (fallback) fallback.style.display = 'flex';
+                  target.style.display = "none";
+                  const fallback = target.parentElement?.querySelector(
+                    ".logo-fallback"
+                  ) as HTMLElement;
+                  if (fallback) fallback.style.display = "flex";
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -55,7 +57,9 @@ export function Header() {
               <span className="font-bold text-xl tracking-tight text-foreground group-hover:text-primary transition-colors">
                 {APP_NAME}
               </span>
-              <span className="text-xs text-muted-foreground hidden sm:block">Tu arbitro de confianza</span>
+              <span className="text-xs text-muted-foreground hidden sm:block">
+                Tu arbitro de confianza
+              </span>
             </div>
           </Link>
 
@@ -105,9 +109,13 @@ export function Header() {
                 </Button>
               </>
             )}
-            
+
             {/* Reservar - Solo desktop */}
-            <Button size="sm" className="hidden sm:flex shadow-md hover:shadow-lg transition-all duration-300" asChild>
+            <Button
+              size="sm"
+              className="hidden sm:flex shadow-md hover:shadow-lg transition-all duration-300"
+              asChild
+            >
               <Link to={ROUTES.ARBITROS}>
                 <Users className="w-4 h-4 mr-2" />
                 Reservar Árbitro
@@ -138,7 +146,7 @@ export function Header() {
           />
 
           {/* Panel del menú */}
-          <div className="absolute top-0 left-0 right-0 bg-background border-b-2 border-primary/30 shadow-2xl animate-in slide-in-from-top duration-300">
+          <div className="absolute top-0 left-0 right-0 bg-background border-b-2 border-primary/30 shadow-2xl animate-in slide-in-from-top duration-300 pt-[env(safe-area-inset-top)]">
             {/* Header del menú */}
             <div className="flex items-center justify-between p-4 border-b border-border">
               <div className="flex items-center gap-3">

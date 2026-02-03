@@ -20,6 +20,9 @@ import type {
   CalificacionCreateData,
   PromedioArbitro,
   TipoPartido,
+  TipoPartidoAdmin,
+  TipoPartidoCreateData,
+  TipoPartidoUpdateData,
   // Eventos
   Evento,
   EventoDetail,
@@ -37,6 +40,7 @@ export const partidoEndpoints = {
   async listarPartidos(token: string, params?: PartidosListParams): Promise<Partido[]> {
     const queryParams = new URLSearchParams();
     if (params?.estado) queryParams.append("estado", params.estado);
+    if (params?.estado_pago) queryParams.append("estado_pago", params.estado_pago);
     if (params?.fecha_desde) queryParams.append("fecha_desde", params.fecha_desde);
     if (params?.fecha_hasta) queryParams.append("fecha_hasta", params.fecha_hasta);
     if (params?.cliente_id) queryParams.append("cliente_id", params.cliente_id.toString());
@@ -80,6 +84,47 @@ export const partidoEndpoints = {
    */
   async listarTiposPartido(token: string): Promise<TipoPartido[]> {
     return authenticatedApiClient<TipoPartido[]>("/api/partidos/tipos-partido/", token);
+  },
+
+  /**
+   * Admin: lista todos los tipos de partido (activos e inactivos)
+   */
+  async listarTiposPartidoAdmin(token: string): Promise<TipoPartidoAdmin[]> {
+    return authenticatedApiClient<TipoPartidoAdmin[]>("/api/partidos/tipos-partido-admin/", token);
+  },
+
+  /**
+   * Admin: crear tipo de partido
+   */
+  async crearTipoPartido(token: string, data: TipoPartidoCreateData): Promise<TipoPartidoAdmin> {
+    return authenticatedApiClient<TipoPartidoAdmin>("/api/partidos/tipos-partido-admin/", token, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Admin: actualizar tipo de partido
+   */
+  async actualizarTipoPartido(
+    token: string,
+    id: number,
+    data: TipoPartidoUpdateData
+  ): Promise<TipoPartidoAdmin> {
+    return authenticatedApiClient<TipoPartidoAdmin>(
+      `/api/partidos/tipos-partido-admin/${id}/`,
+      token,
+      { method: "PATCH", body: JSON.stringify(data) }
+    );
+  },
+
+  /**
+   * Admin: eliminar tipo de partido (solo si no tiene partidos asociados)
+   */
+  async eliminarTipoPartido(token: string, id: number): Promise<void> {
+    await authenticatedApiClient(`/api/partidos/tipos-partido-admin/${id}/eliminar/`, token, {
+      method: "DELETE",
+    });
   },
 
   /**
@@ -354,7 +399,40 @@ export const partidoEndpoints = {
 
     return authenticatedApiClient<Partido[]>(endpoint, token);
   },
+
+  /**
+   * Estadísticas del dashboard de administración (solo admin)
+   */
+  async getAdminDashboardStats(token: string): Promise<AdminDashboardStats> {
+    return authenticatedApiClient<AdminDashboardStats>(
+      "/api/partidos/admin-dashboard-stats/",
+      token
+    );
+  },
+
+  /**
+   * Estadísticas públicas para la landing (sin autenticación)
+   */
+  async getLandingStats(): Promise<LandingStats> {
+    return apiClient<LandingStats>("/api/partidos/landing-stats/");
+  },
 };
+
+export interface AdminDashboardStats {
+  arbitros_activos: number;
+  partidos_hoy: number;
+  pendientes: number;
+  verificaciones: number;
+}
+
+export interface LandingStats {
+  partidos_pitados: number;
+  calificacion_promedio: number | null;
+  arbitros_disponibles_hoy: number;
+  primera_hora_hoy: string | null;
+  arbitros_total: number;
+}
+
 // ==================== EVENTOS ====================
 
 export const eventoEndpoints = {

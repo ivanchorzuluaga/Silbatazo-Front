@@ -13,7 +13,17 @@ import { ROUTES } from "@/lib/constants";
 import { formatCop } from "@/lib/utils";
 
 export function BilleteraPage() {
-  const { retiros, saldo, isLoading, error, listarRetiros, obtenerSaldo } = useRetiros();
+  const {
+    retiros,
+    saldo,
+    isLoading,
+    isLoadingSaldo,
+    isLoadingList,
+    error,
+    listarRetiros,
+    obtenerSaldo,
+    clearError,
+  } = useRetiros();
   const [showFormModal, setShowFormModal] = useState(false);
   const [filtroEstado, setFiltroEstado] = useState<
     "pendiente" | "procesado" | "rechazado" | "todos"
@@ -40,30 +50,58 @@ export function BilleteraPage() {
       contentClassName="container mx-auto px-4 py-8 max-w-4xl"
     >
       <div className="space-y-6">
-        {/* Resumen de saldo */}
-        {saldo && (
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-lg border bg-card p-4 shadow-sm">
-              <p className="text-sm text-muted-foreground mb-1">Saldo Disponible</p>
+        {/* Resumen de saldo - siempre visible */}
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="rounded-lg border bg-card p-4 shadow-sm">
+            <p className="text-sm text-muted-foreground mb-1">Saldo Disponible</p>
+            {isLoadingSaldo ? (
+              <p className="text-2xl font-bold text-primary animate-pulse">—</p>
+            ) : (
               <p className="text-2xl font-bold text-primary">
-                {formatCop(saldo.saldo_real_disponible)}
+                {formatCop(saldo?.saldo_real_disponible ?? 0)}
               </p>
-              <p className="text-xs text-muted-foreground mt-1">COP</p>
-            </div>
-            <div className="rounded-lg border bg-card p-4 shadow-sm">
-              <p className="text-sm text-muted-foreground mb-1">Total Ingresos</p>
-              <p className="text-2xl font-bold text-green-600">{formatCop(saldo.total_ingresos)}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {saldo.partidos_completados} partidos
+            )}
+            <p className="text-xs text-muted-foreground mt-1">COP</p>
+          </div>
+          <div className="rounded-lg border bg-card p-4 shadow-sm">
+            <p className="text-sm text-muted-foreground mb-1">Total Ingresos</p>
+            {isLoadingSaldo ? (
+              <p className="text-2xl font-bold text-green-600 animate-pulse">—</p>
+            ) : (
+              <p className="text-2xl font-bold text-green-600">
+                {formatCop(saldo?.total_ingresos ?? 0)}
               </p>
-            </div>
-            <div className="rounded-lg border bg-card p-4 shadow-sm">
-              <p className="text-sm text-muted-foreground mb-1">Total Retirado</p>
+            )}
+            <p className="text-xs text-muted-foreground mt-1">
+              {saldo?.partidos_completados ?? 0} partidos
+            </p>
+          </div>
+          <div className="rounded-lg border bg-card p-4 shadow-sm">
+            <p className="text-sm text-muted-foreground mb-1">Total Retirado</p>
+            {isLoadingSaldo ? (
+              <p className="text-2xl font-bold text-muted-foreground animate-pulse">—</p>
+            ) : (
               <p className="text-2xl font-bold text-muted-foreground">
-                {formatCop(saldo.total_retirado)}
+                {formatCop(saldo?.total_retirado ?? 0)}
               </p>
-              <p className="text-xs text-muted-foreground mt-1">COP</p>
-            </div>
+            )}
+            <p className="text-xs text-muted-foreground mt-1">COP</p>
+          </div>
+        </div>
+        {!isLoadingSaldo && !isLoadingList && error && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-sm text-destructive flex-1">{error}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                clearError();
+                obtenerSaldo();
+                listarRetiros();
+              }}
+            >
+              Reintentar
+            </Button>
           </div>
         )}
 
@@ -72,7 +110,7 @@ export function BilleteraPage() {
           <h2 className="text-xl font-semibold">Mis Retiros</h2>
           <Button
             onClick={() => setShowFormModal(true)}
-            disabled={isLoading || (saldo?.saldo_real_disponible || 0) <= 0}
+            disabled={isLoading || isLoadingSaldo || (saldo?.saldo_real_disponible ?? 0) <= 0}
           >
             Solicitar Retiro
           </Button>
@@ -110,21 +148,14 @@ export function BilleteraPage() {
           </Button>
         </div>
 
-        {/* Error */}
-        {error && (
-          <div className="p-4 rounded-md bg-destructive/10 border border-destructive/20">
-            <p className="text-sm text-destructive">{error}</p>
-          </div>
-        )}
-
         {/* Lista de retiros */}
-        {isLoading && (
+        {isLoadingList && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">Cargando retiros...</p>
           </div>
         )}
 
-        {!isLoading && !error && (
+        {!isLoadingList && (
           <>
             {retirosFiltrados.length === 0 ? (
               <div className="text-center py-12 rounded-lg border bg-card">
@@ -133,7 +164,7 @@ export function BilleteraPage() {
                     ? "No has realizado ningún retiro aún."
                     : `No hay retiros ${filtroEstado}.`}
                 </p>
-                {filtroEstado === "todos" && (saldo?.saldo_real_disponible || 0) > 0 && (
+                {filtroEstado === "todos" && (saldo?.saldo_real_disponible ?? 0) > 0 && (
                   <Button onClick={() => setShowFormModal(true)}>Solicitar Primer Retiro</Button>
                 )}
               </div>

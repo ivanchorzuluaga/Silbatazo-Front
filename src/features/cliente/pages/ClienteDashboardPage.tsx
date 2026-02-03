@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useClienteDashboard } from "../hooks/useClienteDashboard";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { BottomNav } from "@/components/layout/BottomNav";
 import logoImage from "@/assets/Silbatazo-bordes.png";
 import {
   Calendar,
@@ -46,9 +47,9 @@ export function ClienteDashboardPage() {
   });
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-background">
       <Sidebar />
-      <main className="flex-1 lg:ml-72">
+      <main className="flex-1 lg:ml-72 pb-nav-mobile sm:pb-0">
         <DashboardContainer>
           {/* Header de bienvenida */}
           <header className="mb-8">
@@ -254,6 +255,7 @@ export function ClienteDashboardPage() {
           {!error && !isLoading && stats.total === 0 && <EmptyState />}
         </DashboardContainer>
       </main>
+      <BottomNav />
     </div>
   );
 }

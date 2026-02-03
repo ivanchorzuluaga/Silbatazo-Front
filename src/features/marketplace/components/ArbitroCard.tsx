@@ -56,7 +56,7 @@ export function ArbitroCard({ arbitro }: ArbitroCardProps) {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* Información profesional */}
+          {/* Experiencia y categorías */}
           <div className="space-y-2">
             {arbitro.experiencia_anos > 0 && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">

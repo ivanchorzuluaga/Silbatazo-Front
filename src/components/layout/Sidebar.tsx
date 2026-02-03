@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ROUTES, USER_ROLES, APP_NAME } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import logoImage from "@/assets/Silbatazo-bordes.png";
 import {
   Home,
@@ -20,6 +21,8 @@ import {
   FileText,
   CreditCard,
   LogOut,
+  UserCheck,
+  ClipboardList,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -54,6 +57,12 @@ const navSections: { title?: string; items: NavItem[] }[] = [
         label: "Árbitros",
         icon: Search,
         route: ROUTES.CLIENTE_ARBITROS,
+        roles: [USER_ROLES.CLIENTE],
+      },
+      {
+        label: "Mi perfil",
+        icon: User,
+        route: ROUTES.CLIENTE_PERFIL,
         roles: [USER_ROLES.CLIENTE],
       },
     ],
@@ -91,9 +100,21 @@ const navSections: { title?: string; items: NavItem[] }[] = [
         roles: [USER_ROLES.ADMIN],
       },
       {
+        label: "Verificar Árbitros",
+        icon: UserCheck,
+        route: ROUTES.ADMIN_VERIFICACION,
+        roles: [USER_ROLES.ADMIN],
+      },
+      {
         label: "Partidos",
         icon: Calendar,
         route: ROUTES.ADMIN_GESTION_PARTIDOS,
+        roles: [USER_ROLES.ADMIN],
+      },
+      {
+        label: "Asignación",
+        icon: ClipboardList,
+        route: ROUTES.ADMIN_ASIGNACION_PARTIDOS,
         roles: [USER_ROLES.ADMIN],
       },
       {
@@ -103,9 +124,15 @@ const navSections: { title?: string; items: NavItem[] }[] = [
         roles: [USER_ROLES.ADMIN],
       },
       {
-        label: "Categorías",
+        label: "Tipos de partido",
         icon: FileText,
-        route: ROUTES.ADMIN_CATEGORIAS,
+        route: ROUTES.ADMIN_TIPOS_PARTIDO,
+        roles: [USER_ROLES.ADMIN],
+      },
+      {
+        label: "Retiros",
+        icon: Wallet,
+        route: ROUTES.ADMIN_RETIROS,
         roles: [USER_ROLES.ADMIN],
       },
     ],
@@ -181,34 +208,43 @@ export function Sidebar({ className }: SidebarProps) {
                 </h3>
               )}
               <ul className="space-y-1">
-                {visibleItems.map((item) => {
-                  const Icon = item.icon;
-                  const route = item.route || dashboardRoute;
-                  const isActive =
-                    location.pathname === route ||
-                    (route !== ROUTES.HOME && location.pathname.startsWith(route));
+                {(() => {
+                  const pathname = location.pathname;
+                  const routes = visibleItems.map((item) => item.route || dashboardRoute);
+                  const matchingRoute = routes
+                    .filter(
+                      (r) => pathname === r || (r !== ROUTES.HOME && pathname.startsWith(r + "/"))
+                    )
+                    .sort((a, b) => b.length - a.length)[0];
 
-                  return (
-                    <li key={item.route || "dashboard"}>
-                      <Link
-                        to={route}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-ios",
-                          "hover:bg-accent hover:text-accent-foreground",
-                          isActive && "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
-                        )}
-                      >
-                        <Icon className="size-4 shrink-0" />
-                        <span className="flex-1">{item.label}</span>
-                        {item.badge && (
-                          <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                            {item.badge}
-                          </span>
-                        )}
-                      </Link>
-                    </li>
-                  );
-                })}
+                  return visibleItems.map((item) => {
+                    const Icon = item.icon;
+                    const route = item.route || dashboardRoute;
+                    const isActive = route === matchingRoute;
+
+                    return (
+                      <li key={item.route || "dashboard"}>
+                        <Link
+                          to={route}
+                          className={cn(
+                            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-ios",
+                            "hover:bg-accent hover:text-accent-foreground",
+                            isActive &&
+                              "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
+                          )}
+                        >
+                          <Icon className="size-4 shrink-0" />
+                          <span className="flex-1">{item.label}</span>
+                          {item.badge && (
+                            <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
+                              {item.badge}
+                            </span>
+                          )}
+                        </Link>
+                      </li>
+                    );
+                  });
+                })()}
               </ul>
             </div>
           );
@@ -217,6 +253,7 @@ export function Sidebar({ className }: SidebarProps) {
 
       {/* Footer */}
       <div className="border-t p-4 flex-shrink-0 space-y-3">
+        <WhatsAppButton variant="sidebar" className="w-full" />
         <div className="flex items-center justify-between px-1">
           <span className="text-xs text-muted-foreground">Tema</span>
           <ThemeToggle size="sm" />

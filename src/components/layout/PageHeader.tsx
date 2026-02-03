@@ -58,18 +58,23 @@ export function PageHeader({
 
   return (
     <div className={headerClasses}>
-      <div className={`container mx-auto px-4 py-4 max-w-7xl ${className}`}>
-        <div className="flex items-center justify-between">
+      <div className={`container mx-auto px-4 py-3 sm:py-4 max-w-7xl ${className}`}>
+        <div className="flex items-center justify-between gap-2 min-h-11 sm:min-h-0">
           {/* Lado izquierdo: Botón volver y título */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             {backButton !== null && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleBackClick}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 shrink-0 min-h-10 min-w-10 sm:min-w-0 touch-manipulation"
               >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="h-4 w-4 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -77,10 +82,10 @@ export function PageHeader({
                     d="M15 19l-7-7 7-7"
                   />
                 </svg>
-                {backButton?.label || "Volver"}
+                <span className="hidden sm:inline">{backButton?.label || "Volver"}</span>
               </Button>
             )}
-            {title && <h1 className="text-lg font-semibold">{title}</h1>}
+            {title && <h1 className="text-base sm:text-lg font-semibold truncate">{title}</h1>}
           </div>
 
           {/* Lado derecho: Dashboard y acciones adicionales (tema solo en navbar) */}

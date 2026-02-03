@@ -22,14 +22,11 @@ export function AppShell({ className }: AppShellProps) {
       {isAuthenticated && <Sidebar />}
 
       {/* Contenido principal */}
-      <div className={cn(
-        "flex flex-1 flex-col min-h-screen",
-        isAuthenticated && "sm:ml-64"
-      )}>
+      <div className={cn("flex flex-1 flex-col min-h-screen", isAuthenticated && "sm:ml-64")}>
         <main
           className={cn(
             "flex-1 overflow-y-auto transition-ios",
-            isAuthenticated && "pb-16 sm:pb-0"
+            isAuthenticated && "pb-nav-mobile sm:pb-0"
           )}
         >
           <Outlet />
@@ -41,4 +38,3 @@ export function AppShell({ className }: AppShellProps) {
     </div>
   );
 }
-

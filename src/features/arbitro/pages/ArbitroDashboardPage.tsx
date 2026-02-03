@@ -5,12 +5,10 @@
 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLayout } from "@/components/layout";
-import { ROUTES } from "@/lib/constants";
 import { usePartidos } from "@/features/partidos/hooks/usePartidos";
-import { Calendar, Clock, CheckCircle, DollarSign, User, Shield, Activity } from "lucide-react";
+import { Calendar, Clock, CheckCircle, DollarSign, Shield, Activity } from "lucide-react";
 import { parseLocalDate, getTodayLocalDate, formatCop } from "@/lib/utils";
 
 export function ArbitroDashboardPage() {
@@ -216,28 +214,9 @@ export function ArbitroDashboardPage() {
             <div className="space-y-3">
               <h3 className="text-2xl font-bold text-foreground">¡Completa tu perfil!</h3>
               <p className="text-muted-foreground text-lg max-w-md mx-auto">
-                Actualiza tu información para empezar a recibir asignaciones de partidos
+                Usa el menú para ir a <strong>Mi Perfil</strong> o a <strong>Partidos</strong> y
+                empezar a recibir asignaciones.
               </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                onClick={() => navigate(ROUTES.ARBITRO_PERFIL)}
-                size="lg"
-                className="shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <User className="w-5 h-5 mr-2" />
-                Completar mi perfil
-              </Button>
-              <Button
-                onClick={() => navigate(ROUTES.PARTIDOS)}
-                size="lg"
-                variant="outline"
-                className="border-2 hover:border-primary/50"
-              >
-                <Calendar className="w-5 h-5 mr-2" />
-                Ver partidos disponibles
-              </Button>
             </div>
           </CardContent>
         </Card>

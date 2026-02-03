@@ -1,15 +1,31 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Star, Clock, Users, Trophy } from "lucide-react";
 import arbitroImage from "@/assets/arbitro.png";
+import { useLandingStats } from "@/features/marketplace/hooks/useLandingStats";
+
+/** Formatea "HH:MM" a "H:MM" o "HH:MM" para mostrar (ej. "08:00" → "8:00") */
+function formatHoraCorta(hora: string | null): string {
+  if (!hora) return "";
+  const [h, m] = hora.split(":");
+  const hNum = parseInt(h, 10);
+  return `${hNum}:${m}`;
+}
 
 export function Hero() {
-  // Función para scroll suave a una sección
+  const { stats, isLoading } = useLandingStats();
+
   const handleScrollTo = (sectionId: string) => {
     const element = document.querySelector(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+
+  const partidosPitados = stats?.partidos_pitados ?? null;
+  const calificacionPromedio = stats?.calificacion_promedio ?? null;
+  const arbitrosDisponiblesHoy = stats?.arbitros_disponibles_hoy ?? 0;
+  const primeraHoraHoy = stats?.primera_hora_hoy ? formatHoraCorta(stats.primera_hora_hoy) : null;
+  const arbitrosTotal = stats?.arbitros_total ?? 0;
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-background via-background to-primary">
@@ -24,7 +40,10 @@ export function Hero() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium text-primary backdrop-blur-sm">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              <span className="font-semibold">+50</span> árbitros certificados disponibles
+              <span className="font-semibold">
+                {!isLoading && arbitrosTotal > 0 ? arbitrosTotal : "—"}
+              </span>{" "}
+              árbitros certificados disponibles
             </div>
 
             {/* Main title */}
@@ -35,7 +54,7 @@ export function Hero() {
                 </span>
                 <br />
                 <span className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-muted-foreground">
-                  PROFESIONALES CERTIFICADOS
+                  DE CALIDAD Y GARANTIZADOS
                 </span>
               </h1>
 
@@ -53,12 +72,12 @@ export function Hero() {
               <div className="aspect-[4/3] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
                 <img
                   src={arbitroImage}
-                  alt="Árbitro profesional"
+                  alt="Árbitro certificado"
                   className="absolute inset-0 w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src =
-                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro Profesional%3C/text%3E%3C/svg%3E";
+                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro certificado%3C/text%3E%3C/svg%3E";
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
@@ -75,7 +94,7 @@ export function Hero() {
             {/* Description */}
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
               Conecta con árbitros certificados para tus partidos, torneos y eventos deportivos.
-              <span className="font-semibold text-foreground"> Rápido, seguro y profesional.</span>
+              <span className="font-semibold text-foreground"> Rápido, seguro y de confianza.</span>
             </p>
 
             {/* CTA Buttons */}
@@ -100,35 +119,43 @@ export function Hero() {
               </Button>
             </div>
 
-            {/* Stats */}
+            {/* Stats (datos reales) */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-4 lg:pt-8">
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Trophy className="h-5 w-5 text-yellow-500" />
-                  <p className="text-2xl sm:text-3xl font-bold text-foreground">500+</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
+                    {isLoading ? "—" : partidosPitados}
+                  </p>
                 </div>
                 <p className="text-sm font-medium text-foreground">Partidos arbitrados</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Star className="h-5 w-5 text-yellow-500" />
-                  <p className="text-2xl sm:text-3xl font-bold text-foreground">4.9</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
+                    {isLoading ? "—" : calificacionPromedio ?? "—"}
+                  </p>
                 </div>
                 <p className="text-sm font-medium text-foreground">Calificación promedio</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <Clock className="h-5 w-5 text-green-500" />
-                  <p className="text-2xl sm:text-3xl font-bold text-foreground">24h</p>
+                  <Users className="h-5 w-5 text-green-500" />
+                  <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
+                    {isLoading ? "—" : arbitrosDisponiblesHoy}
+                  </p>
                 </div>
-                <p className="text-sm font-medium text-foreground">Tiempo de respuesta</p>
+                <p className="text-sm font-medium text-foreground">Disponibles hoy</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <CheckCircle className="h-5 w-5 text-blue-500" />
-                  <p className="text-2xl sm:text-3xl font-bold text-foreground">98%</p>
+                  <Clock className="h-5 w-5 text-blue-500" />
+                  <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
+                    {isLoading ? "—" : primeraHoraHoy ? `Desde ${primeraHoraHoy}` : "—"}
+                  </p>
                 </div>
-                <p className="text-sm font-medium text-foreground">Satisfacción</p>
+                <p className="text-sm font-medium text-foreground">Primera hora hoy</p>
               </div>
             </div>
           </div>
@@ -139,12 +166,12 @@ export function Hero() {
             <div className="aspect-[4/5] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
               <img
                 src={arbitroImage}
-                alt="Árbitro profesional"
+                alt="Árbitro certificado"
                 className="absolute inset-0 w-full h-full object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.src =
-                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro Profesional%3C/text%3E%3C/svg%3E";
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro certificado%3C/text%3E%3C/svg%3E";
                 }}
               />
               {/* Gradient overlay */}
@@ -160,9 +187,14 @@ export function Hero() {
             </div>
 
             <div className="absolute -bottom-4 -left-4 bg-card p-4 rounded-lg shadow-lg border border-border/50 backdrop-blur-sm z-20">
-              <p className="text-xs font-medium text-muted-foreground mb-1">Próximo partido</p>
-              <p className="text-lg font-bold text-foreground">Hoy, 18:00</p>
-              <p className="text-xs text-primary">3 árbitros disponibles</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Hoy</p>
+              <p className="text-lg font-bold text-foreground tabular-nums">
+                {isLoading ? "—" : primeraHoraHoy ? `Desde ${primeraHoraHoy}` : "—"}
+              </p>
+              <p className="text-xs text-primary">
+                {isLoading ? "—" : arbitrosDisponiblesHoy}{" "}
+                {arbitrosDisponiblesHoy === 1 ? "árbitro disponible" : "árbitros disponibles"}
+              </p>
             </div>
 
             {/* Decorative elements */}

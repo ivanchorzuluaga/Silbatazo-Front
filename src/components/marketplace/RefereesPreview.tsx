@@ -34,7 +34,7 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
               <h2 className="text-3xl sm:text-4xl font-bold text-black">Árbitros Destacados</h2>
             </div>
             <p className="text-black/70 text-lg">
-              Profesionales certificados y con excelente reputación
+              Árbitros certificados, de calidad y con excelente reputación
             </p>
           </div>
           <Button

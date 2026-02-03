@@ -7,10 +7,26 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageLayout } from "@/components/layout";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useGestionArbitros } from "../hooks/useGestionArbitros";
 import { ROUTES, getVerificarArbitroRoute } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
+
+const TABS_ESTADO_ARBITRO: { value: string; label: string }[] = [
+  { value: "", label: "Todos" },
+  { value: "pendiente", label: "Pendiente" },
+  { value: "en_revision", label: "En Revisión" },
+  { value: "aprobado", label: "Aprobado" },
+  { value: "rechazado", label: "Rechazado" },
+  { value: "suspendido", label: "Suspendido" },
+];
 
 // Utilidad para obtener color del badge según estado
 function getEstadoBadgeColor(estado: string): string {
@@ -24,10 +40,9 @@ function getEstadoBadgeColor(estado: string): string {
   return colores[estado] || "bg-muted text-muted-foreground";
 }
 
-// Componente de filtros
+// Componente de filtros (estado se maneja con tabs arriba)
 interface FiltrosArbitrosProps {
   filtros: { estado: string; busqueda: string; ordenamiento: string };
-  onEstadoChange: (estado: string) => void;
   onOrdenamientoChange: (ordenamiento: string) => void;
   onBusquedaChange: (busqueda: string) => void;
   onBuscar: () => void;
@@ -35,7 +50,6 @@ interface FiltrosArbitrosProps {
 
 function FiltrosArbitros({
   filtros,
-  onEstadoChange,
   onOrdenamientoChange,
   onBusquedaChange,
   onBuscar,
@@ -43,21 +57,6 @@ function FiltrosArbitros({
   return (
     <div className="mb-6 space-y-4 rounded-lg border bg-card p-4">
       <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Estado</label>
-          <select
-            value={filtros.estado}
-            onChange={(e) => onEstadoChange(e.target.value)}
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-          >
-            <option value="">Todos</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="en_revision">En Revisión</option>
-            <option value="aprobado">Aprobado</option>
-            <option value="rechazado">Rechazado</option>
-            <option value="suspendido">Suspendido</option>
-          </select>
-        </div>
         <div>
           <label className="text-sm font-medium mb-2 block">Ordenar por</label>
           <select
@@ -71,7 +70,7 @@ function FiltrosArbitros({
             <option value="experiencia_anos">Menos experiencia</option>
           </select>
         </div>
-        <div className="md:col-span-2">
+        <div className="md:col-span-3">
           <label className="text-sm font-medium mb-2 block">Buscar</label>
           <div className="flex gap-2">
             <Input
@@ -104,9 +103,7 @@ function ArbitroCard({ arbitro, onVerDetalles, onSuspender, onActivar }: Arbitro
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-lg font-semibold">
-              {arbitro.full_name || arbitro.username}
-            </h3>
+            <h3 className="text-lg font-semibold">{arbitro.full_name || arbitro.username}</h3>
             <span
               className={`inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium ${getEstadoBadgeColor(
                 arbitro.estado_verificacion
@@ -120,8 +117,8 @@ function ArbitroCard({ arbitro, onVerDetalles, onSuspender, onActivar }: Arbitro
             {arbitro.telefono && <p>📞 {arbitro.telefono}</p>}
             {arbitro.experiencia_anos > 0 && (
               <p>
-                ⭐ {arbitro.experiencia_anos}{" "}
-                {arbitro.experiencia_anos === 1 ? "año" : "años"} de experiencia
+                ⭐ {arbitro.experiencia_anos} {arbitro.experiencia_anos === 1 ? "año" : "años"} de
+                experiencia
               </p>
             )}
             {arbitro.municipios.length > 0 && (
@@ -130,11 +127,7 @@ function ArbitroCard({ arbitro, onVerDetalles, onSuspender, onActivar }: Arbitro
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:items-start">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onVerDetalles(arbitro.id)}
-          >
+          <Button variant="outline" size="sm" onClick={() => onVerDetalles(arbitro.id)}>
             Ver Detalles
           </Button>
           {arbitro.estado_verificacion === "aprobado" && (
@@ -191,8 +184,8 @@ function ConfirmacionModal({
   if (!arbitro) return null;
 
   const esActivar = tipo === "activar";
-  const labelComentarios = esActivar 
-    ? "Comentarios (opcional)" 
+  const labelComentarios = esActivar
+    ? "Comentarios (opcional)"
     : "Motivo de la suspensión (recomendado)";
   const placeholder = esActivar
     ? "Comentarios sobre la activación..."
@@ -208,15 +201,10 @@ function ConfirmacionModal({
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Árbitro:{" "}
-            <span className="font-medium">
-              {arbitro.full_name || arbitro.username}
-            </span>
+            Árbitro: <span className="font-medium">{arbitro.full_name || arbitro.username}</span>
           </p>
           <div>
-            <label className="text-sm font-medium block mb-2">
-              {labelComentarios}
-            </label>
+            <label className="text-sm font-medium block mb-2">{labelComentarios}</label>
             <textarea
               value={comentarios}
               onChange={(e) => onComentariosChange(e.target.value)}
@@ -226,11 +214,7 @@ function ConfirmacionModal({
           </div>
         </div>
         <DialogFooter className="gap-2">
-          <Button
-            variant="outline"
-            onClick={onCancelar}
-            disabled={isProcesando}
-          >
+          <Button variant="outline" onClick={onCancelar} disabled={isProcesando}>
             Cancelar
           </Button>
           <Button
@@ -289,10 +273,31 @@ export function GestionArbitrosPage() {
         </p>
       </div>
 
+      {/* Tabs por estado */}
+      <div className="mb-6">
+        <p className="text-sm font-medium text-muted-foreground mb-3">Estado de verificación</p>
+        <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto">
+          {TABS_ESTADO_ARBITRO.map((tab) => (
+            <button
+              key={tab.value || "todos"}
+              type="button"
+              onClick={() => setFiltroEstado(tab.value)}
+              className={cn(
+                "shrink-0 px-4 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-10",
+                filtros.estado === tab.value
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Filtros */}
       <FiltrosArbitros
         filtros={filtros}
-        onEstadoChange={setFiltroEstado}
         onOrdenamientoChange={setOrdenamiento}
         onBusquedaChange={setBusqueda}
         onBuscar={handleBuscar}
@@ -316,9 +321,7 @@ export function GestionArbitrosPage() {
       {!isLoading && !error && arbitros.length === 0 && (
         <div className="text-center py-12 space-y-4">
           <p className="text-lg text-muted-foreground">No se encontraron árbitros</p>
-          <p className="text-sm text-muted-foreground">
-            Intenta ajustar los filtros de búsqueda
-          </p>
+          <p className="text-sm text-muted-foreground">Intenta ajustar los filtros de búsqueda</p>
         </div>
       )}
 

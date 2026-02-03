@@ -36,15 +36,12 @@ export function PageLayout({
       {shouldShowNav && <Sidebar />}
 
       {/* Contenido principal */}
-      <div className={cn(
-        "flex flex-1 flex-col min-h-screen",
-        shouldShowNav && "sm:ml-64"
-      )}>
+      <div className={cn("flex flex-1 flex-col min-h-screen", shouldShowNav && "sm:ml-64")}>
         <PageHeader {...headerProps} />
         <div
           className={cn(
             scrollable ? "flex-1 overflow-y-auto" : "flex-1",
-            shouldShowNav && "pb-16 sm:pb-0"
+            shouldShowNav && "pb-nav-mobile sm:pb-0"
           )}
         >
           <div className={contentClassName}>{children}</div>
@@ -56,4 +53,3 @@ export function PageLayout({
     </div>
   );
 }
-

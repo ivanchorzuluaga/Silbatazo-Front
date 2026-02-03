@@ -2,7 +2,7 @@
  * Hook para gestionar el perfil de árbitro
  */
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { arbitroService } from "../services/arbitro.service";
 import type { Arbitro, ArbitroCreateData, ArbitroUpdateData } from "../types/arbitro.types";
 
@@ -22,7 +22,7 @@ export function useArbitro(): UseArbitroReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const obtenerPerfil = async () => {
+  const obtenerPerfil = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -36,9 +36,9 @@ export function useArbitro(): UseArbitroReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const crearPerfil = async (data: ArbitroCreateData) => {
+  const crearPerfil = useCallback(async (data: ArbitroCreateData) => {
     setIsLoading(true);
     setError(null);
 
@@ -52,9 +52,9 @@ export function useArbitro(): UseArbitroReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const actualizarPerfil = async (data: ArbitroUpdateData) => {
+  const actualizarPerfil = useCallback(async (data: ArbitroUpdateData) => {
     setIsLoading(true);
     setError(null);
 
@@ -68,9 +68,9 @@ export function useArbitro(): UseArbitroReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const subirFotoPerfil = async (file: File) => {
+  const subirFotoPerfil = useCallback(async (file: File) => {
     setIsLoading(true);
     setError(null);
 
@@ -84,11 +84,11 @@ export function useArbitro(): UseArbitroReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const clearError = () => {
+  const clearError = useCallback(() => {
     setError(null);
-  };
+  }, []);
 
   return {
     arbitro,

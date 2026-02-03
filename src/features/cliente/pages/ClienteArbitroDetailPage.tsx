@@ -8,6 +8,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useArbitroDetail } from "@/features/marketplace/hooks/useArbitroDetail";
 import { useCalificaciones } from "@/features/partidos/hooks/useCalificaciones";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { PartidoFormModal } from "@/features/partidos/components/PartidoFormModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -52,22 +53,23 @@ export function ClienteArbitroDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen bg-background">
         <Sidebar />
-        <main className="flex-1 lg:ml-72">
+        <main className="flex-1 lg:ml-72 pb-nav-mobile sm:pb-0">
           <PageContainer>
             <LoadingState />
           </PageContainer>
         </main>
+        <BottomNav />
       </div>
     );
   }
 
   if (error || !arbitro) {
     return (
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen bg-background">
         <Sidebar />
-        <main className="flex-1 lg:ml-72">
+        <main className="flex-1 lg:ml-72 pb-nav-mobile sm:pb-0">
           <PageContainer>
             <ErrorState
               error={error || "Árbitro no encontrado"}
@@ -75,6 +77,7 @@ export function ClienteArbitroDetailPage() {
             />
           </PageContainer>
         </main>
+        <BottomNav />
       </div>
     );
   }
@@ -91,16 +94,16 @@ export function ClienteArbitroDetailPage() {
   const experiencia = arbitro.experiencia_anos || 0;
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-background">
       <Sidebar />
-      <main className="flex-1 lg:ml-72">
+      <main className="flex-1 lg:ml-72 pb-nav-mobile sm:pb-0">
         <PageContainer>
           {/* Header con botón volver */}
           <header className="mb-6">
             <Button
               variant="ghost"
               onClick={() => navigate(ROUTES.CLIENTE_ARBITROS)}
-              className="text-muted-foreground hover:text-foreground hover:bg-muted mb-4"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted mb-4 min-h-10 touch-manipulation"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Volver a árbitros
@@ -330,6 +333,7 @@ export function ClienteArbitroDetailPage() {
           />
         )}
       </main>
+      <BottomNav />
     </div>
   );
 }

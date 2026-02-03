@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ROUTES, USER_ROLES } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { getWhatsAppUrl, WhatsAppIcon } from "@/components/ui/WhatsAppButton";
 import { Home, Calendar, Search, User, Wallet, Shield } from "lucide-react";
 
 interface NavItem {
@@ -34,6 +35,12 @@ const navItems: NavItem[] = [
     label: "Árbitros",
     icon: Search,
     route: ROUTES.ARBITROS,
+    roles: [USER_ROLES.CLIENTE],
+  },
+  {
+    label: "Mi perfil",
+    icon: User,
+    route: ROUTES.CLIENTE_PERFIL,
     roles: [USER_ROLES.CLIENTE],
   },
   {
@@ -88,17 +95,19 @@ export function BottomNav() {
     ...visibleItems.filter((item) => item.route !== dashboardRoute),
   ];
 
-  // Limitar a máximo 4 items de navegación para dejar espacio al ThemeToggle
+  // Limitar a 4 items + WhatsApp + Tema
   const displayItems = allItems.slice(0, 4);
+  const whatsAppHref = getWhatsAppUrl();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-md safe-area-bottom sm:hidden">
       <div className="flex h-16 items-center justify-around px-2">
         {displayItems.map((item) => {
           const Icon = item.icon;
-          const isActive =
-            location.pathname === item.route ||
-            (item.route !== ROUTES.HOME && location.pathname.startsWith(item.route));
+          const pathname = location.pathname;
+          const isExact = pathname === item.route;
+          const isChild = item.route !== ROUTES.HOME && pathname.startsWith(item.route + "/");
+          const isActive = isExact || isChild;
 
           return (
             <Link
@@ -124,6 +133,19 @@ export function BottomNav() {
             </Link>
           );
         })}
+        {/* WhatsApp */}
+        <a
+          href={whatsAppHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex flex-col items-center justify-center gap-1 flex-1 h-full transition-ios touch-manipulation active:scale-95 text-muted-foreground hover:text-[#25D366]"
+          aria-label="WhatsApp"
+        >
+          <div className="rounded-lg p-2">
+            <WhatsAppIcon className="size-5 text-current" />
+          </div>
+          <span className="text-[10px] font-medium">WhatsApp</span>
+        </a>
         {/* ThemeToggle al final */}
         <div className="flex flex-col items-center justify-center gap-1 flex-1 h-full">
           <div className="rounded-lg p-2">

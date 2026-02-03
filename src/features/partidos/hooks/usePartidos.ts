@@ -38,6 +38,7 @@ export function usePartidos(params?: PartidosListParams): UsePartidosReturn {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     params?.estado,
+    params?.estado_pago,
     params?.fecha_desde,
     params?.fecha_hasta,
     params?.cliente_id,

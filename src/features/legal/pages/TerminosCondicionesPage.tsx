@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, FileText, Shield, Users, CreditCard, Scale, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { ROUTES, APP_NAME } from "@/lib/constants";
 import logoImage from "@/assets/Silbatazo-bordes.png";
 
@@ -35,7 +36,7 @@ export function TerminosCondicionesPage() {
         <>
           <p className="mb-4">
             {APP_NAME} es una plataforma que conecta a organizadores de eventos deportivos con
-            árbitros profesionales certificados. Nuestro servicio permite:
+            árbitros certificados y garantizados. Nuestro servicio permite:
           </p>
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
@@ -47,7 +48,7 @@ export function TerminosCondicionesPage() {
             <li className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
               <span>
-                A los árbitros: crear perfiles profesionales, gestionar su disponibilidad y recibir
+                A los árbitros: crear su perfil, gestionar su disponibilidad y recibir
                 solicitudes de arbitraje.
               </span>
             </li>
@@ -112,7 +113,7 @@ export function TerminosCondicionesPage() {
             </li>
             <li className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
-              <span>Actuar de manera profesional y ética en todo momento.</span>
+              <span>Actuar de manera ética y responsable en todo momento.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
@@ -141,7 +142,7 @@ export function TerminosCondicionesPage() {
             </li>
             <li className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
-              <span>Tratar a los árbitros con respeto y profesionalismo.</span>
+              <span>Tratar a los árbitros con respeto y seriedad.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
@@ -223,15 +224,20 @@ export function TerminosCondicionesPage() {
       icon: Mail,
       title: "12. Contacto",
       content: (
-        <p>
-          Si tiene preguntas sobre estos Términos y Condiciones, puede contactarnos en:{" "}
-          <a
-            href="mailto:contacto@silbatazo.com"
-            className="text-primary hover:underline font-medium"
-          >
-            contacto@silbatazo.com
-          </a>
-        </p>
+        <div className="space-y-3">
+          <p>
+            Si tiene preguntas sobre estos Términos y Condiciones, puede contactarnos en:{" "}
+            <a
+              href="mailto:contacto@silbatazo.com"
+              className="text-primary hover:underline font-medium"
+            >
+              contacto@silbatazo.com
+            </a>
+          </p>
+          <p>
+            También puede escribirnos por <WhatsAppButton variant="link" className="inline-flex" />.
+          </p>
+        </div>
       ),
     },
   ];

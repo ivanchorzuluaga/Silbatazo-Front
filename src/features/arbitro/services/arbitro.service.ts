@@ -1,6 +1,7 @@
 /**
  * Servicio de árbitros
  * Encapsula la lógica de negocio relacionada con árbitros
+ * Incluye caché de corta duración para reducir peticiones duplicadas (varios hooks/pantallas).
  */
 
 import { arbitroEndpoints } from "@/api/endpoints";
@@ -21,6 +22,22 @@ import type {
   DisponibilidadCreateData,
   DisponibilidadUpdateData,
 } from "../types/arbitro.types";
+
+const CACHE_TTL_MS = 8000;
+const CACHE_TTL_MASTER_MS = 60000;
+
+let perfilCache: { data: Arbitro; ts: number } | null = null;
+let disponibilidadCache: { data: DisponibilidadArbitro[]; ts: number } | null = null;
+let municipiosCache: { data: Municipio[]; ts: number } | null = null;
+let categoriasCache: { data: Categoria[]; ts: number } | null = null;
+let rolesCache: { data: RolArbitro[]; ts: number } | null = null;
+
+function isCacheValid<T>(
+  entry: { data: T; ts: number } | null,
+  ttl: number
+): entry is { data: T; ts: number } {
+  return entry !== null && Date.now() - entry.ts < ttl;
+}
 
 export const arbitroService = {
   /**
@@ -93,14 +110,19 @@ export const arbitroService = {
   },
 
   /**
-   * Obtener perfil propio
+   * Obtener perfil propio (con caché 8s para evitar peticiones duplicadas)
    */
   async obtenerPerfil(): Promise<Arbitro> {
+    if (isCacheValid(perfilCache, CACHE_TTL_MS)) {
+      return perfilCache.data;
+    }
     const token = this.getToken();
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await arbitroEndpoints.obtenerPerfil(token);
+      const data = await arbitroEndpoints.obtenerPerfil(token);
+      perfilCache = { data, ts: Date.now() };
+      return data;
     } catch (error) {
       if (error instanceof ApiException) {
         if (error.status === 404) {
@@ -113,14 +135,16 @@ export const arbitroService = {
   },
 
   /**
-   * Crear perfil de árbitro
+   * Crear perfil de árbitro (invalida caché de perfil)
    */
   async crearPerfil(data: ArbitroCreateData): Promise<Arbitro> {
     const token = this.getToken();
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await arbitroEndpoints.crearPerfil(token, data);
+      const result = await arbitroEndpoints.crearPerfil(token, data);
+      perfilCache = { data: result, ts: Date.now() };
+      return result;
     } catch (error) {
       if (error instanceof ApiException) {
         throw new Error(extractErrorMessage(error.data) || "Error al crear perfil");
@@ -130,14 +154,17 @@ export const arbitroService = {
   },
 
   /**
-   * Actualizar perfil de árbitro
+   * Actualizar perfil de árbitro (invalida caché de perfil)
    */
   async actualizarPerfil(data: ArbitroUpdateData): Promise<Arbitro> {
     const token = this.getToken();
     if (!token) throw new Error("No estás autenticado");
 
+    perfilCache = null;
     try {
-      return await arbitroEndpoints.actualizarPerfil(token, data);
+      const result = await arbitroEndpoints.actualizarPerfil(token, data);
+      perfilCache = { data: result, ts: Date.now() };
+      return result;
     } catch (error) {
       if (error instanceof ApiException) {
         throw new Error(extractErrorMessage(error.data) || "Error al actualizar perfil");
@@ -147,14 +174,17 @@ export const arbitroService = {
   },
 
   /**
-   * Subir foto de perfil del árbitro
+   * Subir foto de perfil del árbitro (invalida caché de perfil)
    */
   async subirFotoPerfil(file: File): Promise<Arbitro> {
     const token = this.getToken();
     if (!token) throw new Error("No estás autenticado");
 
+    perfilCache = null;
     try {
-      return await arbitroEndpoints.subirFotoPerfil(token, file);
+      const result = await arbitroEndpoints.subirFotoPerfil(token, file);
+      perfilCache = { data: result, ts: Date.now() };
+      return result;
     } catch (error) {
       if (error instanceof ApiException) {
         throw new Error(extractErrorMessage(error.data) || "Error al subir la foto");
@@ -215,33 +245,48 @@ export const arbitroService = {
   },
 
   /**
-   * Listar municipios
+   * Listar municipios (caché 60s, datos de referencia)
    */
   async listarMunicipios(): Promise<Municipio[]> {
+    if (isCacheValid(municipiosCache, CACHE_TTL_MASTER_MS)) {
+      return municipiosCache.data;
+    }
     try {
-      return await arbitroEndpoints.listarMunicipios();
+      const data = await arbitroEndpoints.listarMunicipios();
+      municipiosCache = { data, ts: Date.now() };
+      return data;
     } catch {
       throw new Error("Error al obtener municipios");
     }
   },
 
   /**
-   * Listar categorías
+   * Listar categorías (caché 60s, datos de referencia)
    */
   async listarCategorias(): Promise<Categoria[]> {
+    if (isCacheValid(categoriasCache, CACHE_TTL_MASTER_MS)) {
+      return categoriasCache.data;
+    }
     try {
-      return await arbitroEndpoints.listarCategorias();
+      const data = await arbitroEndpoints.listarCategorias();
+      categoriasCache = { data, ts: Date.now() };
+      return data;
     } catch {
       throw new Error("Error al obtener categorías");
     }
   },
 
   /**
-   * Listar roles de árbitro
+   * Listar roles de árbitro (caché 60s, datos de referencia)
    */
   async listarRoles(): Promise<RolArbitro[]> {
+    if (isCacheValid(rolesCache, CACHE_TTL_MASTER_MS)) {
+      return rolesCache.data;
+    }
     try {
-      return await arbitroEndpoints.listarRoles();
+      const data = await arbitroEndpoints.listarRoles();
+      rolesCache = { data, ts: Date.now() };
+      return data;
     } catch {
       throw new Error("Error al obtener roles");
     }

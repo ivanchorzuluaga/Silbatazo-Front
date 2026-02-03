@@ -506,10 +506,10 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
         </div>
       </div>
 
-      {/* Información Profesional */}
+      {/* Información de arbitraje */}
       <div className="space-y-4">
         <div className="border-b pb-2">
-          <h3 className="text-lg font-semibold">Información Profesional</h3>
+          <h3 className="text-lg font-semibold">Información de arbitraje</h3>
           <p className="text-sm text-muted-foreground">Datos sobre tu experiencia</p>
         </div>
 

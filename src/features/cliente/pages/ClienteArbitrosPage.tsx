@@ -9,6 +9,7 @@ import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
 import { FiltrosArbitros } from "@/features/marketplace/components/FiltrosArbitros";
 import { useArbitrosSearch } from "../hooks/useArbitrosSearch";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { Button } from "@/components/ui/button";
 import logoImage from "@/assets/Silbatazo-bordes.png";
 import { getRefereeImage } from "@/lib/referee-images";
@@ -27,9 +28,9 @@ export function ClienteArbitrosPage() {
     useArbitrosSearch();
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-background">
       <Sidebar />
-      <main className="flex-1 lg:ml-72">
+      <main className="flex-1 lg:ml-72 pb-nav-mobile sm:pb-0">
         <PageContainer>
           {/* Header */}
           <header className="mb-8">
@@ -73,6 +74,7 @@ export function ClienteArbitrosPage() {
           </section>
         </PageContainer>
       </main>
+      <BottomNav />
     </div>
   );
 }
@@ -107,7 +109,7 @@ function LoadingState() {
       <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-8 text-center">
         <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
         <p className="text-lg font-medium text-foreground mb-2">Cargando árbitros...</p>
-        <p className="text-sm text-muted-foreground">Buscando los mejores profesionales</p>
+        <p className="text-sm text-muted-foreground">Buscando los mejores árbitros</p>
       </div>
     </div>
   );

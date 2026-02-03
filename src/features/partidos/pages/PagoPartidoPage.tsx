@@ -6,6 +6,7 @@
 import { useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { usePagoPartido } from "../hooks/usePagoPartido";
 import { ROUTES } from "@/lib/constants";
@@ -569,13 +570,21 @@ function PaymentCompletedView({ estadoPago }: PaymentCompletedViewProps) {
       <h2 className="text-2xl font-bold text-foreground mb-3">
         {isAprobado ? "¡Pago Confirmado!" : isEnRevision ? "Pago en Revisión" : "Pago Rechazado"}
       </h2>
-      <p className="text-muted-foreground max-w-md mx-auto mb-8">
+      <p className="text-muted-foreground max-w-md mx-auto mb-6">
         {isAprobado
           ? "Tu pago ha sido verificado exitosamente. El árbitro ha sido notificado y tu partido está confirmado."
           : isEnRevision
           ? "Tu pago está siendo revisado por nuestro equipo. Te notificaremos cuando sea aprobado."
           : "Hubo un problema con tu pago. Por favor, contacta a soporte o intenta nuevamente."}
       </p>
+      {!isAprobado && !isEnRevision && (
+        <div className="mb-6">
+          <WhatsAppButton
+            variant="link"
+            message="Hola, tuve un problema con mi pago y necesito soporte."
+          />
+        </div>
+      )}
       <Link to={ROUTES.CLIENTE_DASHBOARD}>
         <Button size="lg" className="px-8">
           <ArrowLeft className="w-5 h-5 mr-2" />

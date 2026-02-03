@@ -16,6 +16,8 @@ interface UseRetirosReturn {
   retiro: Retiro | null;
   saldo: SaldoDisponible | null;
   isLoading: boolean;
+  isLoadingSaldo: boolean;
+  isLoadingList: boolean;
   error: string | null;
   listarRetiros: (params?: { estado?: "pendiente" | "procesado" | "rechazado" }) => Promise<void>;
   obtenerRetiro: (id: number) => Promise<void>;
@@ -30,13 +32,15 @@ export function useRetiros(): UseRetirosReturn {
   const [retiro, setRetiro] = useState<Retiro | null>(null);
   const [saldo, setSaldo] = useState<SaldoDisponible | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingSaldo, setIsLoadingSaldo] = useState(false);
+  const [isLoadingList, setIsLoadingList] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const clearError = useCallback(() => setError(null), []);
 
   const listarRetiros = useCallback(
     async (params?: { estado?: "pendiente" | "procesado" | "rechazado" }) => {
-      setIsLoading(true);
+      setIsLoadingList(true);
       setError(null);
       try {
         const data = await retiroService.listarRetiros(params);
@@ -44,7 +48,7 @@ export function useRetiros(): UseRetirosReturn {
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error al listar retiros");
       } finally {
-        setIsLoading(false);
+        setIsLoadingList(false);
       }
     },
     []
@@ -84,15 +88,16 @@ export function useRetiros(): UseRetirosReturn {
   );
 
   const obtenerSaldo = useCallback(async () => {
-    setIsLoading(true);
+    setIsLoadingSaldo(true);
     setError(null);
     try {
       const data = await retiroService.obtenerSaldoDisponible();
       setSaldo(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al obtener saldo");
+      setSaldo(null);
     } finally {
-      setIsLoading(false);
+      setIsLoadingSaldo(false);
     }
   }, []);
 
@@ -122,6 +127,8 @@ export function useRetiros(): UseRetirosReturn {
     retiro,
     saldo,
     isLoading,
+    isLoadingSaldo,
+    isLoadingList,
     error,
     listarRetiros,
     obtenerRetiro,
