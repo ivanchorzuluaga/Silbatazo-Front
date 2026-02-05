@@ -3,7 +3,8 @@
  * Maneja interceptores, headers base y errores comunes
  */
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "https://arbi-app-backend.onrender.com";
+
 
 export interface ApiError {
   message: string;
