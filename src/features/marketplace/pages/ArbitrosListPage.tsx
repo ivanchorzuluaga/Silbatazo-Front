@@ -4,20 +4,23 @@
  */
 
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { useMunicipios } from "@/features/arbitro/hooks/useMunicipios";
 import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
+import { useLandingStats } from "../hooks/useLandingStats";
 import { RefereeCard } from "@/components/marketplace/RefereeCard";
 import { FiltrosArbitros, type FiltrosArbitrosType } from "../components/FiltrosArbitros";
 import { Header, Footer } from "@/components/marketplace";
 import { Button } from "@/components/ui/button";
-import { CATEGORIAS_PARTIDO } from "@/lib/constants";
+import { CATEGORIAS_PARTIDO, ROUTES } from "@/lib/constants";
 import logoImage from "@/assets/Silbatazo-bordes.png";
-import { Users, RefreshCw, SearchX, Loader2 } from "lucide-react";
+import { Users, RefreshCw, SearchX, Loader2, CalendarPlus, ArrowRight } from "lucide-react";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
 export function ArbitrosListPage() {
   const { municipios } = useMunicipios();
   const { categorias: todasLasCategorias } = useCategorias();
+  const { stats: landingStats } = useLandingStats();
   // Filtrar solo las categorías de partido (las mismas que se usan en el formulario)
   const categorias = todasLasCategorias.filter((c) =>
     (CATEGORIAS_PARTIDO as readonly string[]).includes(c.nombre)
@@ -157,10 +160,17 @@ export function ArbitrosListPage() {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-foreground to-primary/80 bg-clip-text text-transparent">
               Nuestros Árbitros
             </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
               Encuentra el árbitro perfecto para tu partido. Todos nuestros árbitros están
               certificados, son de calidad y listos para garantizar un juego limpio.
             </p>
+            <Button size="lg" className="shadow-lg hover:shadow-xl transition-all" asChild>
+              <Link to={ROUTES.PARTIDOS_CREAR}>
+                <CalendarPlus className="w-5 h-5 mr-2" />
+                Solicitar árbitro para mi partido
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </Button>
           </div>
 
           {/* Filtros con glassmorphism */}

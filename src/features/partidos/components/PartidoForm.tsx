@@ -51,6 +51,11 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
   const selectedTipo = tiposPartido.find((t) => t.id === parseInt(tipoPartidoId));
   const montoTotal = selectedTipo ? selectedTipo.monto : null;
 
+  const defaultCategoriaId = categoriasPartido[0]?.id;
+  const faltanCategorias = categoriasPartido.length === 0;
+  const faltanTipos = !loadingTipos && (tiposPartido.length === 0 || errorTipos != null);
+  const puedeEnviar = !faltanCategorias && !faltanTipos && defaultCategoriaId != null;
+
   const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
 
   // Cargar tipos de partido al montar (loadingTipos ya es true por defecto)
@@ -78,7 +83,6 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
     if (!tipoPartidoId)
       errors.tipo_partido_id = "Selecciona el tipo de partido que se acomoda a tu partido";
     if (!lugar.trim()) errors.lugar = "El lugar es requerido";
-    const defaultCategoriaId = categoriasPartido[0]?.id;
     if (!defaultCategoriaId)
       errors.categoria_id = "No hay categoría disponible. Intenta más tarde.";
 
@@ -96,7 +100,6 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
     }
 
     try {
-      const defaultCategoriaId = categoriasPartido[0]?.id;
       const data = {
         arbitro_id: null,
         fecha,
@@ -191,6 +194,21 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
               asignará el árbitro final.
             </p>
           </div>
+
+          {/* Aviso cuando faltan datos del sistema */}
+          {(faltanCategorias || faltanTipos) && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertTitle>No se puede crear el partido en este momento</AlertTitle>
+              <AlertDescription>
+                {faltanCategorias && "Faltan categorías de partido en el sistema. "}
+                {faltanTipos &&
+                  (errorTipos
+                    ? `Error al cargar tipos de partido: ${errorTipos} `
+                    : "No hay tipos de partido disponibles. ")}
+                Contacta al administrador o intenta más tarde.
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Fecha y Hora */}
           <div className="grid gap-4 sm:grid-cols-2">
@@ -329,7 +347,7 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
 
           {/* Botones */}
           <div className="flex gap-4 pt-4">
-            <Button type="submit" disabled={isLoading} className="flex-1">
+            <Button type="submit" disabled={isLoading || !puedeEnviar} className="flex-1">
               {isLoading ? "Creando..." : "Crear Partido"}
             </Button>
             <Button

@@ -22,6 +22,7 @@ import { GestionPartidosPage } from "@/features/admin/pages/GestionPartidosPage"
 import { CategoriasPage } from "@/features/admin/pages/CategoriasPage";
 import { TiposPartidoPage } from "@/features/admin/pages/TiposPartidoPage";
 import { AsignacionPartidosPage } from "@/features/admin/pages/AsignacionPartidosPage";
+import { PartidosSolapadosPage } from "@/features/admin/pages/PartidosSolapadosPage";
 import { PagosPendientesPage } from "@/features/admin/pages/PagosPendientesPage";
 import { RetirosPage } from "@/features/admin/pages/RetirosPage";
 import { PartidosListPage } from "@/features/partidos/pages/PartidosListPage";
@@ -221,6 +222,15 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
         <AsignacionPartidosPage />
+      </ProtectedRoute>
+    ),
+  },
+  // Partidos solapados (admin)
+  {
+    path: ROUTES.ADMIN_PARTIDOS_SOLAPADOS,
+    element: (
+      <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+        <PartidosSolapadosPage />
       </ProtectedRoute>
     ),
   },

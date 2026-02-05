@@ -23,6 +23,7 @@ import {
   LogOut,
   UserCheck,
   ClipboardList,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -115,6 +116,12 @@ const navSections: { title?: string; items: NavItem[] }[] = [
         label: "Asignación",
         icon: ClipboardList,
         route: ROUTES.ADMIN_ASIGNACION_PARTIDOS,
+        roles: [USER_ROLES.ADMIN],
+      },
+      {
+        label: "Partidos solapados",
+        icon: AlertTriangle,
+        route: ROUTES.ADMIN_PARTIDOS_SOLAPADOS,
         roles: [USER_ROLES.ADMIN],
       },
       {

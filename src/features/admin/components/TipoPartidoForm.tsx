@@ -37,6 +37,9 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
   const [slug, setSlug] = useState(tipo?.slug || "");
   const [nombre, setNombre] = useState(tipo?.nombre || "");
   const [duracionReferencial, setDuracionReferencial] = useState(tipo?.duracion_referencial || "");
+  const [duracionServicioMin, setDuracionServicioMin] = useState(
+    tipo?.duracion_servicio_minutos?.toString() ?? "90"
+  );
   const [monto, setMonto] = useState(tipo?.monto?.toString() ?? "");
   const [activo, setActivo] = useState(tipo?.activo ?? true);
   const [orden, setOrden] = useState(tipo?.orden?.toString() ?? "0");
@@ -47,6 +50,7 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
       setSlug(tipo.slug);
       setNombre(tipo.nombre);
       setDuracionReferencial(tipo.duracion_referencial || "");
+      setDuracionServicioMin(tipo.duracion_servicio_minutos?.toString() ?? "90");
       setMonto(tipo.monto?.toString() ?? "");
       setActivo(tipo.activo);
       setOrden(tipo.orden?.toString() ?? "0");
@@ -83,6 +87,10 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
     if (orden !== "" && (isNaN(ordenNum) || ordenNum < 0)) {
       errors.orden = "El orden debe ser un número mayor o igual a 0";
     }
+    const duracionMinNum = parseInt(duracionServicioMin, 10);
+    if (duracionServicioMin === "" || isNaN(duracionMinNum) || duracionMinNum < 1) {
+      errors.duracion_servicio_minutos = "La duración del servicio debe ser al menos 1 minuto";
+    }
 
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -99,6 +107,7 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
       slug: slug.trim(),
       nombre: nombre.trim(),
       duracion_referencial: duracionReferencial.trim() || undefined,
+      duracion_servicio_minutos: parseInt(duracionServicioMin, 10) || 90,
       monto: parseInt(monto, 10),
       activo,
       orden: parseInt(orden, 10) || 0,
@@ -153,6 +162,27 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
         onChange={(e) => setDuracionReferencial(e.target.value)}
         disabled={isLoading}
         placeholder="Ej: 40–45 min x tiempo"
+      />
+
+      <FormField
+        label="Duración del servicio (minutos) *"
+        name="duracion_servicio_minutos"
+        type="number"
+        min={1}
+        value={duracionServicioMin}
+        onChange={(e) => {
+          setDuracionServicioMin(e.target.value);
+          if (fieldErrors.duracion_servicio_minutos) {
+            setFieldErrors((prev) => {
+              const { duracion_servicio_minutos: _, ...rest } = prev;
+              return rest;
+            });
+          }
+        }}
+        error={fieldErrors.duracion_servicio_minutos}
+        disabled={isLoading}
+        required
+        helperText="Usado para la brecha de 30 min entre partidos del mismo árbitro (ej: 90, 120)"
       />
 
       <FormField

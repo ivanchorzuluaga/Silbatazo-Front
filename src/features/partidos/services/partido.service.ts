@@ -17,6 +17,7 @@ import type {
   PartidoCancelarData,
   PartidoCompletarData,
   PartidosListParams,
+  GrupoPartidosSolapados,
   PostulacionArbitro,
   PostulacionCreateData,
   PartidoAsignarData,
@@ -338,6 +339,26 @@ export const partidoService = {
         throw new Error(
           extractErrorMessage(error.data) || "Error al obtener partidos que necesitan asignación"
         );
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
+   * Listar partidos solapados: mismo árbitro, mismo día, horarios en conflicto (solo admin)
+   */
+  async listarPartidosSolapados(): Promise<GrupoPartidosSolapados[]> {
+    const token = this.getToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await partidoEndpoints.listarPartidosSolapados(token);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        if (error.status === 403) {
+          throw new Error("Solo los administradores pueden ver esta información");
+        }
+        throw new Error(extractErrorMessage(error.data) || "Error al obtener partidos solapados");
       }
       throw new Error("Error de conexión. Intenta nuevamente.");
     }

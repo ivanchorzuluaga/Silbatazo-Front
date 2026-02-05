@@ -80,6 +80,8 @@ export interface TipoPartido {
   slug: string;
   nombre: string;
   duracion_referencial: string;
+  /** Duración total del servicio en minutos (para brecha 30 min entre partidos) */
+  duracion_servicio_minutos?: number;
   monto: number;
 }
 
@@ -102,6 +104,7 @@ export interface TipoPartidoUpdateData {
   slug?: string;
   nombre?: string;
   duracion_referencial?: string;
+  duracion_servicio_minutos?: number;
   monto?: number;
   activo?: boolean;
   orden?: number;
@@ -153,6 +156,14 @@ export interface PartidosListParams {
   arbitro_id?: number; // Solo admin o cliente
   municipio_id?: number; // Para partidos disponibles
   categoria_id?: number; // Para partidos disponibles
+}
+
+/** Grupo de partidos solapados: mismo árbitro, mismo día, horarios que se pisan */
+export interface GrupoPartidosSolapados {
+  arbitro_id: number;
+  arbitro_nombre: string;
+  fecha: string;
+  partidos: PartidoDetail[];
 }
 
 // Postulaciones

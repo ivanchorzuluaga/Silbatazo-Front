@@ -40,6 +40,7 @@ export const ROUTES = {
   ADMIN_CATEGORIAS: "/admin/categorias",
   ADMIN_TIPOS_PARTIDO: "/admin/tipos-partido",
   ADMIN_ASIGNACION_PARTIDOS: "/admin/partidos/asignacion",
+  ADMIN_PARTIDOS_SOLAPADOS: "/admin/partidos/solapados",
   ADMIN_PAGOS_PENDIENTES: "/admin/pagos/pendientes",
   // Marketplace (público)
   ARBITROS: "/arbitros",

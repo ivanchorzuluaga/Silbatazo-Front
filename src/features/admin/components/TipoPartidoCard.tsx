@@ -59,8 +59,12 @@ export function TipoPartidoCard({
           <p className="text-sm text-muted-foreground font-mono mb-1">{tipo.slug}</p>
 
           {tipo.duracion_referencial && (
-            <p className="text-sm text-muted-foreground mb-2">{tipo.duracion_referencial}</p>
+            <p className="text-sm text-muted-foreground mb-1">{tipo.duracion_referencial}</p>
           )}
+          <p className="text-sm text-muted-foreground mb-2">
+            Duración servicio: {tipo.duracion_servicio_minutos ?? 90} min
+            <span className="text-xs ml-1">(+ 30 min brecha)</span>
+          </p>
 
           <p className="text-lg font-semibold text-primary tabular-nums">{formatCop(tipo.monto)}</p>
 

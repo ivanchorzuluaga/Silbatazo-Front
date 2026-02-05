@@ -13,6 +13,7 @@ import type {
   PartidoCancelarData,
   PartidoCompletarData,
   PartidosListParams,
+  GrupoPartidosSolapados,
   PostulacionArbitro,
   PostulacionCreateData,
   PartidoAsignarData,
@@ -256,6 +257,13 @@ export const partidoEndpoints = {
    */
   async listarPartidosNecesitanAsignacion(token: string): Promise<PartidoDetail[]> {
     return authenticatedApiClient<PartidoDetail[]>("/api/partidos/necesitan-asignacion/", token);
+  },
+
+  /**
+   * Lista de partidos solapados: mismo árbitro, mismo día, horarios en conflicto (solo admin)
+   */
+  async listarPartidosSolapados(token: string): Promise<GrupoPartidosSolapados[]> {
+    return authenticatedApiClient<GrupoPartidosSolapados[]>("/api/partidos/solapados/", token);
   },
 
   /**
