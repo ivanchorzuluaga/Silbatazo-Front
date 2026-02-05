@@ -17,7 +17,6 @@ import {
   Trophy,
   ArrowRight,
   Star,
-  Loader2,
   CreditCard,
   AlertCircle,
   TrendingUp,
@@ -483,7 +482,7 @@ function ActivityItem({ partido, onClick }: ActivityItemProps) {
   );
 }
 
-function PartidosLoading({ title }: { title: string }) {
+function PartidosLoading({ title: _title }: { title: string }) {
   return (
     <section className="mb-8">
       <div className="flex items-center gap-3 mb-4">

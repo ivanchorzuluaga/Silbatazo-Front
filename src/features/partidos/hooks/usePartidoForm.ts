@@ -152,11 +152,6 @@ export function usePartidoForm(
     setFieldErrors((prev) => ({ ...prev, municipio_id: undefined }));
   }, []);
 
-  const setCategoriaId = useCallback((categoriaId: string) => {
-    setFormState((prev) => ({ ...prev, categoriaId }));
-    setFieldErrors((prev) => ({ ...prev, categoria_id: undefined }));
-  }, []);
-
   const setTipoPartidoId = useCallback((id: string) => {
     setFormState((prev) => ({ ...prev, tipoPartidoId: id }));
     setFieldErrors((prev) => ({ ...prev, tipo_partido_id: undefined }));
@@ -255,7 +250,7 @@ export function usePartidoForm(
         fecha,
         hora,
         municipioId,
-        categoriaId,
+        categoriaId: _categoriaId,
         lugar,
         direccion,
         notasCliente,

@@ -27,7 +27,6 @@ const CACHE_TTL_MS = 8000;
 const CACHE_TTL_MASTER_MS = 60000;
 
 let perfilCache: { data: Arbitro; ts: number } | null = null;
-let disponibilidadCache: { data: DisponibilidadArbitro[]; ts: number } | null = null;
 let municipiosCache: { data: Municipio[]; ts: number } | null = null;
 let categoriasCache: { data: Categoria[]; ts: number } | null = null;
 let rolesCache: { data: RolArbitro[]; ts: number } | null = null;

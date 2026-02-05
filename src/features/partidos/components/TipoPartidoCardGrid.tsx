@@ -28,8 +28,6 @@ export function TipoPartidoCardGrid({
   loading = false,
   error = null,
 }: TipoPartidoCardGridProps) {
-  const isModal = variant === "modal";
-
   if (loading) {
     return <p className="text-sm text-muted-foreground">Cargando opciones...</p>;
   }
@@ -52,7 +50,7 @@ export function TipoPartidoCardGrid({
   const textMuted = "text-muted-foreground";
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-variant={variant}>
       {tipos.map((tipo) => {
         const isSelected = selectedId === String(tipo.id);
         const duracion = tipo.duracion_referencial?.trim() || "—";

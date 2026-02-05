@@ -1,4 +1,4 @@
-import { Shield, Clock, Users, Award, CheckCircle, Star, Zap, TrendingUp } from "lucide-react";
+import { Shield, Clock, Users, Award, Star, Zap, TrendingUp } from "lucide-react";
 import { useLandingStats } from "@/features/marketplace/hooks/useLandingStats";
 
 const features = [

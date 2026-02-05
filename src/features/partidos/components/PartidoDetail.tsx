@@ -2,7 +2,7 @@
  * Componente para mostrar el detalle completo de un partido
  */
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { parseLocalDate, formatCop } from "@/lib/utils";
 import { useCalificaciones } from "../hooks/useCalificaciones";
 import { Star } from "lucide-react";
