@@ -5,11 +5,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { authEndpoints } from "@/api/endpoints";
+import { authService } from "@/features/auth/services/auth.service";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
 import { AlertCircle, ArrowLeft, CheckCircle2, Mail } from "lucide-react";
 
 export function VerificarCorreoConfirmPage() {
+  const { updateUser } = useAuth();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || "";
 
@@ -26,6 +29,17 @@ export function VerificarCorreoConfirmPage() {
         setIsLoading(true);
         const response = await authEndpoints.confirmEmailVerification({ token });
         setMessage(response.message || "Correo verificado exitosamente.");
+        // Refrescar perfil si hay sesión activa
+        const accessToken = authService.getAccessToken();
+        if (accessToken) {
+          try {
+            const profile = await authService.getProfile();
+            updateUser(profile);
+          } catch {
+            // Si falla, al menos marcamos verificado en memoria
+            updateUser({ email_verificado: true });
+          }
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error al verificar correo.");
       } finally {

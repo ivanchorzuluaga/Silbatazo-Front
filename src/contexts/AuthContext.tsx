@@ -87,7 +87,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         // Verificar que el token sea válido
         await authEndpoints.testAuth(token);
-        // Si llega aquí, el token es válido - no hacemos nada más
+        // Si llega aquí, el token es válido - refrescar perfil para datos actualizados
+        try {
+          const profile = await authService.getProfile();
+          if (isMounted) {
+            setUser(profile);
+          }
+        } catch {
+          // Si falla el perfil, mantenemos el estado actual
+        }
       } catch {
         // Token inválido, limpiar sesión
         if (isMounted) {
