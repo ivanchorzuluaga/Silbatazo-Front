@@ -46,7 +46,7 @@ export function PageLayout({
             shouldShowNav && "pb-nav-mobile sm:pb-0"
           )}
         >
-          <div className={contentClassName}>{children}</div>
+          <div className={cn("relative z-0", contentClassName)}>{children}</div>
         </div>
       </div>
 

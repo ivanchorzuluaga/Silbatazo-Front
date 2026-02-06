@@ -53,7 +53,7 @@ export function PageHeader({
   const dashboardRoute = user?.role ? getDashboardRoute(user.role) : ROUTES.DASHBOARD;
 
   const headerClasses = sticky
-    ? "sticky top-0 z-10 border-b glass shadow-ios safe-area-top"
+    ? "sticky top-0 z-50 border-b glass shadow-ios safe-area-top bg-background/90 backdrop-blur-md"
     : "border-b bg-card";
 
   return (
