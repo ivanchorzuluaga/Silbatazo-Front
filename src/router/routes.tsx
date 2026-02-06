@@ -7,6 +7,8 @@ import { HomePage } from "@/features/auth/pages/HomePage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { RecuperarContrasenaPage } from "@/features/auth/pages/RecuperarContrasenaPage";
 import { RecuperarContrasenaConfirmPage } from "@/features/auth/pages/RecuperarContrasenaConfirmPage";
+import { VerificarCorreoConfirmPage } from "@/features/auth/pages/VerificarCorreoConfirmPage";
+import { VerificarCorreoPage } from "@/features/auth/pages/VerificarCorreoPage";
 import { ClienteDashboardGuard } from "@/features/cliente/components/ClienteDashboardGuard";
 import { ClienteArbitrosPage } from "@/features/cliente/pages/ClienteArbitrosPage";
 import { ClienteArbitroDetailPage } from "@/features/cliente/pages/ClienteArbitroDetailPage";
@@ -78,6 +80,18 @@ export const router = createBrowserRouter([
   {
     path: ROUTES.RECUPERAR_CONTRASENA_CONFIRM,
     element: <RecuperarContrasenaConfirmPage />,
+  },
+  {
+    path: ROUTES.VERIFICAR_CORREO,
+    element: (
+      <ProtectedRoute>
+        <VerificarCorreoPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.VERIFICAR_CORREO_CONFIRM,
+    element: <VerificarCorreoConfirmPage />,
   },
   {
     path: ROUTES.REGISTER,

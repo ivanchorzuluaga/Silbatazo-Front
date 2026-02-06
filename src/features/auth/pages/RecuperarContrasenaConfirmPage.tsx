@@ -2,8 +2,8 @@
  * Página para confirmar recuperación de contraseña
  */
 
-import { useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { authEndpoints } from "@/api/endpoints";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
@@ -11,6 +11,7 @@ import { AlertCircle, ArrowLeft, CheckCircle2, Lock } from "lucide-react";
 
 export function RecuperarContrasenaConfirmPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const uid = searchParams.get("uid") || "";
   const token = searchParams.get("token") || "";
 
@@ -21,6 +22,15 @@ export function RecuperarContrasenaConfirmPage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
+  useEffect(() => {
+    if (!shouldRedirect) return;
+    const timeout = setTimeout(() => {
+      navigate(ROUTES.LOGIN, { replace: true });
+    }, 3000);
+    return () => clearTimeout(timeout);
+  }, [shouldRedirect, navigate]);
 
   const validateForm = (): boolean => {
     if (!newPassword || !newPasswordConfirm) {
@@ -54,6 +64,7 @@ export function RecuperarContrasenaConfirmPage() {
         new_password_confirm: newPasswordConfirm,
       });
       setMessage(response.message || "Contraseña actualizada exitosamente.");
+      setShouldRedirect(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al actualizar contraseña.");
     } finally {
@@ -162,15 +173,32 @@ export function RecuperarContrasenaConfirmPage() {
               </div>
             )}
 
+            {message && (
+              <p className="text-xs text-white/70 text-center">
+                Serás redirigido a iniciar sesión en unos segundos.
+              </p>
+            )}
+
             <Button
               type="submit"
-              disabled={isLoading || !hasParams}
+              disabled={isLoading || !hasParams || !!message}
               className="w-full h-11 md:h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
               size="lg"
             >
               {isLoading ? "Actualizando..." : "Guardar contraseña"}
             </Button>
           </form>
+
+          {message && (
+            <div className="mt-4 text-center">
+              <Link
+                to={ROUTES.LOGIN}
+                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                Ir a iniciar sesión ahora
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

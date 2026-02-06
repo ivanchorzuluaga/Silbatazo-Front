@@ -86,7 +86,8 @@ export function LoginPage() {
         authResponse.user.role,
         authResponse.user.username,
         authResponse.user.email,
-        authResponse.user.id
+        authResponse.user.id,
+        authResponse.user.email_verificado
       );
 
       // Redirigir
@@ -176,7 +177,9 @@ export function LoginPage() {
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
                 {/* Usuario */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-white drop-shadow-md">Usuario</label>
+                  <label className="text-sm font-semibold text-white drop-shadow-md">
+                    Usuario o correo
+                  </label>
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70">
                       <User className="h-5 w-5" />
@@ -192,7 +195,7 @@ export function LoginPage() {
                         }
                         clearError();
                       }}
-                      placeholder="Tu nombre de usuario"
+                      placeholder="Usuario o correo"
                       disabled={isLoading}
                       autoComplete="username"
                       className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"

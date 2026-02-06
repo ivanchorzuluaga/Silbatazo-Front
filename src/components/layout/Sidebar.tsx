@@ -5,146 +5,14 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import { ROUTES, USER_ROLES, APP_NAME } from "@/lib/constants";
+import { ROUTES, APP_NAME } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import logoImage from "@/assets/Silbatazo-bordes.png";
-import {
-  Home,
-  Calendar,
-  Search,
-  User,
-  Wallet,
-  Shield,
-  Users,
-  FileText,
-  CreditCard,
-  LogOut,
-  UserCheck,
-  ClipboardList,
-  AlertTriangle,
-} from "lucide-react";
+import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface NavItem {
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  route: string;
-  roles?: string[];
-  badge?: number;
-}
-
-const navSections: { title?: string; items: NavItem[] }[] = [
-  {
-    items: [
-      {
-        label: "Dashboard",
-        icon: Home,
-        route: "", // Se reemplazará con el dashboard del usuario
-      },
-    ],
-  },
-  {
-    title: "Principal",
-    items: [
-      {
-        label: "Partidos",
-        icon: Calendar,
-        route: ROUTES.PARTIDOS,
-        roles: [USER_ROLES.CLIENTE, USER_ROLES.ARBITRO],
-      },
-      {
-        label: "Árbitros",
-        icon: Search,
-        route: ROUTES.CLIENTE_ARBITROS,
-        roles: [USER_ROLES.CLIENTE],
-      },
-      {
-        label: "Mi perfil",
-        icon: User,
-        route: ROUTES.CLIENTE_PERFIL,
-        roles: [USER_ROLES.CLIENTE],
-      },
-    ],
-  },
-  {
-    title: "Árbitro",
-    items: [
-      {
-        label: "Mi Perfil",
-        icon: User,
-        route: ROUTES.ARBITRO_PERFIL,
-        roles: [USER_ROLES.ARBITRO],
-      },
-      {
-        label: "Billetera",
-        icon: Wallet,
-        route: ROUTES.ARBITRO_BILLETERA,
-        roles: [USER_ROLES.ARBITRO],
-      },
-    ],
-  },
-  {
-    title: "Administración",
-    items: [
-      {
-        label: "Dashboard",
-        icon: Shield,
-        route: ROUTES.ADMIN_DASHBOARD,
-        roles: [USER_ROLES.ADMIN],
-      },
-      {
-        label: "Árbitros",
-        icon: Users,
-        route: ROUTES.ADMIN_GESTION_ARBITROS,
-        roles: [USER_ROLES.ADMIN],
-      },
-      {
-        label: "Verificar Árbitros",
-        icon: UserCheck,
-        route: ROUTES.ADMIN_VERIFICACION,
-        roles: [USER_ROLES.ADMIN],
-      },
-      {
-        label: "Partidos",
-        icon: Calendar,
-        route: ROUTES.ADMIN_GESTION_PARTIDOS,
-        roles: [USER_ROLES.ADMIN],
-      },
-      {
-        label: "Asignación",
-        icon: ClipboardList,
-        route: ROUTES.ADMIN_ASIGNACION_PARTIDOS,
-        roles: [USER_ROLES.ADMIN],
-      },
-      {
-        label: "Partidos solapados",
-        icon: AlertTriangle,
-        route: ROUTES.ADMIN_PARTIDOS_SOLAPADOS,
-        roles: [USER_ROLES.ADMIN],
-      },
-      {
-        label: "Pagos",
-        icon: CreditCard,
-        route: ROUTES.ADMIN_PAGOS_PENDIENTES,
-        roles: [USER_ROLES.ADMIN],
-      },
-      {
-        label: "Tipos de partido",
-        icon: FileText,
-        route: ROUTES.ADMIN_TIPOS_PARTIDO,
-        roles: [USER_ROLES.ADMIN],
-      },
-      {
-        label: "Retiros",
-        icon: Wallet,
-        route: ROUTES.ADMIN_RETIROS,
-        roles: [USER_ROLES.ADMIN],
-      },
-    ],
-  },
-];
+import { getVisibleNavSections } from "./navConfig";
 
 interface SidebarProps {
   className?: string;
@@ -160,6 +28,7 @@ export function Sidebar({ className }: SidebarProps) {
   }
 
   const dashboardRoute = getDashboardRoute(user.role);
+  const navSections = getVisibleNavSections(user.role);
 
   const handleLogout = async () => {
     try {
@@ -194,16 +63,7 @@ export function Sidebar({ className }: SidebarProps) {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-4 space-y-6">
         {navSections.map((section, sectionIndex) => {
-          // Filtrar items según el rol
-          const visibleItems = section.items.filter((item) => {
-            if (!item.roles) {
-              // Si no tiene roles, es el dashboard genérico
-              return true;
-            }
-            return user.role ? item.roles.includes(user.role) : false;
-          });
-
-          if (visibleItems.length === 0) {
+          if (section.items.length === 0) {
             return null;
           }
 
@@ -217,14 +77,14 @@ export function Sidebar({ className }: SidebarProps) {
               <ul className="space-y-1">
                 {(() => {
                   const pathname = location.pathname;
-                  const routes = visibleItems.map((item) => item.route || dashboardRoute);
+                  const routes = section.items.map((item) => item.route || dashboardRoute);
                   const matchingRoute = routes
                     .filter(
                       (r) => pathname === r || (r !== ROUTES.HOME && pathname.startsWith(r + "/"))
                     )
                     .sort((a, b) => b.length - a.length)[0];
 
-                  return visibleItems.map((item) => {
+                  return section.items.map((item) => {
                     const Icon = item.icon;
                     const route = item.route || dashboardRoute;
                     const isActive = route === matchingRoute;

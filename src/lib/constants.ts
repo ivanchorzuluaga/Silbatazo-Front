@@ -57,6 +57,8 @@ export const ROUTES = {
   REEMBOLSO: "/politica-reembolso",
   RECUPERAR_CONTRASENA: "/recuperar-contrasena",
   RECUPERAR_CONTRASENA_CONFIRM: "/recuperar-contrasena/confirmar",
+  VERIFICAR_CORREO: "/verificar-correo",
+  VERIFICAR_CORREO_CONFIRM: "/verificar-correo/confirmar",
 } as const;
 
 /**

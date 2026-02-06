@@ -7,8 +7,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useArbitroDetail } from "@/features/marketplace/hooks/useArbitroDetail";
 import { useCalificaciones } from "@/features/partidos/hooks/useCalificaciones";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { BottomNav } from "@/components/layout/BottomNav";
+import { PageLayout } from "@/components/layout";
 import { PartidoFormModal } from "@/features/partidos/components/PartidoFormModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,32 +52,24 @@ export function ClienteArbitroDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <Sidebar />
-        <main className="flex-1 lg:ml-72 pb-nav-mobile sm:pb-0">
-          <PageContainer>
-            <LoadingState />
-          </PageContainer>
-        </main>
-        <BottomNav />
-      </div>
+      <PageLayout title="Detalle de árbitro" contentClassName="bg-background">
+        <PageContainer>
+          <LoadingState />
+        </PageContainer>
+      </PageLayout>
     );
   }
 
   if (error || !arbitro) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <Sidebar />
-        <main className="flex-1 lg:ml-72 pb-nav-mobile sm:pb-0">
-          <PageContainer>
-            <ErrorState
-              error={error || "Árbitro no encontrado"}
-              onBack={() => navigate(ROUTES.CLIENTE_ARBITROS)}
-            />
-          </PageContainer>
-        </main>
-        <BottomNav />
-      </div>
+      <PageLayout title="Detalle de árbitro" contentClassName="bg-background">
+        <PageContainer>
+          <ErrorState
+            error={error || "Árbitro no encontrado"}
+            onBack={() => navigate(ROUTES.CLIENTE_ARBITROS)}
+          />
+        </PageContainer>
+      </PageLayout>
     );
   }
 
@@ -94,10 +85,8 @@ export function ClienteArbitroDetailPage() {
   const experiencia = arbitro.experiencia_anos || 0;
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 lg:ml-72 pb-nav-mobile sm:pb-0">
-        <PageContainer>
+    <PageLayout title="Detalle de árbitro" contentClassName="bg-background">
+      <PageContainer>
           {/* Header con botón volver */}
           <header className="mb-6">
             <Button
@@ -312,7 +301,7 @@ export function ClienteArbitroDetailPage() {
           </div>
 
           {/* Botón sticky para móvil */}
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t border-border">
+          <div className="lg:hidden fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t border-border">
             <Button
               onClick={() => setShowSolicitudModal(true)}
               size="lg"
@@ -322,19 +311,17 @@ export function ClienteArbitroDetailPage() {
               Solicitar Árbitro
             </Button>
           </div>
-        </PageContainer>
+      </PageContainer>
 
-        {/* Modal de solicitud */}
-        {showSolicitudModal && arbitro && (
-          <PartidoFormModal
-            arbitro={arbitro}
-            open={showSolicitudModal}
-            onClose={() => setShowSolicitudModal(false)}
-          />
-        )}
-      </main>
-      <BottomNav />
-    </div>
+      {/* Modal de solicitud */}
+      {showSolicitudModal && arbitro && (
+        <PartidoFormModal
+          arbitro={arbitro}
+          open={showSolicitudModal}
+          onClose={() => setShowSolicitudModal(false)}
+        />
+      )}
+    </PageLayout>
   );
 }
 

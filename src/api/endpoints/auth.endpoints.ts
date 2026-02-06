@@ -111,6 +111,29 @@ export const authEndpoints = {
     });
   },
 
+  /**
+   * Reenviar verificación de correo
+   */
+  async requestEmailVerification(email: string): Promise<{ message: string }> {
+    return apiClient<{ message: string }>("/api/users/email/verify/", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  /**
+   * Confirmar verificación de correo
+   */
+  async confirmEmailVerification(data: {
+    uid: string;
+    token: string;
+  }): Promise<{ message: string }> {
+    return apiClient<{ message: string }>("/api/users/email/verify/confirm/", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
   // TODO: Reactivar cuando se implemente Google OAuth
   // /**
   //  * Autenticación con Google OAuth2

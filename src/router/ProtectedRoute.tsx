@@ -3,7 +3,7 @@
  * Opcionalmente puede validar roles específicos
  */
 
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES, type UserRole } from "@/lib/constants";
 import { hasRoleAccess, getDashboardRoute } from "@/lib/routing";
@@ -29,6 +29,7 @@ export function ProtectedRoute({
   redirectToDashboard = true,
 }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, user } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -40,6 +41,19 @@ export function ProtectedRoute({
 
   if (!isAuthenticated) {
     return <Navigate to={ROUTES.LOGIN} replace />;
+  }
+
+  const email = user?.email?.trim();
+  const isEmailVerified = !!user?.email_verificado;
+  const emailVerificationAllowedPaths = [
+    ROUTES.VERIFICAR_CORREO,
+    ROUTES.ARBITRO_ONBOARDING,
+    ROUTES.ARBITRO_PERFIL,
+    ROUTES.CLIENTE_PERFIL,
+  ];
+
+  if (email && !isEmailVerified && !emailVerificationAllowedPaths.includes(location.pathname)) {
+    return <Navigate to={ROUTES.VERIFICAR_CORREO} replace />;
   }
 
   // Si hay restricciones de rol, verificar acceso

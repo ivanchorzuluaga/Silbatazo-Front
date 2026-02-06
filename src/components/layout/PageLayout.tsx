@@ -9,6 +9,7 @@ import { Sidebar } from "./Sidebar";
 import type { PageHeaderProps } from "./PageHeader";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { EmailVerificationBanner } from "@/components/EmailVerificationBanner";
 
 interface PageLayoutProps extends Omit<PageHeaderProps, "className"> {
   children: React.ReactNode;
@@ -38,6 +39,7 @@ export function PageLayout({
       {/* Contenido principal */}
       <div className={cn("flex flex-1 flex-col min-h-screen", shouldShowNav && "sm:ml-64")}>
         <PageHeader {...headerProps} />
+        <EmailVerificationBanner />
         <div
           className={cn(
             scrollable ? "flex-1 overflow-y-auto" : "flex-1",

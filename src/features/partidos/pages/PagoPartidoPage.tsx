@@ -7,7 +7,7 @@ import { useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { PageLayout } from "@/components/layout";
 import { usePagoPartido } from "../hooks/usePagoPartido";
 import { ROUTES } from "@/lib/constants";
 import logoImage from "@/assets/Silbatazo-bordes.png";
@@ -80,54 +80,67 @@ export function PagoPartidoPage() {
   // Estado de carga
   if (isLoading) {
     return (
-      <PageContainer>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-8 text-center">
-            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-            <p className="text-lg font-medium text-foreground">Cargando información del pago...</p>
+      <PageLayout title="Pago del partido" contentClassName="bg-background">
+        <PageContainer>
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-8 text-center">
+              <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+              <p className="text-lg font-medium text-foreground">
+                Cargando información del pago...
+              </p>
+            </div>
           </div>
-        </div>
-      </PageContainer>
+        </PageContainer>
+      </PageLayout>
     );
   }
 
   // Estado de error
   if (error || !partido) {
     return (
-      <PageContainer>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="bg-destructive/10 backdrop-blur-md rounded-2xl border border-destructive/20 p-8 text-center max-w-md">
-            <XCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
-            <p className="text-lg font-medium text-foreground mb-2">Error</p>
-            <p className="text-muted-foreground mb-6">{error || "Partido no encontrado"}</p>
-            <Button onClick={navigateToDashboard}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver al Dashboard
-            </Button>
+      <PageLayout title="Pago del partido" contentClassName="bg-background">
+        <PageContainer>
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="bg-destructive/10 backdrop-blur-md rounded-2xl border border-destructive/20 p-8 text-center max-w-md">
+              <XCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
+              <p className="text-lg font-medium text-foreground mb-2">Error</p>
+              <p className="text-muted-foreground mb-6">
+                {error || "Partido no encontrado"}
+              </p>
+              <Button onClick={navigateToDashboard}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Volver al Dashboard
+              </Button>
+            </div>
           </div>
-        </div>
-      </PageContainer>
+        </PageContainer>
+      </PageLayout>
     );
   }
 
   // Sin permisos
   if (!tienePermiso) {
     return (
-      <PageContainer>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="bg-destructive/10 backdrop-blur-md rounded-2xl border border-destructive/20 p-8 text-center max-w-md">
-            <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
-            <p className="text-lg font-medium text-foreground mb-2">Acceso Denegado</p>
-            <p className="text-muted-foreground mb-6">No tienes permiso para ver este pago</p>
-            <Button onClick={navigateToDashboard}>Volver al Dashboard</Button>
+      <PageLayout title="Pago del partido" contentClassName="bg-background">
+        <PageContainer>
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="bg-destructive/10 backdrop-blur-md rounded-2xl border border-destructive/20 p-8 text-center max-w-md">
+              <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
+              <p className="text-lg font-medium text-foreground mb-2">Acceso Denegado</p>
+              <p className="text-muted-foreground mb-6">
+                No tienes permiso para ver este pago
+              </p>
+              <Button onClick={navigateToDashboard}>Volver al Dashboard</Button>
+            </div>
           </div>
-        </div>
-      </PageContainer>
+        </PageContainer>
+      </PageLayout>
     );
   }
 
   return (
-    <PageContainer>
+    <PageLayout title="Pago del partido" contentClassName="bg-background">
+      <PageContainer>
       {/* Header */}
       <header className="mb-8">
         <div className="flex items-center justify-between mb-4">
@@ -140,10 +153,6 @@ export function PagoPartidoPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver al Dashboard
           </Button>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Tema</span>
-            <ThemeToggle size="sm" />
-          </div>
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Pago del Partido</h1>
         <p className="text-muted-foreground">Completa el pago para confirmar tu solicitud</p>
@@ -403,7 +412,8 @@ export function PagoPartidoPage() {
           <ExternalLink className="w-4 h-4" />
         </a>
       </div>
-    </PageContainer>
+      </PageContainer>
+    </PageLayout>
   );
 }
 

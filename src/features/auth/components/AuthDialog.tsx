@@ -165,7 +165,8 @@ export function AuthDialog({
           authResponse.user.role,
           authResponse.user.username,
           authResponse.user.email,
-          authResponse.user.id
+          authResponse.user.id,
+          authResponse.user.email_verificado
         );
       } else {
         // Modo registro
@@ -187,7 +188,8 @@ export function AuthDialog({
           authResponse.user.role,
           authResponse.user.username,
           authResponse.user.email,
-          authResponse.user.id
+          authResponse.user.id,
+          authResponse.user.email_verificado
         );
       }
 
@@ -284,7 +286,7 @@ export function AuthDialog({
             )}
 
             <FormField
-              label="Usuario"
+              label="Usuario o correo"
               name="username"
               value={username}
               onChange={(e) => {

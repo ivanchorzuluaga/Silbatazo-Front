@@ -53,7 +53,8 @@ export function LoginForm() {
         authResponse.user.role,
         authResponse.user.username,
         authResponse.user.email,
-        authResponse.user.id
+        authResponse.user.id,
+        authResponse.user.email_verificado
       );
     } catch (err) {
       // El error ya está manejado por el hook
@@ -69,7 +70,7 @@ export function LoginForm() {
       </div>
 
       <FormField
-        label="Usuario"
+        label="Usuario o correo"
         name="username"
         value={username}
         onChange={(e) => {

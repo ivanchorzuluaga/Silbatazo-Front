@@ -8,8 +8,7 @@ import { useMunicipios } from "@/features/arbitro/hooks/useMunicipios";
 import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
 import { FiltrosArbitros } from "@/features/marketplace/components/FiltrosArbitros";
 import { useArbitrosSearch } from "../hooks/useArbitrosSearch";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { BottomNav } from "@/components/layout/BottomNav";
+import { PageLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import logoImage from "@/assets/Silbatazo-bordes.png";
 import { getRefereeImage } from "@/lib/referee-images";
@@ -28,10 +27,8 @@ export function ClienteArbitrosPage() {
     useArbitrosSearch();
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 lg:ml-72 pb-nav-mobile sm:pb-0">
-        <PageContainer>
+    <PageLayout title="Árbitros" contentClassName="bg-background">
+      <PageContainer>
           {/* Header */}
           <header className="mb-8">
             <div className="flex items-center gap-3 mb-2">
@@ -72,10 +69,8 @@ export function ClienteArbitrosPage() {
               <ArbitrosList arbitros={arbitros} />
             )}
           </section>
-        </PageContainer>
-      </main>
-      <BottomNav />
-    </div>
+      </PageContainer>
+    </PageLayout>
   );
 }
 

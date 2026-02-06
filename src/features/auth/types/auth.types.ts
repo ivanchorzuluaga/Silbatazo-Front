@@ -6,6 +6,7 @@ export interface User {
   id: number;
   username: string;
   email?: string;
+  email_verificado?: boolean;
   first_name?: string;
   last_name?: string;
   telefono?: string;

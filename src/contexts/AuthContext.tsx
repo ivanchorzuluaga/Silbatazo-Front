@@ -20,7 +20,8 @@ interface AuthContextValue {
     role?: User["role"],
     username?: string,
     email?: string,
-    userId?: number
+    userId?: number,
+    emailVerificado?: boolean
   ) => void;
   /** Actualiza el usuario en contexto (p. ej. tras editar perfil) */
   updateUser: (user: User) => void;
@@ -77,6 +78,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return;
       }
 
+      // Optimista: permitir navegar sin bloquear mientras validamos el token
+      if (isMounted) {
+        setIsLoading(false);
+        setHasCheckedAuth(true);
+      }
+
       try {
         // Verificar que el token sea válido
         await authEndpoints.testAuth(token);
@@ -86,11 +93,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (isMounted) {
           authService.logout();
           setUser(null);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-          setHasCheckedAuth(true);
         }
       }
     };
@@ -109,7 +111,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       role?: User["role"],
       username?: string,
       email?: string,
-      userId?: number
+      userId?: number,
+      emailVerificado?: boolean
     ) => {
       localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
       localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
@@ -119,6 +122,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         username: username || "user",
         role: role,
         email: email,
+        email_verificado: emailVerificado,
       };
       setUser(newUser);
     },
