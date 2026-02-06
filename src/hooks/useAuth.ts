@@ -18,7 +18,8 @@ interface UseAuthReturn {
     role?: User["role"],
     username?: string,
     email?: string,
-    userId?: number
+    userId?: number,
+    emailVerificado?: boolean
   ) => void;
   /** Actualiza el usuario en contexto (p. ej. tras editar perfil) */
   updateUser: (user: User) => void;

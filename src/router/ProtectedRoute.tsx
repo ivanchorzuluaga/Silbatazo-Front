@@ -45,7 +45,7 @@ export function ProtectedRoute({
 
   const email = user?.email?.trim();
   const isEmailVerified = !!user?.email_verificado;
-  const emailVerificationAllowedPaths = [
+  const emailVerificationAllowedPaths: string[] = [
     ROUTES.VERIFICAR_CORREO,
     ROUTES.ARBITRO_ONBOARDING,
     ROUTES.ARBITRO_PERFIL,
