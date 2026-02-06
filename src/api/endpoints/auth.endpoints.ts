@@ -86,6 +86,31 @@ export const authEndpoints = {
     });
   },
 
+  /**
+   * Solicitar recuperación de contraseña
+   */
+  async requestPasswordReset(email: string): Promise<{ message: string }> {
+    return apiClient<{ message: string }>("/api/users/password/reset/", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  /**
+   * Confirmar nueva contraseña
+   */
+  async confirmPasswordReset(data: {
+    uid: string;
+    token: string;
+    new_password: string;
+    new_password_confirm: string;
+  }): Promise<{ message: string }> {
+    return apiClient<{ message: string }>("/api/users/password/reset/confirm/", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
   // TODO: Reactivar cuando se implemente Google OAuth
   // /**
   //  * Autenticación con Google OAuth2

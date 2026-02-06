@@ -55,6 +55,8 @@ export const ROUTES = {
   TERMINOS: "/terminos-condiciones",
   PRIVACIDAD: "/politica-privacidad",
   REEMBOLSO: "/politica-reembolso",
+  RECUPERAR_CONTRASENA: "/recuperar-contrasena",
+  RECUPERAR_CONTRASENA_CONFIRM: "/recuperar-contrasena/confirmar",
 } as const;
 
 /**

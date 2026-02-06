@@ -241,7 +241,7 @@ export function LoginPage() {
                 {/* Recuperar contraseña */}
                 <div className="flex justify-end">
                   <Link
-                    to="/recuperar-contrasena"
+                    to={ROUTES.RECUPERAR_CONTRASENA}
                     className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
                   >
                     ¿Olvidaste tu contraseña?

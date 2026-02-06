@@ -5,6 +5,8 @@
 import { createBrowserRouter } from "react-router-dom";
 import { HomePage } from "@/features/auth/pages/HomePage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
+import { RecuperarContrasenaPage } from "@/features/auth/pages/RecuperarContrasenaPage";
+import { RecuperarContrasenaConfirmPage } from "@/features/auth/pages/RecuperarContrasenaConfirmPage";
 import { ClienteDashboardGuard } from "@/features/cliente/components/ClienteDashboardGuard";
 import { ClienteArbitrosPage } from "@/features/cliente/pages/ClienteArbitrosPage";
 import { ClienteArbitroDetailPage } from "@/features/cliente/pages/ClienteArbitroDetailPage";
@@ -68,6 +70,14 @@ export const router = createBrowserRouter([
   {
     path: ROUTES.LOGIN,
     element: <LoginPage />,
+  },
+  {
+    path: ROUTES.RECUPERAR_CONTRASENA,
+    element: <RecuperarContrasenaPage />,
+  },
+  {
+    path: ROUTES.RECUPERAR_CONTRASENA_CONFIRM,
+    element: <RecuperarContrasenaConfirmPage />,
   },
   {
     path: ROUTES.REGISTER,
