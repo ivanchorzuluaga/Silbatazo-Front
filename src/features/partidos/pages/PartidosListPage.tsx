@@ -40,14 +40,14 @@ export function PartidosListPage() {
       contentClassName="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-7xl"
     >
       {/* Header mejorado */}
-      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-2.5 sm:p-6 mb-3 sm:mb-6 border border-primary/10">
+      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl p-2 sm:p-6 mb-3 sm:mb-6 border border-primary/10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-2">
-            <h1 className="text-base sm:text-3xl font-bold flex items-center gap-2 sm:gap-3">
+            <h1 className="text-sm sm:text-3xl font-bold flex items-center gap-2 sm:gap-3">
               <Calendar className="w-4 h-4 sm:w-8 sm:h-8 text-primary" />
               Mis Partidos
             </h1>
-            <p className="text-muted-foreground text-[11px] sm:text-lg">
+            <p className="text-muted-foreground text-[10px] sm:text-lg">
               {user?.role === "cliente"
                 ? "Gestiona tus solicitudes de partidos"
                 : user?.role === "arbitro"
@@ -59,7 +59,7 @@ export function PartidosListPage() {
             <Button
               onClick={() => navigate(ROUTES.PARTIDOS_CREAR)}
               size="sm"
-              className="shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto h-9"
+              className="shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto h-8 text-xs"
             >
               <Plus className="w-3.5 h-3.5 mr-2" />
               Crear partido
@@ -80,7 +80,7 @@ export function PartidosListPage() {
               type="button"
               onClick={() => setTabEstado(tab.value)}
               className={cn(
-                "shrink-0 px-2.5 sm:px-4 py-1 sm:py-2 rounded-md text-[10px] sm:text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-8",
+                "shrink-0 px-2.5 sm:px-4 py-1 rounded-md text-[10px] sm:text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-7",
                 tabEstado === tab.value
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -120,24 +120,24 @@ export function PartidosListPage() {
       {!isLoading && !error && (
         <>
           {partidos.length === 0 ? (
-            <Card className="text-center py-6 sm:py-16 border-0 bg-gradient-to-br from-primary/5 to-secondary/5">
-              <CardContent className="space-y-6">
-                <div className="relative mx-auto w-14 h-14 sm:w-24 sm:h-24">
+            <Card className="text-center py-5 sm:py-16 border-0 bg-gradient-to-br from-primary/5 to-secondary/5">
+              <CardContent className="space-y-4">
+                <div className="relative mx-auto w-12 h-12 sm:w-24 sm:h-24">
                   <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
                   <div className="relative w-full h-full bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-lg">
-                    <Calendar className="size-7 sm:size-12 text-white" />
+                    <Calendar className="size-6 sm:size-12 text-white" />
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <h3 className="text-base sm:text-2xl font-bold text-foreground">
+                <div className="space-y-2">
+                  <h3 className="text-sm sm:text-2xl font-bold text-foreground">
                     {tabEstado
                       ? `No hay partidos en "${TABS.find((t) => t.value === tabEstado)?.label}"`
                       : user?.role === "cliente"
                       ? "¡Aún no tienes partidos!"
                       : "No hay partidos asignados"}
                   </h3>
-                  <p className="text-muted-foreground text-[11px] sm:text-lg max-w-md mx-auto">
+                  <p className="text-muted-foreground text-[10px] sm:text-lg max-w-md mx-auto">
                     {tabEstado
                       ? "Prueba con otro estado o vuelve a Todos para ver la lista completa."
                       : user?.role === "cliente"
@@ -151,7 +151,7 @@ export function PartidosListPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => setTabEstado("")}
-                    className="border-2 hover:border-primary/50 w-full sm:w-auto h-9"
+                    className="border-2 hover:border-primary/50 w-full sm:w-auto h-8 text-xs"
                   >
                     <Calendar className="w-3.5 h-3.5 mr-2" />
                     Ver todos
@@ -162,7 +162,7 @@ export function PartidosListPage() {
                       <Button
                         onClick={() => navigate(ROUTES.PARTIDOS_CREAR)}
                         size="sm"
-                        className="shadow-lg hover:shadow-xl transition-all duration-300 h-9"
+                        className="shadow-lg hover:shadow-xl transition-all duration-300 h-8 text-xs"
                       >
                         <Plus className="w-3.5 h-3.5 mr-2" />
                         Crear mi primer partido
@@ -171,7 +171,7 @@ export function PartidosListPage() {
                         onClick={() => navigate(ROUTES.ARBITROS)}
                         size="sm"
                         variant="outline"
-                        className="border-2 hover:border-primary/50 h-9"
+                        className="border-2 hover:border-primary/50 h-8 text-xs"
                       >
                         <Search className="w-3.5 h-3.5 mr-2" />
                         Explorar árbitros
