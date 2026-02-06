@@ -11,10 +11,9 @@ import { AlertCircle, ArrowLeft, CheckCircle2, Mail } from "lucide-react";
 
 export function VerificarCorreoConfirmPage() {
   const [searchParams] = useSearchParams();
-  const uid = searchParams.get("uid") || "";
   const token = searchParams.get("token") || "";
 
-  const hasParams = useMemo(() => !!uid && !!token, [uid, token]);
+  const hasParams = useMemo(() => !!token, [token]);
 
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -25,7 +24,7 @@ export function VerificarCorreoConfirmPage() {
       if (!hasParams || isLoading || message || error) return;
       try {
         setIsLoading(true);
-        const response = await authEndpoints.confirmEmailVerification({ uid, token });
+        const response = await authEndpoints.confirmEmailVerification({ token });
         setMessage(response.message || "Correo verificado exitosamente.");
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error al verificar correo.");

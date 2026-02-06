@@ -125,7 +125,6 @@ export const authEndpoints = {
    * Confirmar verificación de correo
    */
   async confirmEmailVerification(data: {
-    uid: string;
     token: string;
   }): Promise<{ message: string }> {
     return apiClient<{ message: string }>("/api/users/email/verify/confirm/", {
