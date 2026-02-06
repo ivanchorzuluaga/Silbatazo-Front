@@ -40,14 +40,14 @@ export function PartidosListPage() {
       contentClassName="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-7xl"
     >
       {/* Header mejorado */}
-      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-3 sm:p-6 mb-4 sm:mb-6 border border-primary/10">
+      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-2.5 sm:p-6 mb-3 sm:mb-6 border border-primary/10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-2">
-            <h1 className="text-lg sm:text-3xl font-bold flex items-center gap-2 sm:gap-3">
-              <Calendar className="w-5 h-5 sm:w-8 sm:h-8 text-primary" />
+            <h1 className="text-base sm:text-3xl font-bold flex items-center gap-2 sm:gap-3">
+              <Calendar className="w-4 h-4 sm:w-8 sm:h-8 text-primary" />
               Mis Partidos
             </h1>
-            <p className="text-muted-foreground text-xs sm:text-lg">
+            <p className="text-muted-foreground text-[11px] sm:text-lg">
               {user?.role === "cliente"
                 ? "Gestiona tus solicitudes de partidos"
                 : user?.role === "arbitro"
@@ -59,9 +59,9 @@ export function PartidosListPage() {
             <Button
               onClick={() => navigate(ROUTES.PARTIDOS_CREAR)}
               size="sm"
-              className="shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto sm:h-11"
+              className="shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto h-9"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-3.5 h-3.5 mr-2" />
               Crear partido
             </Button>
           )}
@@ -70,7 +70,7 @@ export function PartidosListPage() {
 
       {/* Tabs por estado */}
       <div className="mb-6">
-        <p className="text-[11px] sm:text-sm font-medium text-muted-foreground mb-2">
+        <p className="text-[10px] sm:text-sm font-medium text-muted-foreground mb-2">
           Filtrar por estado
         </p>
         <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto scrollbar-hide -mx-2 px-2">
@@ -80,7 +80,7 @@ export function PartidosListPage() {
               type="button"
               onClick={() => setTabEstado(tab.value)}
               className={cn(
-                "shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-[11px] sm:text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-9",
+                "shrink-0 px-2.5 sm:px-4 py-1 sm:py-2 rounded-md text-[10px] sm:text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-8",
                 tabEstado === tab.value
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -120,24 +120,24 @@ export function PartidosListPage() {
       {!isLoading && !error && (
         <>
           {partidos.length === 0 ? (
-            <Card className="text-center py-8 sm:py-16 border-0 bg-gradient-to-br from-primary/5 to-secondary/5">
+            <Card className="text-center py-6 sm:py-16 border-0 bg-gradient-to-br from-primary/5 to-secondary/5">
               <CardContent className="space-y-6">
-                <div className="relative mx-auto w-16 h-16 sm:w-24 sm:h-24">
+                <div className="relative mx-auto w-14 h-14 sm:w-24 sm:h-24">
                   <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
                   <div className="relative w-full h-full bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-lg">
-                    <Calendar className="size-8 sm:size-12 text-white" />
+                    <Calendar className="size-7 sm:size-12 text-white" />
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <h3 className="text-lg sm:text-2xl font-bold text-foreground">
+                  <h3 className="text-base sm:text-2xl font-bold text-foreground">
                     {tabEstado
                       ? `No hay partidos en "${TABS.find((t) => t.value === tabEstado)?.label}"`
                       : user?.role === "cliente"
                       ? "¡Aún no tienes partidos!"
                       : "No hay partidos asignados"}
                   </h3>
-                  <p className="text-muted-foreground text-xs sm:text-lg max-w-md mx-auto">
+                  <p className="text-muted-foreground text-[11px] sm:text-lg max-w-md mx-auto">
                     {tabEstado
                       ? "Prueba con otro estado o vuelve a Todos para ver la lista completa."
                       : user?.role === "cliente"
@@ -151,9 +151,9 @@ export function PartidosListPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => setTabEstado("")}
-                    className="border-2 hover:border-primary/50 w-full sm:w-auto"
+                    className="border-2 hover:border-primary/50 w-full sm:w-auto h-9"
                   >
-                    <Calendar className="w-4 h-4 mr-2" />
+                    <Calendar className="w-3.5 h-3.5 mr-2" />
                     Ver todos
                   </Button>
                 ) : (
@@ -162,18 +162,18 @@ export function PartidosListPage() {
                       <Button
                         onClick={() => navigate(ROUTES.PARTIDOS_CREAR)}
                         size="sm"
-                        className="shadow-lg hover:shadow-xl transition-all duration-300"
+                        className="shadow-lg hover:shadow-xl transition-all duration-300 h-9"
                       >
-                        <Plus className="w-4 h-4 mr-2" />
+                        <Plus className="w-3.5 h-3.5 mr-2" />
                         Crear mi primer partido
                       </Button>
                       <Button
                         onClick={() => navigate(ROUTES.ARBITROS)}
                         size="sm"
                         variant="outline"
-                        className="border-2 hover:border-primary/50"
+                        className="border-2 hover:border-primary/50 h-9"
                       >
-                        <Search className="w-4 h-4 mr-2" />
+                        <Search className="w-3.5 h-3.5 mr-2" />
                         Explorar árbitros
                       </Button>
                     </div>

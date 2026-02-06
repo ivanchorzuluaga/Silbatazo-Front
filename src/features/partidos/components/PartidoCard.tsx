@@ -17,11 +17,11 @@ export function PartidoCard({ partido }: PartidoCardProps) {
   return (
     <Link to={getPartidoDetailRoute(partido.id)} className="block touch-manipulation">
       <Card variant="elevated" className="h-full hover:shadow-ios-lg transition-ios">
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-1">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-3">
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground">
+                <h3 className="text-base sm:text-xl font-semibold text-foreground">
                   Partido #{partido.id}
                 </h3>
                 <Badge
@@ -45,7 +45,7 @@ export function PartidoCard({ partido }: PartidoCardProps) {
                 )}
               </div>
               {partido.codigo && (
-                <p className="text-[11px] sm:text-xs font-mono text-muted-foreground mb-2 break-all">
+                <p className="text-[10px] sm:text-xs font-mono text-muted-foreground mb-1 break-all">
                   {partido.codigo}
                 </p>
               )}
@@ -53,15 +53,15 @@ export function PartidoCard({ partido }: PartidoCardProps) {
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-3">
-          <p className="text-sm sm:text-base font-medium text-foreground">
+        <CardContent className="space-y-2">
+          <p className="text-xs sm:text-base font-medium text-foreground">
             {partido.lugar}
             {partido.direccion && ` - ${partido.direccion}`}
           </p>
 
           {/* Información del partido */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-[11px] sm:text-sm text-muted-foreground">
               <svg
                 className="h-4 w-4 shrink-0"
                 fill="none"
@@ -91,7 +91,7 @@ export function PartidoCard({ partido }: PartidoCardProps) {
                 })}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-[11px] sm:text-sm text-muted-foreground">
               <svg
                 className="h-4 w-4 shrink-0"
                 fill="none"
@@ -110,7 +110,7 @@ export function PartidoCard({ partido }: PartidoCardProps) {
           </div>
 
           {/* Valor y Árbitro */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t">
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t">
             <div className="flex flex-wrap gap-2">
               {partido.arbitro_info ? (
                 <Badge variant="outline" size="sm">
