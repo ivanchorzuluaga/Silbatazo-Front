@@ -17,11 +17,13 @@ export function PartidoCard({ partido }: PartidoCardProps) {
   return (
     <Link to={getPartidoDetailRoute(partido.id)} className="block touch-manipulation">
       <Card variant="elevated" className="h-full hover:shadow-ios-lg transition-ios">
-        <CardHeader>
+        <CardHeader className="pb-2">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-3">
-                <h3 className="text-xl font-semibold text-foreground">Partido #{partido.id}</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground">
+                  Partido #{partido.id}
+                </h3>
                 <Badge
                   variant={
                     partido.estado === "aceptado"
@@ -43,7 +45,7 @@ export function PartidoCard({ partido }: PartidoCardProps) {
                 )}
               </div>
               {partido.codigo && (
-                <p className="text-xs font-mono text-muted-foreground mb-2 break-all">
+                <p className="text-[11px] sm:text-xs font-mono text-muted-foreground mb-2 break-all">
                   {partido.codigo}
                 </p>
               )}
@@ -51,15 +53,15 @@ export function PartidoCard({ partido }: PartidoCardProps) {
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
-          <p className="text-base font-medium text-foreground">
+        <CardContent className="space-y-3">
+          <p className="text-sm sm:text-base font-medium text-foreground">
             {partido.lugar}
             {partido.direccion && ` - ${partido.direccion}`}
           </p>
 
           {/* Información del partido */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
               <svg
                 className="h-4 w-4 shrink-0"
                 fill="none"
@@ -73,7 +75,14 @@ export function PartidoCard({ partido }: PartidoCardProps) {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              <span>
+              <span className="sm:hidden">
+                {parseLocalDate(partido.fecha).toLocaleDateString("es-CO", {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+              <span className="hidden sm:inline">
                 {parseLocalDate(partido.fecha).toLocaleDateString("es-CO", {
                   weekday: "long",
                   year: "numeric",
@@ -82,7 +91,7 @@ export function PartidoCard({ partido }: PartidoCardProps) {
                 })}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
               <svg
                 className="h-4 w-4 shrink-0"
                 fill="none"

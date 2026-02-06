@@ -37,17 +37,17 @@ export function PartidosListPage() {
     <PageLayout
       backButton={{ label: "Dashboard", to: ROUTES.DASHBOARD }}
       showDashboard={false}
-      contentClassName="container mx-auto px-4 py-8 max-w-7xl"
+      contentClassName="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-7xl"
     >
       {/* Header mejorado */}
-      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-6 mb-6 border border-primary/10">
+      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-4 sm:p-6 mb-6 border border-primary/10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-3">
-              <Calendar className="w-8 h-8 text-primary" />
+            <h1 className="text-xl sm:text-3xl font-bold flex items-center gap-3">
+              <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
               Mis Partidos
             </h1>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-sm sm:text-lg">
               {user?.role === "cliente"
                 ? "Gestiona tus solicitudes de partidos"
                 : user?.role === "arbitro"
@@ -59,7 +59,7 @@ export function PartidosListPage() {
             <Button
               onClick={() => navigate(ROUTES.PARTIDOS_CREAR)}
               size="lg"
-              className="shadow-lg hover:shadow-xl transition-all duration-300"
+              className="shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
             >
               <Plus className="w-5 h-5 mr-2" />
               Crear Partido
@@ -70,15 +70,17 @@ export function PartidosListPage() {
 
       {/* Tabs por estado */}
       <div className="mb-6">
-        <p className="text-sm font-medium text-muted-foreground mb-3">Filtrar por estado</p>
-        <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto scrollbar-hide -mx-1 px-1">
+        <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-3">
+          Filtrar por estado
+        </p>
+        <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto scrollbar-hide -mx-2 px-2">
           {TABS.map((tab) => (
             <button
               key={tab.value || "todos"}
               type="button"
               onClick={() => setTabEstado(tab.value)}
               className={cn(
-                "shrink-0 px-4 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-10",
+                "shrink-0 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-10",
                 tabEstado === tab.value
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -118,7 +120,7 @@ export function PartidosListPage() {
       {!isLoading && !error && (
         <>
           {partidos.length === 0 ? (
-            <Card className="text-center py-16 border-0 bg-gradient-to-br from-primary/5 to-secondary/5">
+            <Card className="text-center py-10 sm:py-16 border-0 bg-gradient-to-br from-primary/5 to-secondary/5">
               <CardContent className="space-y-6">
                 <div className="relative mx-auto w-24 h-24">
                   <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
@@ -128,14 +130,14 @@ export function PartidosListPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <h3 className="text-2xl font-bold text-foreground">
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">
                     {tabEstado
                       ? `No hay partidos en "${TABS.find((t) => t.value === tabEstado)?.label}"`
                       : user?.role === "cliente"
                       ? "¡Aún no tienes partidos!"
                       : "No hay partidos asignados"}
                   </h3>
-                  <p className="text-muted-foreground text-lg max-w-md mx-auto">
+                  <p className="text-muted-foreground text-sm sm:text-lg max-w-md mx-auto">
                     {tabEstado
                       ? "Prueba con otro estado o vuelve a Todos para ver la lista completa."
                       : user?.role === "cliente"
@@ -179,7 +181,7 @@ export function PartidosListPage() {
                 )}
 
                 {/* Trust indicators */}
-                <div className="flex items-center justify-center gap-8 pt-6">
+                <div className="flex flex-wrap items-center justify-center gap-4 pt-6">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span>Árbitros verificados</span>
