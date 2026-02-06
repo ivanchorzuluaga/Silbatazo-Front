@@ -138,7 +138,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   );
 
   const updateUser = useCallback((nextUser: Partial<User>) => {
-    setUser((prev) => (prev ? { ...prev, ...nextUser } : nextUser));
+    setUser((prev) => (prev ? { ...prev, ...nextUser } : prev));
   }, []);
 
   const logout = useCallback(async () => {
