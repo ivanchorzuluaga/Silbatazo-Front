@@ -33,7 +33,7 @@ export function VerificarCorreoConfirmPage() {
       }
     };
     confirm();
-  }, [hasParams, uid, token, isLoading, message, error]);
+  }, [hasParams, token, isLoading, message, error]);
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
