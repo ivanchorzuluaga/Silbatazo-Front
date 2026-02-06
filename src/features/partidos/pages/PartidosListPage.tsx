@@ -18,11 +18,9 @@ import { cn } from "@/lib/utils";
 
 const TABS: { value: "" | EstadoPartido; label: string }[] = [
   { value: "", label: "Todos" },
-  { value: "buscando_arbitro", label: "Buscando" },
   { value: "pendiente", label: "Pendiente" },
   { value: "aceptado", label: "Aceptado" },
   { value: "completado", label: "Completado" },
-  { value: "rechazado", label: "Rechazado" },
   { value: "cancelado", label: "Cancelado" },
 ];
 
@@ -75,14 +73,14 @@ export function PartidosListPage() {
         <p className="text-[10px] sm:text-sm font-medium text-muted-foreground mb-2">
           Filtrar por estado
         </p>
-        <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto scrollbar-hide -mx-2 px-2">
+        <div className="flex flex-wrap gap-1 p-1 rounded-lg bg-muted/50 border border-border -mx-2 px-2">
           {TABS.map((tab) => (
             <button
               key={tab.value || "todos"}
               type="button"
               onClick={() => setTabEstado(tab.value)}
               className={cn(
-                "shrink-0 px-2.5 py-1 rounded-md text-[10px] sm:text-sm font-medium transition-colors whitespace-nowrap min-h-7",
+                "px-2.5 py-1 rounded-md text-[10px] sm:text-sm font-medium transition-colors whitespace-nowrap min-h-7",
                 tabEstado === tab.value
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
