@@ -2,7 +2,7 @@
  * Página para pedir verificación de correo
  */
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { authEndpoints } from "@/api/endpoints";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,17 +12,28 @@ import { AlertCircle, ArrowLeft, CheckCircle2, Mail } from "lucide-react";
 
 export function VerificarCorreoPage() {
   const { user } = useAuth();
-  const email = user?.email?.trim() || "";
+  const defaultEmail = user?.email?.trim() || "";
+  const [email, setEmail] = useState(defaultEmail);
   const [isSending, setIsSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const perfilRoute = useMemo(() => {
+    if (user?.role === "arbitro") return ROUTES.ARBITRO_PERFIL;
+    if (user?.role === "cliente") return ROUTES.CLIENTE_PERFIL;
+    return ROUTES.DASHBOARD;
+  }, [user?.role]);
 
   const handleResend = async () => {
     setIsSending(true);
     setMessage(null);
     setError(null);
     try {
-      const response = await authEndpoints.requestEmailVerification(email);
+      if (!email.trim()) {
+        setError("Debes ingresar un correo válido para recibir la verificación.");
+        setIsSending(false);
+        return;
+      }
+      const response = await authEndpoints.requestEmailVerification(email.trim());
       setMessage(response.message || "Te enviamos un correo de verificación.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "No pudimos enviar el correo.");
@@ -42,7 +53,7 @@ export function VerificarCorreoPage() {
           asChild
           className="min-h-10 touch-manipulation bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 hover:text-white"
         >
-          <Link to={ROUTES.DASHBOARD}>
+          <Link to={perfilRoute}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver
           </Link>
@@ -66,18 +77,50 @@ export function VerificarCorreoPage() {
           <div className="space-y-3 text-sm text-white/80">
             <p>
               Te enviamos un enlace de verificación a:
-              <span className="block font-semibold text-white mt-1">{email || "Sin correo"}</span>
+              <span className="block font-semibold text-white mt-1">
+                {defaultEmail || "Sin correo"}
+              </span>
             </p>
             <p>
               Revisa también la carpeta de spam o promociones.
             </p>
           </div>
 
+          {!defaultEmail && (
+            <div className="mt-6 space-y-2">
+              <label className="text-sm font-semibold text-white drop-shadow-md">
+                Correo electrónico
+              </label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70">
+                  <Mail className="h-5 w-5" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error) setError(null);
+                    if (message) setMessage(null);
+                  }}
+                  placeholder="correo@ejemplo.com"
+                  disabled={isSending}
+                  autoComplete="email"
+                  className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"
+                />
+              </div>
+              <p className="text-xs text-white/60">
+                Si no tienes correo en tu perfil, ingrésalo aquí o actualízalo en tu perfil.
+              </p>
+            </div>
+          )}
+
           <div className="mt-6">
             <Button
               type="button"
               onClick={handleResend}
-              disabled={isSending || !email}
+              disabled={isSending || !email.trim()}
               className="w-full h-11 md:h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
               size="lg"
             >
