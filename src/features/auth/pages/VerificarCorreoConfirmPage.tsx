@@ -36,7 +36,7 @@ export function VerificarCorreoConfirmPage() {
             const profile = await authService.getProfile();
             updateUser(profile);
           } catch {
-            // Si falla, al menos marcamos verificado en memoria
+            // Si falla el perfil, al menos marcamos verificado en memoria
             updateUser({ email_verificado: true });
           }
         }

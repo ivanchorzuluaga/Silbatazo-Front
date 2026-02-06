@@ -24,7 +24,7 @@ interface AuthContextValue {
     emailVerificado?: boolean
   ) => void;
   /** Actualiza el usuario en contexto (p. ej. tras editar perfil) */
-  updateUser: (user: User) => void;
+  updateUser: (user: Partial<User>) => void;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
 }
@@ -137,7 +137,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     []
   );
 
-  const updateUser = useCallback((nextUser: User) => {
+  const updateUser = useCallback((nextUser: Partial<User>) => {
     setUser((prev) => (prev ? { ...prev, ...nextUser } : nextUser));
   }, []);
 

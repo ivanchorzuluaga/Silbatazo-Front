@@ -22,7 +22,7 @@ interface UseAuthReturn {
     emailVerificado?: boolean
   ) => void;
   /** Actualiza el usuario en contexto (p. ej. tras editar perfil) */
-  updateUser: (user: User) => void;
+  updateUser: (user: Partial<User>) => void;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
 }
