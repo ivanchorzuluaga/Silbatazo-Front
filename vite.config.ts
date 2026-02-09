@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
     {
       name: "html-transform",
       transformIndexHtml(html) {
-        return html.replace(/%VITE_APP_URL%/g, baseUrl);
+        return html.replace(/__APP_URL__/g, baseUrl);
       },
     },
     react({
@@ -34,17 +34,18 @@ export default defineConfig(({ mode }) => {
     chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
-        manualChunks: {
-          react: ["react", "react-dom", "react-router-dom"],
-          ui: [
-            "@radix-ui/react-dialog",
-            "@radix-ui/react-dropdown-menu",
-            "@radix-ui/react-popover",
-            "@radix-ui/react-select",
-            "@radix-ui/react-tabs",
-            "@radix-ui/react-tooltip",
-            "lucide-react",
-          ],
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (
+              id.includes("react") ||
+              id.includes("react-dom") ||
+              id.includes("react-router-dom")
+            ) {
+              return "react";
+            }
+            return "vendor";
+          }
+          return undefined;
         },
       },
     },
