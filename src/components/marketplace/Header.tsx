@@ -27,7 +27,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm pt-[env(safe-area-inset-top)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between min-h-14 sm:h-16">
+        <div className="flex items-center justify-between min-h-16 sm:min-h-20 md:min-h-24">
           {/* Logo completo (imagen con texto incluido) */}
           <Link
             to={ROUTES.HOME}
@@ -37,7 +37,7 @@ export function Header() {
             <img
               src="/Logo-completo.png"
               alt={`${APP_NAME} - Árbitro de confianza`}
-              className="h-9 sm:h-10 w-auto object-contain"
+              className="h-12 sm:h-16 md:h-20 w-auto object-contain"
               loading="eager"
               decoding="async"
             />
