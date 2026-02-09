@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ROUTES, APP_NAME } from "@/lib/constants";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 import { Menu, Users, Clock, Mail, Shield, User, ArrowRight, X } from "lucide-react";
 
 export function Header() {
   const { isAuthenticated } = useAuth();
+  const { isDark } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigationItems = [
@@ -28,16 +30,16 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm pt-[env(safe-area-inset-top)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between min-h-16 sm:min-h-20 md:min-h-24">
-          {/* Logo completo (imagen con texto incluido) */}
+          {/* Logo completo (imagen con texto incluido) - cambia según tema */}
           <Link
             to={ROUTES.HOME}
             className="flex items-center hover:opacity-90 transition-all duration-200"
             onClick={() => setMobileMenuOpen(false)}
           >
             <img
-              src="/Logo-completo.png"
+              src={isDark ? "/Logo-completo.png" : "/Logo-completo-Negro.png"}
               alt={`${APP_NAME} - Árbitro de confianza`}
-              className="h-12 sm:h-16 md:h-20 w-auto object-contain"
+              className="h-12 sm:h-16 md:h-20 w-auto object-contain transition-opacity duration-200"
               loading="eager"
               decoding="async"
             />
