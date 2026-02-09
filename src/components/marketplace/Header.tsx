@@ -28,41 +28,19 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm pt-[env(safe-area-inset-top)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between min-h-14 sm:h-16">
-          {/* Logo */}
+          {/* Logo completo (imagen con texto incluido) */}
           <Link
             to={ROUTES.HOME}
-            className="flex items-center gap-3 hover:opacity-90 transition-all duration-200 group"
+            className="flex items-center hover:opacity-90 transition-all duration-200"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <div className="relative">
-              <img
-                src="/Logo.png"
-                alt={`${APP_NAME} Logo`}
-                className="h-10 w-auto object-contain transition-transform group-hover:scale-105 logo-high-quality"
-                loading="eager"
-                decoding="async"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                  const fallback = target.parentElement?.querySelector(
-                    ".logo-fallback"
-                  ) as HTMLElement;
-                  if (fallback) fallback.style.display = "flex";
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center logo-fallback hidden shadow-lg">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-xl tracking-tight text-foreground group-hover:text-primary transition-colors">
-                {APP_NAME}
-              </span>
-              <span className="text-xs text-muted-foreground hidden sm:block">
-                Tu arbitro de confianza
-              </span>
-            </div>
+            <img
+              src="/Logo-completo.png"
+              alt={`${APP_NAME} - Árbitro de confianza`}
+              className="h-9 sm:h-10 w-auto object-contain"
+              loading="eager"
+              decoding="async"
+            />
           </Link>
 
           {/* Desktop Navigation */}
