@@ -38,7 +38,9 @@ export function Header() {
               <img
                 src="/Logo.png"
                 alt={`${APP_NAME} Logo`}
-                className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
+                className="h-10 w-auto object-contain transition-transform group-hover:scale-105 logo-high-quality"
+                loading="eager"
+                decoding="async"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = "none";

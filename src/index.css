@@ -476,3 +476,18 @@ input:-webkit-autofill:active {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Optimización de renderizado para logos - mejora calidad al escalar */
+.logo-high-quality {
+  /* Mejor algoritmo de escalado para imágenes grandes escaladas hacia abajo */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: auto;
+  /* Aceleración por hardware para mejor renderizado */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+  /* Suavizado mejorado */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
