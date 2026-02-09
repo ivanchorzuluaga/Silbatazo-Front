@@ -12,7 +12,7 @@ import { getDashboardRoute } from "@/lib/routing";
 import { Button } from "@/components/ui/button";
 import { validations } from "@/lib/validations";
 import { AuthDialog } from "../components/AuthDialog";
-import logoImage from "@/assets/Silbatazo-bordes.png";
+import logoImage from "@/assets/Logo.png";
 import { User, Lock, LogIn, ArrowLeft, AlertCircle } from "lucide-react";
 
 export function LoginPage() {

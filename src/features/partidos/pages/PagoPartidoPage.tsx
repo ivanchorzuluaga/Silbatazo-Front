@@ -10,7 +10,7 @@ import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { PageLayout } from "@/components/layout";
 import { usePagoPartido } from "../hooks/usePagoPartido";
 import { ROUTES } from "@/lib/constants";
-import logoImage from "@/assets/Silbatazo-bordes.png";
+import logoImage from "@/assets/Logo.png";
 import {
   Loader2,
   CheckCircle,

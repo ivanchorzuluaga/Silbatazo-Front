@@ -13,7 +13,7 @@ import { FiltrosArbitros, type FiltrosArbitrosType } from "../components/Filtros
 import { Header, Footer } from "@/components/marketplace";
 import { Button } from "@/components/ui/button";
 import { CATEGORIAS_PARTIDO, ROUTES } from "@/lib/constants";
-import logoImage from "@/assets/Silbatazo-bordes.png";
+import logoImage from "@/assets/Logo.png";
 import { Users, RefreshCw, SearchX, Loader2, CalendarPlus, ArrowRight } from "lucide-react";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 

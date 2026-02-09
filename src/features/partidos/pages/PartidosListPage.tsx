@@ -16,8 +16,7 @@ import type { EstadoPartido, PartidosListParams } from "../types/partido.types";
 import { Calendar, Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const TABS: { value: "" | EstadoPartido; label: string }[] = [
-  { value: "", label: "Todos" },
+const TABS: { value: "" | EstadoPartido; label: string }[] = [  { value: "", label: "Todos" },
   { value: "pendiente", label: "Pendiente" },
   { value: "aceptado", label: "Aceptado" },
   { value: "completado", label: "Completado" },

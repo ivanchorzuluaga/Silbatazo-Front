@@ -9,7 +9,7 @@ import { ROUTES, APP_NAME } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
-import logoImage from "@/assets/Silbatazo-bordes.png";
+import logoImage from "@/assets/Silvato.png";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getVisibleNavSections } from "./navConfig";

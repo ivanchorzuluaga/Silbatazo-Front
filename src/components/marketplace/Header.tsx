@@ -36,7 +36,7 @@ export function Header() {
           >
             <div className="relative">
               <img
-                src="/silbatazo-logo.png"
+                src="/Logo.png"
                 alt={`${APP_NAME} Logo`}
                 className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
                 onError={(e) => {

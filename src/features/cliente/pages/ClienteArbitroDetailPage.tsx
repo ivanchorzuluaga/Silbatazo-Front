@@ -11,7 +11,7 @@ import { PageLayout } from "@/components/layout";
 import { PartidoFormModal } from "@/features/partidos/components/PartidoFormModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import logoImage from "@/assets/Silbatazo-bordes.png";
+import logoImage from "@/assets/Logo.png";
 import { getRefereeImage } from "@/lib/referee-images";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";

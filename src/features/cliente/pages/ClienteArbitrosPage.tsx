@@ -10,7 +10,7 @@ import { FiltrosArbitros } from "@/features/marketplace/components/FiltrosArbitr
 import { useArbitrosSearch } from "../hooks/useArbitrosSearch";
 import { PageLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import logoImage from "@/assets/Silbatazo-bordes.png";
+import logoImage from "@/assets/Logo.png";
 import { getRefereeImage } from "@/lib/referee-images";
 import { getClienteArbitroDetailRoute, CATEGORIAS_PARTIDO } from "@/lib/constants";
 import { Users, RefreshCw, SearchX, Loader2, Star, MapPin, Trophy, ArrowRight } from "lucide-react";

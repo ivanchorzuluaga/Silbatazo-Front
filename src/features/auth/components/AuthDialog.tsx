@@ -23,7 +23,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { validations } from "@/lib/validations";
 import { USER_ROLES, type UserRole } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
-import logoImage from "@/assets/Silbatazo-bordes.png";
+import logoImage from "@/assets/Logo.png";
 import {
   LogIn,
   UserPlus,

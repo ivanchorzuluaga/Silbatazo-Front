@@ -13,7 +13,7 @@ import { DisponibilidadDisplay } from "@/features/arbitro/components/Disponibili
 import { PartidoFormModal } from "@/features/partidos/components/PartidoFormModal";
 import { useCalificaciones } from "@/features/partidos/hooks/useCalificaciones";
 import { getRefereeImage } from "@/lib/referee-images";
-import logoImage from "@/assets/Silbatazo-bordes.png";
+import logoImage from "@/assets/Logo.png";
 import {
   ArrowLeft,
   Star,

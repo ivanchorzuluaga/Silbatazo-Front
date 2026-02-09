@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ROUTES, APP_NAME } from "@/lib/constants";
-import logoImage from "@/assets/Silbatazo-bordes.png";
+import logoImage from "@/assets/Logo.png";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { Mail, Phone } from "lucide-react";
 

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useClienteDashboard } from "../hooks/useClienteDashboard";
 import { PageLayout } from "@/components/layout";
-import logoImage from "@/assets/Silbatazo-bordes.png";
+import logoImage from "@/assets/Logo.png";
 import {
   Calendar,
   Clock,

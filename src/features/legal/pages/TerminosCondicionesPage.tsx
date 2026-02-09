@@ -9,7 +9,7 @@ import { ArrowLeft, FileText, Shield, Users, CreditCard, Scale, Mail } from "luc
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { ROUTES, APP_NAME } from "@/lib/constants";
-import logoImage from "@/assets/Silbatazo-bordes.png";
+import logoImage from "@/assets/Logo.png";
 
 export function TerminosCondicionesPage() {
   // Scroll al inicio al cargar la página
