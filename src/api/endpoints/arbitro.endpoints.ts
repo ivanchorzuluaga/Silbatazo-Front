@@ -3,6 +3,7 @@
  */
 
 import { authenticatedApiClient } from "../client";
+import { unwrapPaginated, type PaginatedResponse } from "../utils/pagination";
 import type {
   Arbitro,
   ArbitroCreateData,
@@ -53,7 +54,11 @@ export const arbitroEndpoints = {
     const query = queryParams.toString();
     const endpoint = `/api/arbitros/${query ? `?${query}` : ""}`;
 
-    return authenticatedApiClient<Arbitro[]>(endpoint, token);
+    const data = await authenticatedApiClient<PaginatedResponse<Arbitro> | Arbitro[]>(
+      endpoint,
+      token
+    );
+    return unwrapPaginated(data);
   },
 
   /**

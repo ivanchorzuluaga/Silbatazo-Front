@@ -3,6 +3,7 @@
  */
 
 import apiClient, { authenticatedApiClient } from "../client";
+import { unwrapPaginated, type PaginatedResponse } from "../utils/pagination";
 import type {
   Partido,
   PartidoDetail,
@@ -211,7 +212,11 @@ export const partidoEndpoints = {
     const query = queryParams.toString();
     const endpoint = `/api/partidos/disponibles/${query ? `?${query}` : ""}`;
 
-    return authenticatedApiClient<Partido[]>(endpoint, token);
+    const data = await authenticatedApiClient<PaginatedResponse<Partido> | Partido[]>(
+      endpoint,
+      token
+    );
+    return unwrapPaginated(data);
   },
 
   /**
