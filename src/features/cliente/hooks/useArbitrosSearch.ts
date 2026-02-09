@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
+import { unwrapPaginated } from "@/api/utils/pagination";
 
 export interface FiltrosArbitrosType {
   municipio?: number;
@@ -72,7 +73,7 @@ export function useArbitrosSearch(): UseArbitrosSearchReturn {
         }
 
         const data = await response.json();
-        setArbitros(data);
+        setArbitros(unwrapPaginated<Arbitro>(data));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error al cargar árbitros");
       } finally {

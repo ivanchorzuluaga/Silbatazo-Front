@@ -15,6 +15,7 @@ import {
   RefereesPreview,
 } from "@/components/marketplace";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
+import { unwrapPaginated } from "@/api/utils/pagination";
 
 export function HomePage() {
   const [arbitrosDestacados, setArbitrosDestacados] = useState<Arbitro[]>([]);
@@ -59,7 +60,7 @@ export function HomePage() {
 
         if (response.ok) {
           const data = await response.json();
-          const arbitros = Array.isArray(data) ? data.slice(0, 4) : [];
+          const arbitros = unwrapPaginated<Arbitro>(data).slice(0, 4);
           setArbitrosDestacados(arbitros);
         }
       } catch (err) {

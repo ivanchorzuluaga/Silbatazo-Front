@@ -16,6 +16,7 @@ import { CATEGORIAS_PARTIDO, ROUTES } from "@/lib/constants";
 import logoImage from "@/assets/Logo.png";
 import { Users, RefreshCw, SearchX, Loader2, CalendarPlus, ArrowRight } from "lucide-react";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
+import { unwrapPaginated } from "@/api/utils/pagination";
 
 export function ArbitrosListPage() {
   const { municipios } = useMunicipios();
@@ -114,7 +115,7 @@ export function ArbitrosListPage() {
       }
 
       const data = await response.json();
-      setArbitros(data);
+      setArbitros(unwrapPaginated<Arbitro>(data));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar árbitros");
     } finally {
