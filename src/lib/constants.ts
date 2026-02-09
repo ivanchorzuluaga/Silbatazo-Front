@@ -18,6 +18,8 @@ export const STORAGE_KEYS = {
   USER: "user",
 } as const;
 
+export const MAX_FOTO_PERFIL_MB = 2;
+
 export const ROUTES = {
   LOGIN: "/login",
   REGISTER: "/register",

@@ -12,7 +12,7 @@ import { useCategorias } from "../hooks/useCategorias";
 import { useRoles } from "../hooks/useRoles";
 import { authService } from "@/features/auth/services/auth.service";
 import { validations } from "@/lib/validations";
-import { ROUTES, CATEGORIAS_PARTIDO } from "@/lib/constants";
+import { ROUTES, CATEGORIAS_PARTIDO, MAX_FOTO_PERFIL_MB } from "@/lib/constants";
 import { getRefereeImage } from "@/lib/referee-images";
 import { Camera } from "lucide-react";
 import type { Arbitro } from "../types/arbitro.types";
@@ -86,6 +86,7 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
   );
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [fotoError, setFotoError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fieldErrors, setFieldErrors] = useState<{
@@ -329,6 +330,15 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
+                  const maxBytes = MAX_FOTO_PERFIL_MB * 1024 * 1024;
+                  if (file.size > maxBytes) {
+                    setFotoError(
+                      `La imagen supera el tamaño máximo de ${MAX_FOTO_PERFIL_MB} MB.`
+                    );
+                    e.currentTarget.value = "";
+                    return;
+                  }
+                  setFotoError(null);
                   setPreviewUrl((prev) => {
                     if (prev) URL.revokeObjectURL(prev);
                     return URL.createObjectURL(file);
@@ -354,6 +364,7 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
                   : "Tu foto se muestra en el marketplace."}
               </p>
             )}
+            {fotoError && <p className="text-xs text-destructive">{fotoError}</p>}
           </div>
         </div>
       </div>
