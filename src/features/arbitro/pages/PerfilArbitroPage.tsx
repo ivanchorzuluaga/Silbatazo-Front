@@ -92,7 +92,7 @@ export function PerfilArbitroPage() {
     <PageLayout
       title={pageTitle}
       backButton={{ label: "Volver", to: ROUTES.ARBITRO_DASHBOARD }}
-      contentClassName="container max-w-2xl mx-auto p-4 sm:p-6"
+      contentClassName="page-surface max-w-2xl"
     >
       <div>
         {isLoading && !hasCheckedProfile ? (

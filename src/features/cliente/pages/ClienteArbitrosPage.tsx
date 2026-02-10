@@ -27,7 +27,7 @@ export function ClienteArbitrosPage() {
     useArbitrosSearch();
 
   return (
-    <PageLayout title="Árbitros" contentClassName="bg-background">
+    <PageLayout title="Árbitros">
       <PageContainer>
           {/* Header */}
           <header className="mb-8">
@@ -80,7 +80,7 @@ export function ClienteArbitrosPage() {
 
 function PageContainer({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen relative bg-background">
+    <div className="min-h-screen relative">
       {/* Fondo con gradiente adaptativo */}
       <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-primary/10 dark:from-background dark:via-background dark:to-primary/20" />
       {/* Efectos de luz solo en oscuro */}
@@ -200,6 +200,7 @@ function ArbitroCard({ arbitro }: ArbitroCardProps) {
     <Link
       to={getClienteArbitroDetailRoute(arbitro.id)}
       className="group block bg-card backdrop-blur-sm rounded-xl border border-border overflow-hidden hover:border-primary/30 hover:bg-muted transition-all duration-300"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "300px 460px" }}
     >
       {/* Imagen */}
       <div className="relative aspect-[4/3] overflow-hidden">

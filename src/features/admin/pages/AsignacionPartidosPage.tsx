@@ -75,7 +75,7 @@ export function AsignacionPartidosPage() {
     <PageLayout
       backButton={{ label: "Dashboard", to: ROUTES.ADMIN_DASHBOARD }}
       title="Asignación de Árbitros"
-      contentClassName="container mx-auto px-4 py-8 max-w-7xl"
+      contentClassName="page-surface"
     >
       <div className="space-y-6">
         {/* Header */}

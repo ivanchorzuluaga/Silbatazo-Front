@@ -85,12 +85,6 @@ export const navSections: NavSection[] = [
     title: "Administración",
     items: [
       {
-        label: "Dashboard",
-        icon: Shield,
-        route: ROUTES.ADMIN_DASHBOARD,
-        roles: [USER_ROLES.ADMIN],
-      },
-      {
         label: "Árbitros",
         icon: Users,
         route: ROUTES.ADMIN_GESTION_ARBITROS,

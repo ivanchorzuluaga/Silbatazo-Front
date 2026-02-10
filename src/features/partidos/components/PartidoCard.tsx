@@ -15,7 +15,11 @@ interface PartidoCardProps {
 
 export function PartidoCard({ partido }: PartidoCardProps) {
   return (
-    <Link to={getPartidoDetailRoute(partido.id)} className="block touch-manipulation">
+    <Link
+      to={getPartidoDetailRoute(partido.id)}
+      className="block touch-manipulation"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "320px 420px" }}
+    >
       <Card variant="elevated" className="h-full hover:shadow-ios-lg transition-ios">
         <CardHeader className="pb-1">
           <div className="flex items-start justify-between gap-3">

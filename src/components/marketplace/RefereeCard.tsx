@@ -22,6 +22,7 @@ export function RefereeCard({ arbitro }: RefereeCardProps) {
     <Link
       to={getArbitroDetailRoute(arbitro.id)}
       className="group block bg-card/50 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden hover:border-primary/30 hover:bg-card/80 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "320px 520px" }}
     >
       {/* Imagen del árbitro */}
       <div className="relative aspect-[3/4] bg-secondary overflow-hidden">

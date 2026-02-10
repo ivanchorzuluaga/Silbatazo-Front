@@ -128,7 +128,7 @@ export const arbitroEndpoints = {
     if (params?.ordering) queryParams.append("ordering", params.ordering);
 
     const query = queryParams.toString();
-    const endpoint = `/api/arbitros/todos/${query ? `?${query}` : ""}`;
+    const endpoint = `/api/arbitros/${query ? `?${query}` : ""}`;
 
     return authenticatedApiClient<Arbitro[]>(endpoint, token);
   },
@@ -137,7 +137,7 @@ export const arbitroEndpoints = {
    * Lista de árbitros pendientes (solo admin)
    */
   async listarPendientes(token: string): Promise<Arbitro[]> {
-    return authenticatedApiClient<Arbitro[]>("/api/arbitros/pendientes/", token);
+    return authenticatedApiClient<Arbitro[]>("/api/arbitros/?estado=pendiente", token);
   },
 
   /**
@@ -189,7 +189,7 @@ export const arbitroEndpoints = {
    * Listar documentos propios
    */
   async listarDocumentos(token: string): Promise<DocumentoArbitro[]> {
-    return authenticatedApiClient<DocumentoArbitro[]>("/api/arbitros/documentos/list/", token);
+    return authenticatedApiClient<DocumentoArbitro[]>("/api/arbitros/documentos/", token);
   },
 
   /**
@@ -197,7 +197,7 @@ export const arbitroEndpoints = {
    */
   async listarDocumentosArbitro(token: string, arbitroId: number): Promise<DocumentoArbitro[]> {
     return authenticatedApiClient<DocumentoArbitro[]>(
-      `/api/arbitros/documentos/list/${arbitroId}/`,
+      `/api/arbitros/documentos/?arbitro_id=${arbitroId}`,
       token
     );
   },
@@ -273,7 +273,7 @@ export const arbitroEndpoints = {
    * Crear categoría - solo admin
    */
   async crearCategoria(token: string, data: CategoriaCreateData): Promise<Categoria> {
-    return authenticatedApiClient<Categoria>("/api/arbitros/categorias/crear/", token, {
+    return authenticatedApiClient<Categoria>("/api/arbitros/categorias/", token, {
       method: "POST",
       body: JSON.stringify(data),
     });

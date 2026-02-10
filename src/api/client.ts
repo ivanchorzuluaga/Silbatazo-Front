@@ -3,6 +3,8 @@
  * Maneja interceptores, headers base y errores comunes
  */
 
+import { ROUTES, STORAGE_KEYS } from "@/lib/constants";
+
 const API_URL = import.meta.env.VITE_API_URL || "https://arbi-app-backend.onrender.com";
 
 
@@ -119,13 +121,72 @@ export async function authenticatedApiClient<T>(
   token: string,
   options: RequestInit = {}
 ): Promise<T> {
-  return apiClient<T>(endpoint, {
-    ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    return await apiClient<T>(endpoint, {
+      ...options,
+      headers: {
+        ...options.headers,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    if (error instanceof ApiException && error.status === 401) {
+      const nuevoToken = await refreshAccessToken();
+      if (nuevoToken) {
+        return apiClient<T>(endpoint, {
+          ...options,
+          headers: {
+            ...options.headers,
+            Authorization: `Bearer ${nuevoToken}`,
+          },
+        });
+      }
+      redirectToLogin();
+    }
+    throw error;
+  }
 }
 
 export default apiClient;
+
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+  if (!refreshToken) return null;
+
+  refreshPromise = (async () => {
+    try {
+      const data = await apiClient<{ access: string }>("/api/users/token/refresh/", {
+        method: "POST",
+        body: JSON.stringify({ refresh: refreshToken }),
+      });
+      if (data?.access) {
+        localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.access);
+        return data.access;
+      }
+      return null;
+    } catch {
+      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER);
+      redirectToLogin();
+      return null;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
+
+function redirectToLogin() {
+  if (typeof window === "undefined") return;
+  if (window.location.pathname !== ROUTES.LOGIN) {
+    window.location.href = ROUTES.LOGIN;
+  }
+}

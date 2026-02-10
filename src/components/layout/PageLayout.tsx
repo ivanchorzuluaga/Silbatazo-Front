@@ -32,7 +32,7 @@ export function PageLayout({
   const shouldShowNav = showNavigation && isAuthenticated;
 
   return (
-    <div className="flex min-h-screen bg-background safe-area-inset">
+    <div className="flex min-h-screen bg-transparent safe-area-inset">
       {/* Sidebar para desktop */}
       {shouldShowNav && <Sidebar />}
 

@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
-import { unwrapPaginated } from "@/api/utils/pagination";
+import { fetchArbitrosCached } from "@/api/utils/arbitros-cache";
 
 export interface FiltrosArbitrosType {
   municipio?: number;
@@ -45,7 +45,6 @@ export function useArbitrosSearch(): UseArbitrosSearchReturn {
       setError(null);
 
       try {
-        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
         const queryParams = new URLSearchParams();
 
         if (filtros.municipio) queryParams.append("municipio", filtros.municipio.toString());
@@ -55,25 +54,10 @@ export function useArbitrosSearch(): UseArbitrosSearchReturn {
         if (filtros.fecha) queryParams.append("fecha", filtros.fecha);
         if (filtros.hora) queryParams.append("hora", filtros.hora);
 
-        const token = localStorage.getItem("access_token");
-        const headers: HeadersInit = {
-          "Content-Type": "application/json",
-        };
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
-        }
-
-        const response = await fetch(
-          `${API_URL}/api/arbitros/${queryParams.toString() ? `?${queryParams.toString()}` : ""}`,
-          { headers },
-        );
-
-        if (!response.ok) {
-          throw new Error("Error al cargar árbitros");
-        }
-
-        const data = await response.json();
-        setArbitros(unwrapPaginated<Arbitro>(data));
+        const arbitrosList = await fetchArbitrosCached({
+          query: queryParams.toString(),
+        });
+        setArbitros(arbitrosList);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error al cargar árbitros");
       } finally {

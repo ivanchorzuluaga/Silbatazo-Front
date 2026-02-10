@@ -41,7 +41,7 @@ export function FormField({
           id={fieldId}
           rows={rows}
           className={cn(
-            "flex w-full rounded-lg border-2 border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 transition-ios",
+            "flex w-full rounded-lg border border-border/80 bg-card/70 px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary focus-visible:shadow-ios-md disabled:cursor-not-allowed disabled:opacity-50 transition-ios",
             error && "border-destructive",
             className
           )}

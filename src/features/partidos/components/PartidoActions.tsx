@@ -173,7 +173,7 @@ export function PartidoActions({
       {/* Modal de Rechazo */}
       {showRechazarModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-lg border bg-card p-6 shadow-lg">
+          <div className="w-full max-w-md rounded-2xl border border-border/60 bg-card/90 p-6 shadow-ios-xl backdrop-blur-md">
             <h3 className="text-lg font-semibold mb-4">Rechazar Partido</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Por favor, proporciona un motivo para rechazar este partido:
@@ -181,7 +181,7 @@ export function PartidoActions({
             <textarea
               value={motivoRechazo}
               onChange={(e) => setMotivoRechazo(e.target.value)}
-              className="w-full min-h-[100px] rounded-md border bg-background px-3 py-2 text-sm"
+              className="w-full min-h-[100px] rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm shadow-ios focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary"
               placeholder="Motivo del rechazo..."
             />
             <div className="flex gap-2 mt-4">
@@ -227,7 +227,7 @@ export function PartidoActions({
               <textarea
                 value={motivoCancelacion}
                 onChange={(e) => setMotivoCancelacion(e.target.value)}
-                className="w-full min-h-[100px] rounded-md border bg-background px-3 py-2 text-sm"
+                className="w-full min-h-[100px] rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm shadow-ios focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary"
                 placeholder="Explica el motivo de la cancelación..."
               />
             </div>

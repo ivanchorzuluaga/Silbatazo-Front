@@ -534,7 +534,7 @@ export function AuthDialog({
                 <span className="w-full border-t border-border/50" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-background px-3 text-muted-foreground font-medium">
+                <span className="bg-card/80 px-3 text-muted-foreground font-medium backdrop-blur-sm">
                   o continúa con
                 </span>
               </div>

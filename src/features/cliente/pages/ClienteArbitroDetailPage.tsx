@@ -52,7 +52,7 @@ export function ClienteArbitroDetailPage() {
 
   if (isLoading) {
     return (
-      <PageLayout title="Detalle de árbitro" contentClassName="bg-background">
+      <PageLayout title="Detalle de árbitro">
         <PageContainer>
           <LoadingState />
         </PageContainer>
@@ -62,7 +62,7 @@ export function ClienteArbitroDetailPage() {
 
   if (error || !arbitro) {
     return (
-      <PageLayout title="Detalle de árbitro" contentClassName="bg-background">
+      <PageLayout title="Detalle de árbitro">
         <PageContainer>
           <ErrorState
             error={error || "Árbitro no encontrado"}
@@ -85,7 +85,7 @@ export function ClienteArbitroDetailPage() {
   const experiencia = arbitro.experiencia_anos || 0;
 
   return (
-    <PageLayout title="Detalle de árbitro" contentClassName="bg-background">
+    <PageLayout title="Detalle de árbitro">
       <PageContainer>
           {/* Header con botón volver */}
           <header className="mb-6">
@@ -301,7 +301,7 @@ export function ClienteArbitroDetailPage() {
           </div>
 
           {/* Botón sticky para móvil */}
-          <div className="lg:hidden fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t border-border">
+          <div className="lg:hidden fixed bottom-16 left-0 right-0 p-4 bg-card/90 backdrop-blur-xl border-t border-border/60">
             <Button
               onClick={() => setShowSolicitudModal(true)}
               size="lg"

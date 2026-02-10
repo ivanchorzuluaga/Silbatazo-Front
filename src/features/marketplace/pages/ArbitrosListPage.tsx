@@ -10,13 +10,14 @@ import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
 import { useLandingStats } from "../hooks/useLandingStats";
 import { RefereeCard } from "@/components/marketplace/RefereeCard";
 import { FiltrosArbitros, type FiltrosArbitrosType } from "../components/FiltrosArbitros";
-import { Header, Footer } from "@/components/marketplace";
+import { Header } from "@/components/marketplace/Header";
+import { Footer } from "@/components/marketplace/Footer";
 import { Button } from "@/components/ui/button";
 import { CATEGORIAS_PARTIDO, ROUTES } from "@/lib/constants";
 import logoImage from "@/assets/Logo.png";
 import { Users, RefreshCw, SearchX, Loader2, CalendarPlus, ArrowRight } from "lucide-react";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
-import { unwrapPaginated } from "@/api/utils/pagination";
+import { fetchArbitrosCached } from "@/api/utils/arbitros-cache";
 
 export function ArbitrosListPage() {
   const { municipios } = useMunicipios();
@@ -87,7 +88,6 @@ export function ArbitrosListPage() {
     setError(null);
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const queryParams = new URLSearchParams();
 
       if (filtros.municipio) queryParams.append("municipio", filtros.municipio.toString());
@@ -97,25 +97,10 @@ export function ArbitrosListPage() {
       if (filtros.fecha) queryParams.append("fecha", filtros.fecha);
       if (filtros.hora) queryParams.append("hora", filtros.hora);
 
-      const token = localStorage.getItem("access_token");
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
-      const response = await fetch(
-        `${API_URL}/api/arbitros/${queryParams.toString() ? `?${queryParams.toString()}` : ""}`,
-        { headers }
-      );
-
-      if (!response.ok) {
-        throw new Error("Error al cargar árbitros");
-      }
-
-      const data = await response.json();
-      setArbitros(unwrapPaginated<Arbitro>(data));
+      const arbitrosList = await fetchArbitrosCached({
+        query: queryParams.toString(),
+      });
+      setArbitros(arbitrosList);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar árbitros");
     } finally {

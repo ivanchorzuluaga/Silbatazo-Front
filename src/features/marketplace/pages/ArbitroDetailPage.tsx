@@ -114,7 +114,7 @@ export function ArbitroDetailPage() {
   // Estados de carga y error
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-8 text-center">
           <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
           <p className="text-lg font-medium text-foreground">Cargando perfil...</p>
@@ -125,8 +125,8 @@ export function ArbitroDetailPage() {
 
   if (error || !arbitro) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="bg-destructive/10 backdrop-blur-md rounded-2xl border border-destructive/20 p-8 text-center max-w-md">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-destructive/10 backdrop-blur-md rounded-2xl border border-destructive/20 p-8 text-center max-w-md shadow-ios-lg">
           <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
           <p className="text-lg font-medium text-foreground mb-2">Error</p>
           <p className="text-muted-foreground mb-6">{error || "Árbitro no encontrado"}</p>
@@ -145,7 +145,7 @@ export function ArbitroDetailPage() {
   const totalCalificaciones = promedio?.total_calificaciones || 0;
 
   return (
-    <div className="min-h-screen relative bg-background">
+    <div className="min-h-screen relative">
       {/* Fondo con gradiente adaptativo */}
       <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-primary/10 dark:from-background dark:via-background dark:to-primary/20" />
 
@@ -163,7 +163,7 @@ export function ArbitroDetailPage() {
       </div>
 
       {/* Header */}
-      <header className="relative z-50 sticky top-0 bg-background/90 backdrop-blur-md border-b border-border">
+      <header className="relative z-50 sticky top-0 bg-background/80 backdrop-blur-xl border-b border-border/60">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <Button
             variant="ghost"
@@ -215,7 +215,7 @@ export function ArbitroDetailPage() {
 
                 {/* Rating badge */}
                 {totalCalificaciones > 0 && rating > 0 ? (
-                  <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1 border border-border">
+                  <div className="absolute top-4 right-4 bg-card/85 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1 border border-border/60 shadow-ios">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     <span className="text-foreground font-semibold">{rating.toFixed(1)}</span>
                     {totalCalificaciones > 0 && (
@@ -475,7 +475,7 @@ export function ArbitroDetailPage() {
         </div>
 
         {/* Botón de solicitar - Mobile (sticky) */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t border-border z-50">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur-xl border-t border-border/60 z-50">
           <Button onClick={handleSolicitar} size="lg" className="w-full h-14 text-lg shadow-lg">
             {isAuthenticated ? "Solicitar Árbitro" : "Registrarse para Solicitar"}
           </Button>

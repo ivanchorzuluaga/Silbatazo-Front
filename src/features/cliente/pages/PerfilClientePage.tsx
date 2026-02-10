@@ -37,7 +37,7 @@ export function PerfilClientePage() {
     <PageLayout
       title="Mi perfil"
       backButton={{ label: "Dashboard", to: ROUTES.CLIENTE_DASHBOARD }}
-      contentClassName="container max-w-md mx-auto p-4 sm:p-6 pb-nav-mobile"
+      contentClassName="page-surface max-w-md pb-nav-mobile"
     >
       <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
         <h2 className="text-lg font-semibold mb-2">Datos personales</h2>

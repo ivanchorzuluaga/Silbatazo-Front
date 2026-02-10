@@ -108,7 +108,7 @@ export function ArbitroOnboardingPage() {
           ? null
           : { label: "Atrás", onClick: () => setPasoActual((p) => Math.max(1, p - 1) as 1 | 2 | 3) }
       }
-      contentClassName="container max-w-2xl mx-auto p-4 sm:p-6 pb-nav-mobile"
+      contentClassName="page-surface max-w-2xl pb-nav-mobile"
     >
       {/* Stepper */}
       <div className="mb-8">

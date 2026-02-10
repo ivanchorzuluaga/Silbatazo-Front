@@ -45,7 +45,7 @@ export function BottomNav() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-md safe-area-bottom sm:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/60 bg-card/85 backdrop-blur-xl safe-area-bottom sm:hidden">
         <div className="flex h-16 items-center justify-around px-2">
           {displayItems.map((item) => {
             const Icon = item.icon;
@@ -64,7 +64,12 @@ export function BottomNav() {
                   isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <div className={cn("rounded-lg p-2 transition-ios", isActive && "bg-primary/10")}>
+                <div
+                  className={cn(
+                    "rounded-xl p-2 transition-ios",
+                    isActive && "bg-primary/10 ring-1 ring-primary/20"
+                  )}
+                >
                   <Icon className="size-5" />
                 </div>
                 <span
@@ -86,7 +91,7 @@ export function BottomNav() {
               "text-muted-foreground hover:text-foreground"
             )}
           >
-            <div className="rounded-lg p-2">
+            <div className="rounded-xl p-2">
               <Menu className="size-5" />
             </div>
             <span className="text-[10px] font-medium">Más</span>
@@ -95,7 +100,7 @@ export function BottomNav() {
       </nav>
 
       <SlidePanel open={isOpen} onOpenChange={setIsOpen}>
-        <SlidePanelContent className="max-w-xl rounded-b-2xl">
+        <SlidePanelContent className="max-w-xl rounded-b-2xl bg-card/95 backdrop-blur-xl">
           <SlidePanelHeader>
             <SlidePanelTitle>Menú</SlidePanelTitle>
           </SlidePanelHeader>
@@ -116,7 +121,7 @@ export function BottomNav() {
                         key={route}
                         to={route}
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-2 rounded-lg border border-border/60 px-3 py-2 text-sm hover:bg-accent"
+                        className="flex items-center gap-2 rounded-xl border border-border/60 px-3 py-2 text-sm hover:bg-accent/60"
                       >
                         <Icon className="size-4" />
                         <span className="truncate">{item.label}</span>

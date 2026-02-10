@@ -459,7 +459,7 @@ function ModalHeader({ arbitro, imagenArbitro, rating, onClose, isLoading }: Mod
             className="w-20 h-20 rounded-xl object-cover border-2 border-primary/30"
           />
           {rating > 0 && (
-            <div className="absolute -bottom-2 -right-2 bg-background px-2 py-0.5 rounded-full flex items-center gap-1 border border-border">
+            <div className="absolute -bottom-2 -right-2 bg-card/80 backdrop-blur-sm px-2 py-0.5 rounded-full flex items-center gap-1 border border-border/60 shadow-ios">
               <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
               <span className="text-foreground text-xs font-semibold">{rating.toFixed(1)}</span>
             </div>

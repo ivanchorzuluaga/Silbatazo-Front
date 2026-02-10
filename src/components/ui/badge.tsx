@@ -8,16 +8,16 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground shadow-ios",
+          "border-transparent bg-primary text-primary-foreground shadow-ios ring-1 ring-primary/30",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground shadow-ios",
+          "border-transparent bg-secondary text-secondary-foreground shadow-ios ring-1 ring-secondary/30",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow-ios",
-        outline: "text-foreground border-border shadow-ios",
+          "border-transparent bg-destructive text-destructive-foreground shadow-ios ring-1 ring-destructive/30",
+        outline: "text-foreground border-border/80 bg-card/60 shadow-ios",
         success:
-          "border-transparent bg-success text-success-foreground shadow-ios",
+          "border-transparent bg-success text-success-foreground shadow-ios ring-1 ring-success/30",
         warning:
-          "border-transparent bg-warning text-warning-foreground shadow-ios",
+          "border-transparent bg-warning text-warning-foreground shadow-ios ring-1 ring-warning/30",
         soft:
           "border-transparent bg-primary/10 text-primary dark:bg-primary/20",
       },
@@ -45,4 +45,3 @@ function Badge({ className, variant, size, ...props }: BadgeProps) {
 }
 
 export { Badge, badgeVariants }
-

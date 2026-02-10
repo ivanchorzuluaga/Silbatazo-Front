@@ -6,6 +6,7 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/layout";
+import { FilterTabs } from "@/components/ui/FilterTabs";
 import { FormField } from "@/components/forms";
 import {
   Dialog,
@@ -19,7 +20,7 @@ import { Loader2, CheckCircle2, XCircle, Eye, AlertCircle, ImageIcon } from "luc
 import { usePartidos } from "@/features/partidos/hooks/usePartidos";
 import { usePagosPendientes } from "../hooks/usePagosPendientes";
 import { ROUTES, getPartidoDetailRoute } from "@/lib/constants";
-import { formatCop, cn } from "@/lib/utils";
+import { formatCop } from "@/lib/utils";
 import type { Partido, EstadoPago } from "@/features/partidos/types/partido.types";
 
 const TABS_PAGO: { value: EstadoPago; label: string }[] = [
@@ -66,9 +67,10 @@ interface PagoCardProps {
   onVerDetalle: () => void;
   onAprobar: () => void;
   onRechazar: () => void;
+  onPreview: (url: string) => void;
 }
 
-function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar }: PagoCardProps) {
+function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar, onPreview }: PagoCardProps) {
   return (
     <div className="rounded-xl border bg-card p-5 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex flex-col gap-4">
@@ -148,13 +150,17 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar }: PagoCardProp
               <ImageIcon className="h-4 w-4 shrink-0" />
               Ver captura del comprobante
             </a>
-            <div className="mt-2 rounded-lg border bg-muted/30 overflow-hidden max-h-40 w-full max-w-xs">
+            <button
+              type="button"
+              onClick={() => onPreview(partido.comprobante_pago_url)}
+              className="mt-2 rounded-lg border bg-muted/30 overflow-hidden max-h-40 w-full max-w-xs text-left"
+            >
               <img
                 src={partido.comprobante_pago_url}
                 alt="Comprobante de pago"
                 className="w-full h-full object-contain object-left-top"
               />
-            </div>
+            </button>
           </div>
         )}
 
@@ -205,6 +211,7 @@ interface AprobarModalProps {
   onConfirmar: () => void;
   onCancelar: () => void;
   isProcessing: boolean;
+  onPreview: (url: string) => void;
 }
 
 function AprobarModal({
@@ -215,6 +222,7 @@ function AprobarModal({
   onConfirmar,
   onCancelar,
   isProcessing,
+  onPreview,
 }: AprobarModalProps) {
   return (
     <Dialog open={open} onOpenChange={onCancelar}>
@@ -241,6 +249,15 @@ function AprobarModal({
                 <ImageIcon className="h-4 w-4 shrink-0" />
                 Abrir en nueva pestaña
               </a>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="ml-2"
+                onClick={() => onPreview(partido.comprobante_pago_url)}
+              >
+                Ver grande
+              </Button>
               <div className="rounded-lg border bg-muted/30 overflow-hidden">
                 <img
                   src={partido.comprobante_pago_url}
@@ -305,6 +322,7 @@ interface RechazarModalProps {
   onConfirmar: () => void;
   onCancelar: () => void;
   isProcessing: boolean;
+  onPreview: (url: string) => void;
 }
 
 function RechazarModal({
@@ -315,6 +333,7 @@ function RechazarModal({
   onConfirmar,
   onCancelar,
   isProcessing,
+  onPreview,
 }: RechazarModalProps) {
   return (
     <Dialog open={open} onOpenChange={onCancelar}>
@@ -341,6 +360,15 @@ function RechazarModal({
                 <ImageIcon className="h-4 w-4 shrink-0" />
                 Abrir en nueva pestaña
               </a>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="ml-2"
+                onClick={() => onPreview(partido.comprobante_pago_url)}
+              >
+                Ver grande
+              </Button>
               <div className="rounded-lg border bg-muted/30 overflow-hidden">
                 <img
                   src={partido.comprobante_pago_url}
@@ -401,6 +429,7 @@ function RechazarModal({
 // Componente principal
 export function PagosPendientesPage() {
   const navigate = useNavigate();
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [tabPago, setTabPago] = useState<EstadoPago>("en_revision");
 
   const filtros = { estado_pago: tabPago };
@@ -430,30 +459,16 @@ export function PagosPendientesPage() {
     <PageLayout
       backButton={{ label: "Dashboard", to: ROUTES.ADMIN_DASHBOARD }}
       title="Pagos de Partidos"
-      contentClassName="container mx-auto px-4 py-6 max-w-7xl"
+      contentClassName="page-surface"
     >
       <div className="space-y-6">
         {/* Tabs por estado de pago */}
-        <div>
-          <p className="text-sm font-medium text-muted-foreground mb-3">Estado del pago</p>
-          <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto">
-            {TABS_PAGO.map((tab) => (
-              <button
-                key={tab.value}
-                type="button"
-                onClick={() => setTabPago(tab.value)}
-                className={cn(
-                  "shrink-0 px-4 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-10",
-                  tabPago === tab.value
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <FilterTabs
+          label="Estado del pago"
+          tabs={TABS_PAGO}
+          value={tabPago}
+          onValueChange={setTabPago}
+        />
 
         {/* Error */}
         {error && (
@@ -491,6 +506,7 @@ export function PagosPendientesPage() {
                 onVerDetalle={() => navigate(getPartidoDetailRoute(partido.id))}
                 onAprobar={() => abrirModalAprobar(partido)}
                 onRechazar={() => abrirModalRechazar(partido)}
+                onPreview={(url) => setPreviewUrl(url)}
               />
             ))}
           </div>
@@ -505,6 +521,7 @@ export function PagosPendientesPage() {
         onConfirmar={handleAprobar}
         onCancelar={cerrarModales}
         isProcessing={isProcessing}
+        onPreview={(url) => setPreviewUrl(url)}
       />
 
       <RechazarModal
@@ -515,7 +532,28 @@ export function PagosPendientesPage() {
         onConfirmar={handleRechazar}
         onCancelar={cerrarModales}
         isProcessing={isProcessing}
+        onPreview={(url) => setPreviewUrl(url)}
       />
+
+      <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
+        <DialogContent className="max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg sm:text-xl">Vista previa del comprobante</DialogTitle>
+            <DialogDescription className="text-sm sm:text-base">
+              Imagen subida por el cliente.
+            </DialogDescription>
+          </DialogHeader>
+          {previewUrl && (
+            <div className="rounded-lg border bg-muted/30 overflow-hidden">
+              <img
+                src={previewUrl}
+                alt="Comprobante de pago"
+                className="w-full max-h-[70vh] object-contain"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </PageLayout>
   );
 }

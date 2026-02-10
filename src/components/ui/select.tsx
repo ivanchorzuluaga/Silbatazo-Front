@@ -8,7 +8,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <select
         className={cn(
-          "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+          "flex h-12 sm:h-11 w-full rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm shadow-ios transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary focus-visible:shadow-ios-md disabled:cursor-not-allowed disabled:opacity-50",
           className
         )}
         ref={ref}
@@ -22,4 +22,3 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 Select.displayName = "Select";
 
 export { Select };
-

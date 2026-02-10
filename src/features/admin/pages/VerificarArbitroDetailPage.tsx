@@ -257,7 +257,7 @@ function ConfirmacionModal({
             <textarea
               value={comentarios}
               onChange={(e) => onComentariosChange(e.target.value)}
-              className="w-full min-h-[100px] rounded-md border bg-background px-3 py-2 text-sm"
+              className="w-full min-h-[100px] rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm shadow-ios focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary"
               placeholder={esRechazar ? "Explica el motivo del rechazo..." : "Comentarios sobre la aprobación..."}
             />
           </div>
@@ -320,7 +320,7 @@ export function VerificarArbitroDetailPage() {
     return (
       <PageLayout
         backButton={{ label: "Volver", to: ROUTES.ADMIN_VERIFICACION }}
-        contentClassName="container mx-auto px-4 py-8 max-w-4xl"
+        contentClassName="page-surface max-w-4xl"
       >
         <div className="text-center py-12">
           <p className="text-muted-foreground">Cargando árbitro...</p>
@@ -334,7 +334,7 @@ export function VerificarArbitroDetailPage() {
     return (
       <PageLayout
         backButton={{ label: "Volver", to: ROUTES.ADMIN_VERIFICACION }}
-        contentClassName="container mx-auto px-4 py-8 max-w-4xl"
+        contentClassName="page-surface max-w-4xl"
       >
         <div className="text-center py-12 space-y-4">
           <p className="text-destructive">{error}</p>
@@ -354,7 +354,7 @@ export function VerificarArbitroDetailPage() {
     <PageLayout
       backButton={{ label: "Volver", to: ROUTES.ADMIN_VERIFICACION }}
       title="Verificar Árbitro"
-      contentClassName="container mx-auto px-4 py-6 max-w-4xl"
+      contentClassName="page-surface max-w-4xl"
     >
       {/* Error inline */}
       {error && (

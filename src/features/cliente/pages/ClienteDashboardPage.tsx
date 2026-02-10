@@ -45,7 +45,7 @@ export function ClienteDashboardPage() {
   });
 
   return (
-    <PageLayout title="Dashboard" contentClassName="bg-background">
+    <PageLayout title="Dashboard">
       <DashboardContainer>
           {/* Header de bienvenida */}
           <header className="mb-8">
@@ -260,7 +260,7 @@ export function ClienteDashboardPage() {
 
 function DashboardContainer({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen relative bg-background">
+    <div className="min-h-screen relative">
       {/* Fondo con gradiente adaptativo */}
       <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-primary/10 dark:from-background dark:via-background dark:to-primary/20" />
 

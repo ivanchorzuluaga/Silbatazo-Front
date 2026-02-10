@@ -80,7 +80,7 @@ export function PagoPartidoPage() {
   // Estado de carga
   if (isLoading) {
     return (
-      <PageLayout title="Pago del partido" contentClassName="bg-background">
+      <PageLayout title="Pago del partido">
         <PageContainer>
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-8 text-center">
@@ -98,7 +98,7 @@ export function PagoPartidoPage() {
   // Estado de error
   if (error || !partido) {
     return (
-      <PageLayout title="Pago del partido" contentClassName="bg-background">
+      <PageLayout title="Pago del partido">
         <PageContainer>
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="bg-destructive/10 backdrop-blur-md rounded-2xl border border-destructive/20 p-8 text-center max-w-md">
@@ -121,7 +121,7 @@ export function PagoPartidoPage() {
   // Sin permisos
   if (!tienePermiso) {
     return (
-      <PageLayout title="Pago del partido" contentClassName="bg-background">
+      <PageLayout title="Pago del partido">
         <PageContainer>
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="bg-destructive/10 backdrop-blur-md rounded-2xl border border-destructive/20 p-8 text-center max-w-md">
@@ -139,7 +139,7 @@ export function PagoPartidoPage() {
   }
 
   return (
-    <PageLayout title="Pago del partido" contentClassName="bg-background">
+    <PageLayout title="Pago del partido">
       <PageContainer>
       {/* Header */}
       <header className="mb-8">
@@ -423,7 +423,7 @@ export function PagoPartidoPage() {
 
 function PageContainer({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen relative bg-background">
+    <div className="min-h-screen relative">
       {/* Fondo con gradiente adaptativo */}
       <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-primary/10 dark:from-background dark:via-background dark:to-primary/20" />
 

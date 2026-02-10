@@ -255,6 +255,22 @@ body {
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "kern" 1, "liga" 1;
+    background-image:
+      radial-gradient(900px 520px at 12% -10%, color-mix(in oklch, var(--color-emerald) 16%, transparent), transparent 60%),
+      radial-gradient(800px 420px at 90% -15%, color-mix(in oklch, var(--color-indigo) 14%, transparent), transparent 55%),
+      url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMjAnIGhlaWdodD0nMTIwJyB2aWV3Qm94PScwIDAgMTIwIDEyMCc+PGZpbHRlciBpZD0nbic+PGZlVHVyYnVsZW5jZSB0eXBlPSdmcmFjdGFsTm9pc2UnIGJhc2VGcmVxdWVuY3k9JzAuOScgbnVtT2N0YXZlcz0nMicgc3RpdGNoVGlsZXM9J3N0aXRjaCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMjAnIGhlaWdodD0nMTIwJyBmaWx0ZXI9J3VybCgjbiknIG9wYWNpdHk9JzAuMTgnLz48L3N2Zz4=");
+    background-repeat: no-repeat;
+    background-size: cover, cover, 240px 240px;
+    background-attachment: scroll;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(900px 520px at 10% -10%, color-mix(in oklch, var(--color-emerald) 18%, transparent), transparent 65%),
+      radial-gradient(800px 420px at 92% -18%, color-mix(in oklch, var(--color-indigo) 16%, transparent), transparent 60%),
+      url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMjAnIGhlaWdodD0nMTIwJyB2aWV3Qm94PScwIDAgMTIwIDEyMCc+PGZpbHRlciBpZD0nbic+PGZlVHVyYnVsZW5jZSB0eXBlPSdmcmFjdGFsTm9pc2UnIGJhc2VGcmVxdWVuY3k9JzAuOScgbnVtT2N0YXZlcz0nMicgc3RpdGNoVGlsZXM9J3N0aXRjaCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMjAnIGhlaWdodD0nMTIwJyBmaWx0ZXI9J3VybCgjbiknIG9wYWNpdHk9JzAuMTgnLz48L3N2Zz4=");
+    background-repeat: no-repeat;
+    background-size: cover, cover, 240px 240px;
   }
 
   /* Tipografía mejorada tipo iOS */
@@ -334,22 +350,25 @@ body {
 
   /* Sombras tipo iOS (múltiples capas) */
   .shadow-ios {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 2px rgba(2, 6, 23, 0.08), 0 1px 1px rgba(2, 6, 23, 0.05);
   }
 
   .shadow-ios-md {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06),
-      0 0 0 1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28),
+      0 2px 4px rgba(2, 6, 23, 0.08),
+      0 0 0 1px rgba(2, 6, 23, 0.04);
   }
 
   .shadow-ios-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05),
-      0 0 0 1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 18px 28px -18px rgba(2, 6, 23, 0.35),
+      0 4px 8px rgba(2, 6, 23, 0.12),
+      0 0 0 1px rgba(2, 6, 23, 0.04);
   }
 
   .shadow-ios-xl {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04),
-      0 0 0 1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 28px 42px -26px rgba(2, 6, 23, 0.45),
+      0 10px 16px rgba(2, 6, 23, 0.16),
+      0 0 0 1px rgba(2, 6, 23, 0.05);
   }
 
   /* Glassmorphism sutil */
@@ -452,6 +471,27 @@ body {
 
   .gradient-brand {
     background: linear-gradient(135deg, var(--color-emerald) 0%, var(--color-indigo) 100%);
+  }
+
+  /* Superficies y contenedores globales */
+  .page-surface {
+    @apply container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl;
+  }
+
+  .section-surface {
+    @apply rounded-2xl border border-border/60 bg-card/80 backdrop-blur-md;
+    box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28), 0 2px 4px rgba(2, 6, 23, 0.08),
+      0 0 0 1px rgba(2, 6, 23, 0.04);
+  }
+
+  .section-surface-strong {
+    @apply rounded-3xl border border-border/60 bg-card/90 backdrop-blur-lg;
+    box-shadow: 0 18px 28px -18px rgba(2, 6, 23, 0.35), 0 4px 8px rgba(2, 6, 23, 0.12),
+      0 0 0 1px rgba(2, 6, 23, 0.04);
+  }
+
+  .surface-muted {
+    @apply rounded-xl border border-border/60 bg-muted/30 backdrop-blur;
   }
 }
 

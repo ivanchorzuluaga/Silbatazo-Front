@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { FilterTabs } from "@/components/ui/FilterTabs";
 import { PageLayout } from "@/components/layout";
 import { usePartidos } from "../hooks/usePartidos";
 import { PartidoCard } from "../components/PartidoCard";
@@ -14,9 +15,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
 import type { EstadoPartido, PartidosListParams } from "../types/partido.types";
 import { Calendar, Plus, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
 
-const TABS: { value: "" | EstadoPartido; label: string }[] = [  { value: "", label: "Todos" },
+const TABS: { value: "" | EstadoPartido; label: string }[] = [
+  { value: "", label: "Todos" },
   { value: "pendiente", label: "Pendiente" },
   { value: "aceptado", label: "Aceptado" },
   { value: "completado", label: "Completado" },
@@ -34,7 +35,7 @@ export function PartidosListPage() {
     <PageLayout
       backButton={{ label: "Dashboard", to: ROUTES.DASHBOARD }}
       showDashboard={false}
-      contentClassName="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-6xl"
+      contentClassName="page-surface max-w-6xl px-3 sm:px-4 py-4 sm:py-8"
     >
       {/* Header compacto */}
       <div className="rounded-xl border border-primary/10 bg-gradient-to-r from-primary/10 to-secondary/10 p-3 mb-4">
@@ -68,28 +69,14 @@ export function PartidosListPage() {
       </div>
 
       {/* Tabs compactos */}
-      <div className="mb-4">
-        <p className="text-[10px] sm:text-sm font-medium text-muted-foreground mb-2">
-          Filtrar por estado
-        </p>
-        <div className="flex flex-wrap gap-1 p-1 rounded-lg bg-muted/50 border border-border -mx-2 px-2">
-          {TABS.map((tab) => (
-            <button
-              key={tab.value || "todos"}
-              type="button"
-              onClick={() => setTabEstado(tab.value)}
-              className={cn(
-                "px-2.5 py-1 rounded-md text-[10px] sm:text-sm font-medium transition-colors whitespace-nowrap min-h-7",
-                tabEstado === tab.value
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <FilterTabs
+        className="mb-4"
+        label="Filtrar por estado"
+        tabs={TABS}
+        value={tabEstado}
+        onValueChange={setTabEstado}
+        size="sm"
+      />
 
       {/* Error */}
       {error && (

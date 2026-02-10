@@ -48,7 +48,7 @@ export function ArbitroDashboardPage() {
     <PageLayout
       title="Dashboard"
       showNavigation={true}
-      contentClassName="container mx-auto px-4 py-6 sm:py-8 max-w-7xl space-y-8"
+      contentClassName="page-surface space-y-8"
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-6 border border-primary/10">

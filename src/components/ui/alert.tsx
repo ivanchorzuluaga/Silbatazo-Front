@@ -9,7 +9,7 @@ interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   ({ className, variant = "default", children, ...props }, ref) => {
     const variantStyles = {
-      default: "bg-muted text-foreground border-border",
+      default: "bg-card/70 text-foreground border-border/60",
       destructive: "bg-destructive/10 text-destructive border-destructive/20",
       success: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
       warning: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20",
@@ -19,7 +19,11 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       <div
         ref={ref}
         role="alert"
-        className={cn("relative w-full rounded-lg border p-4", variantStyles[variant], className)}
+        className={cn(
+          "relative w-full rounded-xl border p-4 shadow-ios",
+          variantStyles[variant],
+          className
+        )}
         {...props}
       >
         {children}

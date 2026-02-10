@@ -17,7 +17,7 @@ export function PartidoCreatePage() {
   return (
     <PageLayout
       backButton={{ label: "Volver a Dashboard", to: ROUTES.DASHBOARD }}
-      contentClassName="container mx-auto px-4 py-8 max-w-3xl"
+      contentClassName="page-surface max-w-3xl"
     >
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold">Crear Nuevo Partido</h1>
@@ -32,4 +32,3 @@ export function PartidoCreatePage() {
     </PageLayout>
   );
 }
-

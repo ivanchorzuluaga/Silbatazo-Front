@@ -47,7 +47,7 @@ export function BilleteraPage() {
     <PageLayout
       title="Mi Billetera"
       backButton={{ label: "Dashboard", to: ROUTES.ARBITRO_DASHBOARD }}
-      contentClassName="container mx-auto px-4 py-8 max-w-4xl"
+      contentClassName="page-surface max-w-4xl"
     >
       <div className="space-y-6">
         {/* Resumen de saldo - siempre visible */}

@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { FilterTabs } from "@/components/ui/FilterTabs";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { PageLayout } from "@/components/layout";
@@ -13,7 +14,6 @@ import { PartidoCard } from "@/features/partidos/components/PartidoCard";
 import { useMunicipios } from "@/features/arbitro/hooks/useMunicipios";
 import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
 import { ROUTES } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 import type { PartidosListParams, EstadoPartido } from "@/features/partidos/types/partido.types";
 
 const TABS_ESTADO: { value: "" | EstadoPartido; label: string }[] = [
@@ -64,30 +64,16 @@ export function GestionPartidosPage() {
     <PageLayout
       backButton={{ label: "Dashboard", to: ROUTES.ADMIN_DASHBOARD }}
       title="Gestión de Partidos"
-      contentClassName="container mx-auto px-4 py-6 max-w-7xl"
+      contentClassName="page-surface"
     >
       <div className="space-y-6">
         {/* Tabs por estado */}
-        <div>
-          <p className="text-sm font-medium text-muted-foreground mb-3">Estado del partido</p>
-          <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto">
-            {TABS_ESTADO.map((tab) => (
-              <button
-                key={tab.value || "todos"}
-                type="button"
-                onClick={() => setTabEstado(tab.value)}
-                className={cn(
-                  "shrink-0 px-4 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-10",
-                  tabEstado === tab.value
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <FilterTabs
+          label="Estado del partido"
+          tabs={TABS_ESTADO}
+          value={tabEstado}
+          onValueChange={setTabEstado}
+        />
 
         {/* Filtros adicionales */}
         <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">

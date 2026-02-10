@@ -16,7 +16,7 @@ export function VerificacionArbitrosPage() {
     <PageLayout
       backButton={{ label: "Dashboard", to: ROUTES.ADMIN_DASHBOARD }}
       title="Verificación de Árbitros"
-      contentClassName="container mx-auto px-4 py-6 max-w-7xl"
+      contentClassName="page-surface"
     >
       {/* Header Section */}
       <div className="mb-8 space-y-4">

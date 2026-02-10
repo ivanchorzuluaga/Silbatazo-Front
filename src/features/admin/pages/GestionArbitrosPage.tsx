@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageLayout } from "@/components/layout";
+import { FilterTabs } from "@/components/ui/FilterTabs";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { useGestionArbitros } from "../hooks/useGestionArbitros";
 import { ROUTES, getVerificarArbitroRoute } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
 const TABS_ESTADO_ARBITRO: { value: string; label: string }[] = [
@@ -55,14 +55,14 @@ function FiltrosArbitros({
   onBuscar,
 }: FiltrosArbitrosProps) {
   return (
-    <div className="mb-6 space-y-4 rounded-lg border bg-card p-4">
+    <div className="mb-6 space-y-4 rounded-2xl border border-border/60 bg-card/80 p-4 shadow-ios backdrop-blur">
       <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-4">
         <div>
           <label className="text-sm font-medium mb-2 block">Ordenar por</label>
           <select
             value={filtros.ordenamiento}
             onChange={(e) => onOrdenamientoChange(e.target.value)}
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm shadow-ios focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary"
           >
             <option value="-created_at">Más recientes</option>
             <option value="created_at">Más antiguos</option>
@@ -208,7 +208,7 @@ function ConfirmacionModal({
             <textarea
               value={comentarios}
               onChange={(e) => onComentariosChange(e.target.value)}
-              className="w-full min-h-[100px] rounded-md border bg-background px-3 py-2 text-sm"
+              className="w-full min-h-[100px] rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm shadow-ios focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary"
               placeholder={placeholder}
             />
           </div>
@@ -264,7 +264,7 @@ export function GestionArbitrosPage() {
     <PageLayout
       backButton={{ label: "Dashboard", to: ROUTES.ADMIN_DASHBOARD }}
       title="Gestión de Árbitros"
-      contentClassName="container mx-auto px-4 py-6 max-w-7xl"
+      contentClassName="page-surface"
     >
       {/* Header Section */}
       <div className="mb-6 space-y-4">
@@ -274,26 +274,13 @@ export function GestionArbitrosPage() {
       </div>
 
       {/* Tabs por estado */}
-      <div className="mb-6">
-        <p className="text-sm font-medium text-muted-foreground mb-3">Estado de verificación</p>
-        <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto">
-          {TABS_ESTADO_ARBITRO.map((tab) => (
-            <button
-              key={tab.value || "todos"}
-              type="button"
-              onClick={() => setFiltroEstado(tab.value)}
-              className={cn(
-                "shrink-0 px-4 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-10",
-                filtros.estado === tab.value
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <FilterTabs
+        className="mb-6"
+        label="Estado de verificación"
+        tabs={TABS_ESTADO_ARBITRO}
+        value={filtros.estado}
+        onValueChange={setFiltroEstado}
+      />
 
       {/* Filtros */}
       <FiltrosArbitros

@@ -8,6 +8,7 @@ import { arbitroEndpoints } from "@/api/endpoints";
 import { authService } from "@/features/auth/services/auth.service";
 import { ApiException } from "@/api/client";
 import { extractErrorMessage } from "@/lib/error-utils";
+import { unwrapPaginated } from "@/api/utils/pagination";
 import type {
   Arbitro,
   ArbitroCreateData,
@@ -62,7 +63,8 @@ export const arbitroService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await arbitroEndpoints.listarArbitros(token, params);
+      const data = await arbitroEndpoints.listarArbitros(token, params);
+      return unwrapPaginated<Arbitro>(data as Arbitro[]);
     } catch (error) {
       if (error instanceof ApiException) {
         throw new Error(extractErrorMessage(error.data) || "Error al obtener árbitros");
@@ -380,7 +382,8 @@ export const arbitroService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await arbitroEndpoints.listarTodos(token, params);
+      const data = await arbitroEndpoints.listarTodos(token, params);
+      return unwrapPaginated<Arbitro>(data as Arbitro[]);
     } catch (error) {
       if (error instanceof ApiException) {
         throw new Error(extractErrorMessage(error.data) || "Error al obtener árbitros");
@@ -397,7 +400,8 @@ export const arbitroService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await arbitroEndpoints.listarPendientes(token);
+      const data = await arbitroEndpoints.listarPendientes(token);
+      return unwrapPaginated<Arbitro>(data as Arbitro[]);
     } catch (error) {
       if (error instanceof ApiException) {
         throw new Error(extractErrorMessage(error.data) || "Error al obtener árbitros pendientes");

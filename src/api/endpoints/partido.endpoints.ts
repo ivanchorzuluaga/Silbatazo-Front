@@ -75,7 +75,7 @@ export const partidoEndpoints = {
    * El backend devuelve PartidoDetail directamente
    */
   async crearPartido(token: string, data: PartidoCreateData): Promise<PartidoDetail> {
-    return authenticatedApiClient<PartidoDetail>("/api/partidos/crear/", token, {
+    return authenticatedApiClient<PartidoDetail>("/api/partidos/", token, {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -137,7 +137,7 @@ export const partidoEndpoints = {
     id: number,
     data: PartidoUpdateData
   ): Promise<PartidoDetail> {
-    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/actualizar/`, token, {
+    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/`, token, {
       method: "PATCH",
       body: JSON.stringify(data),
     });
@@ -151,9 +151,9 @@ export const partidoEndpoints = {
     id: number,
     data?: PartidoAceptarData
   ): Promise<PartidoDetail> {
-    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/aceptar/`, token, {
+    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/estado/`, token, {
       method: "PATCH",
-      body: JSON.stringify(data || {}),
+      body: JSON.stringify({ estado: "aceptado", ...(data || {}) }),
     });
   },
 
@@ -165,9 +165,9 @@ export const partidoEndpoints = {
     id: number,
     data: PartidoRechazarData
   ): Promise<PartidoDetail> {
-    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/rechazar/`, token, {
+    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/estado/`, token, {
       method: "PATCH",
-      body: JSON.stringify(data),
+      body: JSON.stringify({ estado: "rechazado", ...data }),
     });
   },
 
@@ -179,9 +179,9 @@ export const partidoEndpoints = {
     id: number,
     data: PartidoCancelarData
   ): Promise<PartidoDetail> {
-    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/cancelar/`, token, {
+    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/estado/`, token, {
       method: "PATCH",
-      body: JSON.stringify(data),
+      body: JSON.stringify({ estado: "cancelado", ...data }),
     });
   },
 
@@ -193,9 +193,9 @@ export const partidoEndpoints = {
     id: number,
     data?: PartidoCompletarData
   ): Promise<PartidoDetail> {
-    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/completar/`, token, {
+    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/estado/`, token, {
       method: "PATCH",
-      body: JSON.stringify(data || {}),
+      body: JSON.stringify({ estado: "completado", ...(data || {}) }),
     });
   },
 
@@ -227,10 +227,14 @@ export const partidoEndpoints = {
     id: number,
     data?: PostulacionCreateData
   ): Promise<PostulacionArbitro> {
-    return authenticatedApiClient<PostulacionArbitro>(`/api/partidos/${id}/postular/`, token, {
+    return authenticatedApiClient<PostulacionArbitro>(
+      `/api/partidos/${id}/postulaciones/`,
+      token,
+      {
       method: "POST",
       body: JSON.stringify(data || {}),
-    });
+      }
+    );
   },
 
   /**
@@ -251,7 +255,7 @@ export const partidoEndpoints = {
     id: number,
     data: PartidoAsignarData
   ): Promise<PartidoDetail> {
-    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/asignar/`, token, {
+    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/arbitro/`, token, {
       method: "PATCH",
       body: JSON.stringify(data),
     });
@@ -356,7 +360,7 @@ export const partidoEndpoints = {
       formData.append("comprobante_pago", comprobante);
     }
 
-    const response = await fetch(`${API_URL}/api/partidos/${id}/marcar-pagado/`, {
+    const response = await fetch(`${API_URL}/api/partidos/${id}/pago/`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -366,7 +370,7 @@ export const partidoEndpoints = {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.detail || "Error al marcar como pagado");
+      throw new Error(errorData.detail || errorData.error || "Error al marcar como pagado");
     }
 
     return response.json();
@@ -380,9 +384,9 @@ export const partidoEndpoints = {
     id: number,
     data?: { notas_pago?: string }
   ): Promise<PartidoDetail> {
-    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/aprobar-pago/`, token, {
+    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/pago/`, token, {
       method: "PATCH",
-      body: JSON.stringify(data || {}),
+      body: JSON.stringify({ estado_pago: "aprobado", ...(data || {}) }),
     });
   },
 
@@ -390,9 +394,9 @@ export const partidoEndpoints = {
    * Rechazar un pago (solo admin)
    */
   async rechazarPago(token: string, id: number, motivo: string): Promise<PartidoDetail> {
-    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/rechazar-pago/`, token, {
+    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/pago/`, token, {
       method: "PATCH",
-      body: JSON.stringify({ motivo }),
+      body: JSON.stringify({ estado_pago: "rechazado", motivo }),
     });
   },
 
@@ -410,7 +414,11 @@ export const partidoEndpoints = {
     const baseEndpoint = "/api/partidos/pagos-pendientes/";
     const endpoint = query ? `${baseEndpoint}?${query}` : baseEndpoint;
 
-    return authenticatedApiClient<Partido[]>(endpoint, token);
+    const data = await authenticatedApiClient<PaginatedResponse<Partido> | Partido[]>(
+      endpoint,
+      token
+    );
+    return unwrapPaginated(data);
   },
 
   /**

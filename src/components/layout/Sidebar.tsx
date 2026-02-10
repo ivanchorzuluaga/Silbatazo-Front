@@ -42,12 +42,12 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "hidden sm:flex sm:flex-col sm:fixed sm:left-0 sm:top-0 sm:h-screen sm:w-64 sm:border-r sm:bg-card/50 sm:backdrop-blur-sm sm:z-40",
+        "hidden sm:flex sm:flex-col sm:fixed sm:left-0 sm:top-0 sm:h-screen sm:w-64 sm:border-r sm:border-border/60 sm:bg-card/70 sm:backdrop-blur-xl sm:z-40",
         className
       )}
     >
       {/* Header con Logo */}
-      <div className="flex h-20 items-center gap-3 border-b px-6 flex-shrink-0">
+      <div className="flex h-20 items-center gap-3 border-b border-border/60 px-6 flex-shrink-0">
         <Link
           to={ROUTES.HOME}
           className="flex items-center gap-3 flex-1 min-w-0 hover:opacity-80 transition-opacity cursor-pointer"
@@ -94,10 +94,10 @@ export function Sidebar({ className }: SidebarProps) {
                         <Link
                           to={route}
                           className={cn(
-                            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-ios",
-                            "hover:bg-accent hover:text-accent-foreground",
+                            "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-ios",
+                            "hover:bg-accent/60 hover:text-accent-foreground",
                             isActive &&
-                              "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
+                              "bg-primary/10 text-primary font-semibold ring-1 ring-primary/20 hover:bg-primary/15"
                           )}
                         >
                           <Icon className="size-4 shrink-0" />

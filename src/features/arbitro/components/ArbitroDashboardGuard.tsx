@@ -29,7 +29,7 @@ export function ArbitroDashboardGuard() {
   // No decidir nada hasta haber intentado cargar el perfil al menos una vez
   if (!verificacionHecha || (isLoading && !arbitro)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center">
         <p className="text-muted-foreground">Cargando...</p>
       </div>
     );

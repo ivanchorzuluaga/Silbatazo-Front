@@ -4,18 +4,27 @@
  * El Header se encarga de mostrar el botón apropiado según autenticación
  */
 
-import { useState, useEffect } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import {
-  Header,
-  Hero,
-  Features,
-  HowItWorks,
-  Footer,
-  RefereesPreview,
-} from "@/components/marketplace";
+import { Header } from "@/components/marketplace/Header";
+import { Hero } from "@/components/marketplace/Hero";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
-import { unwrapPaginated } from "@/api/utils/pagination";
+import { fetchArbitrosCached } from "@/api/utils/arbitros-cache";
+
+const Features = lazy(() =>
+  import("@/components/marketplace/Features").then((m) => ({ default: m.Features }))
+);
+const HowItWorks = lazy(() =>
+  import("@/components/marketplace/HowItWorks").then((m) => ({ default: m.HowItWorks }))
+);
+const RefereesPreview = lazy(() =>
+  import("@/components/marketplace/RefereesPreview").then((m) => ({
+    default: m.RefereesPreview,
+  }))
+);
+const Footer = lazy(() =>
+  import("@/components/marketplace/Footer").then((m) => ({ default: m.Footer }))
+);
 
 export function HomePage() {
   const [arbitrosDestacados, setArbitrosDestacados] = useState<Arbitro[]>([]);
@@ -42,27 +51,13 @@ export function HomePage() {
     const cargarArbitrosDestacados = async () => {
       setIsLoadingArbitros(true);
       try {
-        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-        const token = localStorage.getItem("access_token");
-        const headers: HeadersInit = {
-          "Content-Type": "application/json",
-        };
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
-        }
-
         const queryParams = new URLSearchParams();
         queryParams.append("ordering", "-created_at");
 
-        const response = await fetch(`${API_URL}/api/arbitros/?${queryParams.toString()}`, {
-          headers,
+        const arbitros = await fetchArbitrosCached({
+          query: queryParams.toString(),
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          const arbitros = unwrapPaginated<Arbitro>(data).slice(0, 4);
-          setArbitrosDestacados(arbitros);
-        }
+        setArbitrosDestacados(arbitros.slice(0, 4));
       } catch (err) {
         console.error("Error al cargar árbitros destacados:", err);
       } finally {
@@ -78,11 +73,20 @@ export function HomePage() {
       <Header />
       <Hero />
       <HowItWorks />
-      {!isLoadingArbitros && arbitrosDestacados.length > 0 && (
-        <RefereesPreview arbitros={arbitrosDestacados} />
-      )}
-      <Features />
-      <Footer />
+      <Suspense fallback={<div className="min-h-[200px]" />}>
+        {!isLoadingArbitros && arbitrosDestacados.length > 0 && (
+          <RefereesPreview arbitros={arbitrosDestacados} />
+        )}
+      </Suspense>
+      <Suspense fallback={<div className="min-h-[300px]" />}>
+        <HowItWorks />
+      </Suspense>
+      <Suspense fallback={<div className="min-h-[300px]" />}>
+        <Features />
+      </Suspense>
+      <Suspense fallback={<div className="min-h-[200px]" />}>
+        <Footer />
+      </Suspense>
     </main>
   );
 }

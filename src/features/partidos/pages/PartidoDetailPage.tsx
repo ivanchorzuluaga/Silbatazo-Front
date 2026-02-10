@@ -73,7 +73,7 @@ export function PartidoDetailPage() {
     return (
       <PageLayout
         backButton={{ label: "Volver a Partidos", to: ROUTES.PARTIDOS }}
-        contentClassName="container mx-auto px-4 py-8 max-w-4xl"
+        contentClassName="page-surface max-w-4xl"
       >
         <div className="text-center py-12">
           <p className="text-muted-foreground">Cargando partido...</p>
@@ -87,7 +87,7 @@ export function PartidoDetailPage() {
     return (
       <PageLayout
         backButton={{ label: "Volver a Partidos", to: ROUTES.PARTIDOS }}
-        contentClassName="container mx-auto px-4 py-8 max-w-4xl"
+        contentClassName="page-surface max-w-4xl"
       >
         <div className="rounded-lg border bg-card p-6 shadow-sm">
           <p className="text-destructive mb-4">{error || "Partido no encontrado"}</p>
@@ -103,7 +103,7 @@ export function PartidoDetailPage() {
     <PageLayout
       backButton={{ label: "Volver a Partidos", to: ROUTES.PARTIDOS }}
       showDashboard={true}
-      contentClassName="container mx-auto px-4 py-8 max-w-4xl"
+      contentClassName="page-surface max-w-4xl"
     >
       <div className="space-y-6">
         {/* Botón de Editar en el header */}

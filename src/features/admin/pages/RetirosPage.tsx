@@ -4,10 +4,10 @@
 
 import { useEffect, useState } from "react";
 import { PageLayout } from "@/components/layout";
+import { FilterTabs } from "@/components/ui/FilterTabs";
 import { useRetiros } from "@/features/arbitro/hooks/useRetiros";
 import { RetiroCard } from "../components/RetiroCard";
 import { ROUTES } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 import type { Retiro, RetiroProcesarData } from "@/features/arbitro/types/arbitro.types";
 
 type FiltroRetiro = "pendiente" | "procesado" | "rechazado" | "todos";
@@ -40,7 +40,7 @@ export function RetirosPage() {
     <PageLayout
       title="Gestión de Retiros"
       backButton={{ label: "Dashboard Admin", to: ROUTES.ADMIN_DASHBOARD }}
-      contentClassName="container mx-auto px-4 py-8 max-w-7xl"
+      contentClassName="page-surface"
     >
       <div className="space-y-6">
         {/* Estadísticas */}
@@ -64,26 +64,12 @@ export function RetirosPage() {
         </div>
 
         {/* Tabs por estado */}
-        <div>
-          <p className="text-sm font-medium text-muted-foreground mb-3">Estado</p>
-          <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border overflow-x-auto">
-            {TABS_RETIRO.map((tab) => (
-              <button
-                key={tab.value}
-                type="button"
-                onClick={() => setTabEstado(tab.value)}
-                className={cn(
-                  "shrink-0 px-4 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap touch-manipulation min-h-10",
-                  tabEstado === tab.value
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <FilterTabs
+          label="Estado"
+          tabs={TABS_RETIRO}
+          value={tabEstado}
+          onValueChange={setTabEstado}
+        />
 
         {/* Error */}
         {error && (
