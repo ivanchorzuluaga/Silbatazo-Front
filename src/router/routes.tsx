@@ -24,6 +24,26 @@ const RecuperarContrasenaConfirmPage = lazy(() =>
     default: m.RecuperarContrasenaConfirmPage,
   }))
 );
+const RegisterPage = lazy(() =>
+  import("@/features/auth/pages/RegisterPage").then((m) => ({
+    default: m.RegisterPage,
+  }))
+);
+const LegalTerminosPage = lazy(() =>
+  import("@/features/legal/pages/LegalTerminosPage").then((m) => ({
+    default: m.LegalTerminosPage,
+  }))
+);
+const LegalPrivacidadPage = lazy(() =>
+  import("@/features/legal/pages/LegalPrivacidadPage").then((m) => ({
+    default: m.LegalPrivacidadPage,
+  }))
+);
+const LegalReembolsoPage = lazy(() =>
+  import("@/features/legal/pages/LegalReembolsoPage").then((m) => ({
+    default: m.LegalReembolsoPage,
+  }))
+);
 const VerificarCorreoConfirmPage = lazy(() =>
   import("@/features/auth/pages/VerificarCorreoConfirmPage").then((m) => ({
     default: m.VerificarCorreoConfirmPage,
@@ -159,21 +179,6 @@ const BilleteraPage = lazy(() =>
     default: m.BilleteraPage,
   }))
 );
-const TerminosCondicionesPage = lazy(() =>
-  import("@/features/legal/pages/TerminosCondicionesPage").then((m) => ({
-    default: m.TerminosCondicionesPage,
-  }))
-);
-const PoliticaPrivacidadPage = lazy(() =>
-  import("@/features/legal/pages/PoliticaPrivacidadPage").then((m) => ({
-    default: m.PoliticaPrivacidadPage,
-  }))
-);
-const PoliticaReembolsoPage = lazy(() =>
-  import("@/features/legal/pages/PoliticaReembolsoPage").then((m) => ({
-    default: m.PoliticaReembolsoPage,
-  }))
-);
 
 function PageLoader() {
   return (
@@ -247,7 +252,19 @@ export const router = createBrowserRouter([
       },
       {
         path: ROUTES.REGISTER,
-        element: withSuspense(<LoginPage />), // El registro se maneja en el mismo componente
+        element: withSuspense(<RegisterPage />),
+      },
+      {
+        path: "/legal/terminos",
+        element: withSuspense(<LegalTerminosPage />),
+      },
+      {
+        path: "/legal/privacidad",
+        element: withSuspense(<LegalPrivacidadPage />),
+      },
+      {
+        path: "/legal/reembolso",
+        element: withSuspense(<LegalReembolsoPage />),
       },
       // Dashboard genérico (redirige según rol)
       {
@@ -465,18 +482,6 @@ export const router = createBrowserRouter([
         ),
       },
       // Páginas legales (públicas)
-      {
-        path: ROUTES.TERMINOS,
-        element: withSuspense(<TerminosCondicionesPage />),
-      },
-      {
-        path: ROUTES.PRIVACIDAD,
-        element: withSuspense(<PoliticaPrivacidadPage />),
-      },
-      {
-        path: ROUTES.REEMBOLSO,
-        element: withSuspense(<PoliticaReembolsoPage />),
-      },
     ],
   },
 ]);

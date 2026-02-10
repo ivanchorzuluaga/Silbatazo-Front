@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FormField } from "@/components/forms";
+import { FormField, DateField } from "@/components/forms";
 import { TimePicker24h } from "@/components/forms/TimePicker24h";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -212,13 +212,12 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
 
           {/* Fecha y Hora */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField
+            <DateField
               label="Fecha del Partido"
               name="fecha"
-              type="date"
               value={fecha}
-              onChange={(e) => {
-                setFecha(e.target.value);
+              onChange={(value) => {
+                setFecha(value);
                 if (fieldErrors.fecha) {
                   setFieldErrors((prev) => ({ ...prev, fecha: undefined }));
                 }

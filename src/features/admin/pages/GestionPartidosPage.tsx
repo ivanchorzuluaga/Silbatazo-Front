@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FilterTabs } from "@/components/ui/FilterTabs";
 import { Input } from "@/components/ui/input";
+import { DateField } from "@/components/forms";
 import { Select } from "@/components/ui/select";
 import { PageLayout } from "@/components/layout";
 import { usePartidos } from "@/features/partidos/hooks/usePartidos";
@@ -80,30 +81,20 @@ export function GestionPartidosPage() {
           <h2 className="text-lg font-semibold mb-4">Filtros adicionales</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {/* Fecha Desde */}
-            <div className="space-y-2">
-              <label htmlFor="fechaDesde" className="text-sm font-medium">
-                Fecha Desde
-              </label>
-              <Input
-                id="fechaDesde"
-                type="date"
-                value={fechaDesde}
-                onChange={(e) => setFechaDesde(e.target.value)}
-              />
-            </div>
+            <DateField
+              id="fechaDesde"
+              label="Fecha Desde"
+              value={fechaDesde}
+              onChange={setFechaDesde}
+            />
 
             {/* Fecha Hasta */}
-            <div className="space-y-2">
-              <label htmlFor="fechaHasta" className="text-sm font-medium">
-                Fecha Hasta
-              </label>
-              <Input
-                id="fechaHasta"
-                type="date"
-                value={fechaHasta}
-                onChange={(e) => setFechaHasta(e.target.value)}
-              />
-            </div>
+            <DateField
+              id="fechaHasta"
+              label="Fecha Hasta"
+              value={fechaHasta}
+              onChange={setFechaHasta}
+            />
 
             {/* Municipio */}
             <div className="space-y-2">

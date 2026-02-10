@@ -1,12 +1,27 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ROUTES, APP_NAME } from "@/lib/constants";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { APP_NAME } from "@/lib/constants";
 import logoImage from "@/assets/Logo.png";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
-import { Mail, Phone } from "lucide-react";
+import { Mail, Phone, X } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { TerminosModalContent } from "@/features/legal/components/TerminosModalContent";
+import { PrivacidadModalContent } from "@/features/legal/components/PrivacidadModalContent";
+import { ReembolsoModalContent } from "@/features/legal/components/ReembolsoModalContent";
 
 export function Footer() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [showTerminos, setShowTerminos] = useState(false);
+  const [showPrivacidad, setShowPrivacidad] = useState(false);
+  const [showReembolso, setShowReembolso] = useState(false);
 
   // Función para hacer scroll suave a una sección
   const handleScrollTo = (sectionId: string) => {
@@ -104,15 +119,27 @@ export function Footer() {
           <div className="space-y-3">
             <h4 className="font-bold text-lg text-foreground">Legal</h4>
             <div className="flex flex-wrap justify-center gap-4 text-sm text-foreground/80">
-              <Link to={ROUTES.TERMINOS} className="hover:text-foreground transition-colors">
+              <button
+                type="button"
+                onClick={() => setShowTerminos(true)}
+                className="hover:text-foreground transition-colors"
+              >
                 Términos
-              </Link>
-              <Link to={ROUTES.PRIVACIDAD} className="hover:text-foreground transition-colors">
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowPrivacidad(true)}
+                className="hover:text-foreground transition-colors"
+              >
                 Privacidad
-              </Link>
-              <Link to={ROUTES.REEMBOLSO} className="hover:text-foreground transition-colors">
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowReembolso(true)}
+                className="hover:text-foreground transition-colors"
+              >
                 Reembolso
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -198,19 +225,31 @@ export function Footer() {
               <h4 className="font-semibold mb-4 text-foreground">Legal</h4>
               <ul className="space-y-2 text-sm text-foreground/70">
                 <li>
-                  <Link to={ROUTES.TERMINOS} className="hover:text-foreground transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setShowTerminos(true)}
+                    className="hover:text-foreground transition-colors"
+                  >
                     Términos y Condiciones
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link to={ROUTES.PRIVACIDAD} className="hover:text-foreground transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setShowPrivacidad(true)}
+                    className="hover:text-foreground transition-colors"
+                  >
                     Política de Privacidad
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link to={ROUTES.REEMBOLSO} className="hover:text-foreground transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setShowReembolso(true)}
+                    className="hover:text-foreground transition-colors"
+                  >
                     Política de Reembolso
-                  </Link>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -233,6 +272,84 @@ export function Footer() {
           </div>
         </div>
       </div>
+
+      <Dialog open={showTerminos} onOpenChange={setShowTerminos}>
+        <DialogContent className="max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="!flex-row items-center justify-between gap-4">
+            <DialogTitle>Términos y Condiciones</DialogTitle>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowTerminos(false)}
+              aria-label="Cerrar"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </DialogHeader>
+          <div className="pt-2">
+            <TerminosModalContent />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setShowTerminos(false)}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showPrivacidad} onOpenChange={setShowPrivacidad}>
+        <DialogContent className="max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="!flex-row items-center justify-between gap-4">
+            <DialogTitle>Política de Privacidad</DialogTitle>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowPrivacidad(false)}
+              aria-label="Cerrar"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </DialogHeader>
+          <div className="pt-2">
+            <PrivacidadModalContent />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setShowPrivacidad(false)}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showReembolso} onOpenChange={setShowReembolso}>
+        <DialogContent className="max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="!flex-row items-center justify-between gap-4">
+            <DialogTitle>Política de Reembolso</DialogTitle>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowReembolso(false)}
+              aria-label="Cerrar"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </DialogHeader>
+          <div className="pt-2">
+            <ReembolsoModalContent />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setShowReembolso(false)}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </footer>
   );
 }

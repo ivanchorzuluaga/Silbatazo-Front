@@ -4,26 +4,22 @@
  */
 
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams, useLocation, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLogin } from "../hooks/useLogin";
-import { ROUTES, APP_NAME, USER_ROLES } from "@/lib/constants";
+import { ROUTES, APP_NAME } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
 import { Button } from "@/components/ui/button";
 import { validations } from "@/lib/validations";
-import { AuthDialog } from "../components/AuthDialog";
 import logoImage from "@/assets/Logo.png";
 import { User, Lock, LogIn, ArrowLeft, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function LoginPage() {
   const { isAuthenticated, user, login: setAuth } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirect");
-  const roleParam = searchParams.get("role");
-  const isRegisterPage = location.pathname === ROUTES.REGISTER;
-  const defaultRoleRegister = roleParam === "arbitro" ? USER_ROLES.ARBITRO : USER_ROLES.CLIENTE;
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -106,40 +102,29 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
-      {/* Panel de registro: se muestra cuando la ruta es /register */}
-      {isRegisterPage && (
-        <AuthDialog
-          open={true}
-          onOpenChange={(open) => {
-            if (!open) navigate(ROUTES.LOGIN);
-          }}
-          initialMode="register"
-          defaultRole={defaultRoleRegister}
-        />
-      )}
-
-      {/* Fondo con gradiente oscuro */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-black" />
+    <div className="min-h-screen relative flex items-center justify-center overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-background text-foreground">
+      {/* Fondo con gradiente adaptable al tema */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-emerald-100 dark:from-gray-950 dark:via-gray-900 dark:to-black" />
 
       {/* Efectos de luz decorativos */}
-      <div className="absolute top-0 left-1/4 h-96 w-96 bg-primary/30 rounded-full blur-[128px]" />
-      <div className="absolute bottom-0 right-1/4 h-96 w-96 bg-primary/20 rounded-full blur-[128px]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 bg-emerald-500/10 rounded-full blur-[100px]" />
+      <div className="absolute top-0 left-1/4 h-96 w-96 bg-primary/20 dark:bg-primary/30 rounded-full blur-[128px]" />
+      <div className="absolute bottom-0 right-1/4 h-96 w-96 bg-primary/10 dark:bg-primary/20 rounded-full blur-[128px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[100px]" />
 
       {/* Top navigation bar */}
-      <div className="absolute top-4 left-4 right-4 z-50 flex justify-start">
+      <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
         <Button
           variant="ghost"
           size="sm"
           asChild
-          className="min-h-10 touch-manipulation bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 hover:text-white"
+          className="min-h-10 touch-manipulation bg-white/70 dark:bg-white/10 backdrop-blur-md border border-border/60 text-foreground hover:bg-white/90 dark:hover:bg-white/20"
         >
           <Link to={ROUTES.HOME}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver al inicio
           </Link>
         </Button>
+        <ThemeToggle size="sm" />
       </div>
 
       {/* Contenedor principal con logo a la izquierda y form a la derecha */}
@@ -156,7 +141,7 @@ export function LoginPage() {
         {/* Formulario */}
         <div className="w-full max-w-md">
           {/* Card glassmorphism */}
-          <div className="relative rounded-3xl border border-white/10 shadow-2xl p-6 md:p-10 overflow-hidden">
+          <div className="relative rounded-3xl border border-border/60 bg-card/70 text-card-foreground shadow-2xl p-6 md:p-10 overflow-hidden">
             {/* Logo de fondo dentro de la card - Solo visible en móvil */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none md:hidden">
               <img src={logoImage} alt="" className="w-64 h-64 object-contain opacity-15" />
@@ -166,10 +151,10 @@ export function LoginPage() {
             <div className="relative z-10">
               {/* Título */}
               <div className="text-center mb-6 md:mb-8">
-                <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg mb-1">
+                <h1 className="text-2xl md:text-3xl font-bold drop-shadow-lg mb-1">
                   Bienvenido
                 </h1>
-                <p className="text-sm md:text-base text-white/90 drop-shadow-md">
+                <p className="text-sm md:text-base text-muted-foreground">
                   Ingresa tus credenciales para continuar
                 </p>
               </div>
@@ -292,10 +277,10 @@ export function LoginPage() {
               {/* Divider */}
               <div className="relative my-4 md:my-6">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-white/30" />
+                  <span className="w-full border-t border-border/60" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-gray-900/80 px-3 text-white/80 font-medium rounded">
+                  <span className="bg-card/80 px-3 text-muted-foreground font-medium rounded">
                     ¿No tienes cuenta?
                   </span>
                 </div>
@@ -306,7 +291,7 @@ export function LoginPage() {
                 type="button"
                 variant="outline"
                 onClick={() => navigate(ROUTES.REGISTER)}
-                className="w-full h-11 md:h-12 bg-black/40 border-2 border-white/30 text-white font-semibold hover:bg-white/20 hover:border-white/50 rounded-xl transition-all duration-200"
+                className="w-full h-11 md:h-12 bg-card/40 border-2 border-border/60 text-foreground font-semibold hover:bg-card/70 hover:border-border rounded-xl transition-all duration-200"
                 size="lg"
               >
                 Crear una cuenta nueva
@@ -315,7 +300,7 @@ export function LoginPage() {
           </div>
 
           {/* Texto de copyright */}
-          <p className="text-center text-white/70 text-xs md:text-sm mt-4 md:mt-6 drop-shadow-md">
+          <p className="text-center text-muted-foreground text-xs md:text-sm mt-4 md:mt-6 drop-shadow-md">
             © 2026 {APP_NAME}. Todos los derechos reservados.
           </p>
         </div>

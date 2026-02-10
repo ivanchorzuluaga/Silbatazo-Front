@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FormField } from "@/components/forms";
+import { FormField, DateField } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import { useArbitro } from "../hooks/useArbitro";
 import { useMunicipios } from "../hooks/useMunicipios";
@@ -461,13 +461,12 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
             placeholder="+57 300 123 4567"
           />
 
-          <FormField
+          <DateField
             label="Fecha de Nacimiento"
             name="fecha_nacimiento"
-            type="date"
             value={fechaNacimiento}
-            onChange={(e) => {
-              setFechaNacimiento(e.target.value);
+            onChange={(value) => {
+              setFechaNacimiento(value);
               if (fieldErrors.fecha_nacimiento) {
                 setFieldErrors((prev) => ({ ...prev, fecha_nacimiento: undefined }));
               }

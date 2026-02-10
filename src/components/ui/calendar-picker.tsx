@@ -91,7 +91,7 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
 
   return (
     <div
-      className="bg-popover border border-border rounded-xl shadow-2xl p-4 w-[320px]"
+      className="bg-foreground text-background border border-foreground/20 rounded-xl shadow-2xl p-4 w-[320px]"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header del calendario */}
@@ -101,19 +101,19 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
           onClick={prevMonth}
           disabled={!canGoPrev}
           className={cn(
-            "p-2 rounded-lg transition-colors text-foreground",
-            canGoPrev ? "hover:bg-muted" : "text-muted-foreground cursor-not-allowed"
+            "p-2 rounded-lg transition-colors text-background",
+            canGoPrev ? "hover:bg-background/10" : "text-background/40 cursor-not-allowed"
           )}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h3 className="font-semibold text-foreground">
+        <h3 className="font-semibold text-background">
           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
         </h3>
         <button
           type="button"
           onClick={nextMonth}
-          className="p-2 rounded-lg hover:bg-muted text-foreground transition-colors"
+          className="p-2 rounded-lg hover:bg-background/10 text-background transition-colors"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -122,7 +122,7 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
       {/* Días de la semana */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {dayNames.map((dayName) => (
-          <div key={dayName} className="text-center text-xs font-medium text-muted-foreground py-2">
+          <div key={dayName} className="text-center text-xs font-medium text-background/60 py-2">
             {dayName}
           </div>
         ))}
@@ -150,8 +150,8 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
               disabled={past}
               className={cn(
                 "h-10 w-10 rounded-lg text-sm font-medium transition-all flex items-center justify-center",
-                past && "text-muted-foreground/50 cursor-not-allowed",
-                !past && !selected && "hover:bg-primary/20 text-foreground",
+                past && "text-background/40 cursor-not-allowed",
+                !past && !selected && "hover:bg-background/10 text-background",
                 selected && "bg-primary text-primary-foreground",
                 todayDay && !selected && "ring-2 ring-primary"
               )}
@@ -170,7 +170,7 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
             onSelect("");
             onClose();
           }}
-          className="w-full mt-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors border-t border-border pt-4"
+          className="w-full mt-4 py-2 text-sm text-background/70 hover:text-background transition-colors border-t border-foreground/20 pt-4"
         >
           Limpiar fecha
         </button>

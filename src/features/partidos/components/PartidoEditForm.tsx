@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { FormField } from "@/components/forms";
+import { FormField, DateField } from "@/components/forms";
 import { TimePicker24h } from "@/components/forms/TimePicker24h";
 import { Button } from "@/components/ui/button";
 import {
@@ -154,13 +154,12 @@ export function PartidoEditForm({ partido, open, onClose, onSuccess }: PartidoEd
 
           {/* Fecha y Hora */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField
+            <DateField
               label="Fecha del Partido"
               name="fecha"
-              type="date"
               value={fecha}
-              onChange={(e) => {
-                setFecha(e.target.value);
+              onChange={(value) => {
+                setFecha(value);
                 if (fieldErrors.fecha) {
                   setFieldErrors((prev) => ({ ...prev, fecha: undefined }));
                 }

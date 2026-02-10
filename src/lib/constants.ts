@@ -54,9 +54,6 @@ export const ROUTES = {
   PARTIDO_PAGO: "/partidos/:id/pago",
   HOME: "/",
   // Páginas legales
-  TERMINOS: "/terminos-condiciones",
-  PRIVACIDAD: "/politica-privacidad",
-  REEMBOLSO: "/politica-reembolso",
   RECUPERAR_CONTRASENA: "/recuperar-contrasena",
   RECUPERAR_CONTRASENA_CONFIRM: "/recuperar-contrasena/confirmar",
   VERIFICAR_CORREO: "/verificar-correo",

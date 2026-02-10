@@ -15,6 +15,7 @@ export interface RegisterCredentials {
   role: "cliente" | "arbitro";
   first_name?: string;
   last_name?: string;
+  terminos_aceptados: boolean;
 }
 
 export interface AuthTokens {
