@@ -28,7 +28,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm pt-[env(safe-area-inset-top)]">
+    <header className="sticky top-0 z-50 nav-surface border-b shadow-ios pt-[env(safe-area-inset-top)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between min-h-16 sm:min-h-20 md:min-h-24">
           {/* Logo completo (imagen con texto incluido) - cambia según tema */}
@@ -129,7 +129,7 @@ export function Header() {
           />
 
           {/* Panel del menú */}
-          <div className="absolute top-0 left-0 right-0 bg-card/95 backdrop-blur-xl border-b border-border/60 shadow-2xl animate-in slide-in-from-top duration-300 pt-[env(safe-area-inset-top)] rounded-b-3xl overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 nav-surface border-b shadow-2xl animate-in slide-in-from-top duration-300 pt-[env(safe-area-inset-top)] rounded-b-3xl overflow-hidden">
             {/* Header del menú */}
             <div className="flex items-center justify-between p-4 border-b border-border/60">
               <div className="flex items-center gap-3">

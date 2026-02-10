@@ -38,7 +38,7 @@ const SlidePanelContent = React.forwardRef<HTMLDivElement, SlidePanelContentProp
       <div
         ref={ref}
         className={cn(
-          "w-full border-b border-border/60 bg-card/90 text-card-foreground shadow-ios-xl backdrop-blur-xl slide-panel-enter",
+          "w-full nav-surface border-b shadow-ios-xl slide-panel-enter",
           className
         )}
         {...props}

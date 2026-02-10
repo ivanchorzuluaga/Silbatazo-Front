@@ -181,7 +181,7 @@ export function PartidoActions({
             <textarea
               value={motivoRechazo}
               onChange={(e) => setMotivoRechazo(e.target.value)}
-              className="w-full min-h-[100px] rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm shadow-ios focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary"
+              className="field-textarea min-h-[100px]"
               placeholder="Motivo del rechazo..."
             />
             <div className="flex gap-2 mt-4">
@@ -227,7 +227,7 @@ export function PartidoActions({
               <textarea
                 value={motivoCancelacion}
                 onChange={(e) => setMotivoCancelacion(e.target.value)}
-                className="w-full min-h-[100px] rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm shadow-ios focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary"
+                className="field-textarea min-h-[100px]"
                 placeholder="Explica el motivo de la cancelación..."
               />
             </div>

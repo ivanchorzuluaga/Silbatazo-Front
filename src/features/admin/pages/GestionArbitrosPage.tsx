@@ -62,7 +62,7 @@ function FiltrosArbitros({
           <select
             value={filtros.ordenamiento}
             onChange={(e) => onOrdenamientoChange(e.target.value)}
-            className="w-full rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm shadow-ios focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary"
+            className="field-select"
           >
             <option value="-created_at">Más recientes</option>
             <option value="created_at">Más antiguos</option>
@@ -208,7 +208,7 @@ function ConfirmacionModal({
             <textarea
               value={comentarios}
               onChange={(e) => onComentariosChange(e.target.value)}
-              className="w-full min-h-[100px] rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm shadow-ios focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary"
+              className="field-textarea min-h-[100px]"
               placeholder={placeholder}
             />
           </div>

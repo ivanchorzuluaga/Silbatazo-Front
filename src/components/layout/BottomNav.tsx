@@ -50,7 +50,7 @@ export function BottomNav() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/60 bg-card/85 backdrop-blur-xl safe-area-bottom sm:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 nav-surface border-t safe-area-bottom sm:hidden">
         <div className="flex h-16 items-center justify-around px-2">
           {displayItems.map((item) => {
             const Icon = item.icon;

@@ -231,7 +231,7 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
           checked={activo}
           onChange={(e) => setActivo(e.target.checked)}
           disabled={isLoading}
-          className="h-4 w-4 rounded border-gray-300"
+          className="h-4 w-4 rounded border-border bg-background"
         />
         <label htmlFor="activo" className="text-sm font-medium">
           Activo (visible en el selector de creación de partidos)

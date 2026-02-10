@@ -206,7 +206,7 @@ export function DisponibilidadForm({
                     type="checkbox"
                     checked={municipiosSeleccionados.includes(municipio.id)}
                     onChange={() => toggleMunicipio(municipio.id)}
-                    className="rounded border-gray-300"
+                    className="rounded border-border bg-background"
                   />
                   <span className="text-sm">
                     {municipio.nombre}
@@ -230,7 +230,7 @@ export function DisponibilidadForm({
             type="checkbox"
             checked={activo}
             onChange={(e) => setActivo(e.target.checked)}
-            className="rounded border-gray-300"
+            className="rounded border-border bg-background"
           />
           <span className="text-sm font-medium text-foreground">Disponibilidad activa</span>
         </label>

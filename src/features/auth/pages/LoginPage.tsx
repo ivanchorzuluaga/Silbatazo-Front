@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { validations } from "@/lib/validations";
 import { AuthDialog } from "../components/AuthDialog";
 import logoImage from "@/assets/Logo.png";
-import { User, Lock, LogIn, ArrowLeft, AlertCircle } from "lucide-react";
+import { User, Lock, LogIn, ArrowLeft, AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export function LoginPage() {
   const { isAuthenticated, user, login: setAuth } = useAuth();
@@ -27,6 +27,7 @@ export function LoginPage() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
     username?: string;
     password?: string;
@@ -198,7 +199,7 @@ export function LoginPage() {
                       placeholder="Usuario o correo"
                       disabled={isLoading}
                       autoComplete="username"
-                      className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"
+                      className="auth-input pl-11 pr-4"
                     />
                   </div>
                   {fieldErrors.username && (
@@ -218,7 +219,7 @@ export function LoginPage() {
                       <Lock className="h-5 w-5" />
                     </div>
                     <input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       name="password"
                       value={password}
                       onChange={(e) => {
@@ -231,8 +232,16 @@ export function LoginPage() {
                       placeholder="Tu contraseña"
                       disabled={isLoading}
                       autoComplete="current-password"
-                      className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"
+                      className="auth-input pl-11 pr-11"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
                   </div>
                   {fieldErrors.password && (
                     <p className="text-sm text-red-400 font-medium drop-shadow-md">

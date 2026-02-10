@@ -308,6 +308,89 @@ body {
     @apply text-sm text-muted-foreground;
     line-height: 1.5;
   }
+
+  input,
+  textarea,
+  select {
+    color: var(--foreground);
+  }
+
+  select,
+  option {
+    background-color: var(--background);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: color-mix(in oklch, var(--muted-foreground) 75%, transparent);
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--primary);
+    border-color: var(--border);
+    background-color: var(--background);
+  }
+}
+
+/* Inputs de auth (fondos oscuros con texto legible) */
+@utility auth-input {
+  @apply w-full h-11 md:h-12 rounded-xl border border-white/30 bg-black/40 text-white placeholder:text-white/50;
+  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200;
+  @apply disabled:opacity-50;
+}
+
+/* Campos base (texto) */
+@utility field-base {
+  @apply w-full h-12 sm:h-11 rounded-lg border border-border/80 bg-card/70 px-4 py-3 text-sm text-foreground transition-all duration-200;
+  @apply placeholder:text-muted-foreground/60;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary;
+  @apply disabled:cursor-not-allowed disabled:opacity-50;
+  box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28), 0 2px 4px rgba(2, 6, 23, 0.08),
+    0 0 0 1px rgba(2, 6, 23, 0.04);
+}
+
+/* Selects */
+@utility field-select {
+  @apply w-full h-12 sm:h-11 rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm text-foreground transition-all duration-200;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary;
+  @apply disabled:cursor-not-allowed disabled:opacity-50;
+  @apply appearance-none cursor-pointer;
+  box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28), 0 2px 4px rgba(2, 6, 23, 0.08),
+    0 0 0 1px rgba(2, 6, 23, 0.04);
+}
+
+/* Textareas */
+@utility field-textarea {
+  @apply w-full rounded-lg border border-border/80 bg-card/70 px-4 py-3 text-sm text-foreground transition-all duration-200;
+  @apply placeholder:text-muted-foreground/60;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary;
+  @apply disabled:cursor-not-allowed disabled:opacity-50;
+  box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28), 0 2px 4px rgba(2, 6, 23, 0.08),
+    0 0 0 1px rgba(2, 6, 23, 0.04);
+}
+
+/* Superficies de UI */
+@utility card-surface {
+  @apply rounded-2xl border border-border/60 bg-card/85 text-card-foreground backdrop-blur;
+  box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28), 0 2px 4px rgba(2, 6, 23, 0.08),
+    0 0 0 1px rgba(2, 6, 23, 0.04);
+}
+
+@utility card-surface-strong {
+  @apply rounded-3xl border border-border/60 bg-card/92 text-card-foreground backdrop-blur-md;
+  box-shadow: 0 18px 28px -18px rgba(2, 6, 23, 0.35), 0 4px 8px rgba(2, 6, 23, 0.12),
+    0 0 0 1px rgba(2, 6, 23, 0.04);
+}
+
+@utility modal-surface {
+  @apply rounded-2xl border border-border/60 bg-card/90 text-card-foreground backdrop-blur-md;
+  box-shadow: 0 28px 42px -26px rgba(2, 6, 23, 0.45), 0 10px 16px rgba(2, 6, 23, 0.16),
+    0 0 0 1px rgba(2, 6, 23, 0.05);
+}
+
+@utility nav-surface {
+  @apply border border-border/60 bg-card/85 backdrop-blur-xl;
 }
 
 @layer utilities {
@@ -491,6 +574,7 @@ body {
   .surface-muted {
     @apply rounded-xl border border-border/60 bg-muted/30 backdrop-blur;
   }
+
 }
 
 /* ============================================

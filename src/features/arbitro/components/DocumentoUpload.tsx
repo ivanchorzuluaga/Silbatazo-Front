@@ -140,7 +140,7 @@ export function DocumentoUpload({ onSuccess }: DocumentoUploadProps) {
             accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
             onChange={handleFileChange}
             disabled={isLoading || isSubmitting}
-            className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 file:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            className="field-base file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 file:cursor-pointer"
             required
           />
           <p className="text-xs text-muted-foreground">
@@ -165,7 +165,7 @@ export function DocumentoUpload({ onSuccess }: DocumentoUploadProps) {
             onChange={(e) => setNombre(e.target.value)}
             disabled={isLoading || isSubmitting}
             placeholder="Ej: Certificación FIFA 2023"
-            className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            className="field-base"
           />
         </div>
 
@@ -176,4 +176,3 @@ export function DocumentoUpload({ onSuccess }: DocumentoUploadProps) {
     </form>
   );
 }
-

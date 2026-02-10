@@ -508,7 +508,7 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
             }}
             disabled={isLoading}
             rows={4}
-            className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            className="field-textarea"
             placeholder="Describe tu experiencia y formación como árbitro..."
           />
           {fieldErrors.biografia && (
@@ -570,7 +570,7 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
           </label>
           <div
             className={`max-h-40 overflow-y-auto rounded-lg border p-2 space-y-1 ${
-              fieldErrors.municipios_ids ? "border-destructive" : "border-input"
+              fieldErrors.municipios_ids ? "border-destructive" : "border-border/80"
             }`}
           >
             {municipiosLoading ? (
@@ -588,7 +588,7 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
                     checked={municipiosSeleccionados.includes(municipio.id)}
                     onChange={() => toggleMunicipio(municipio.id)}
                     disabled={isLoading}
-                    className="rounded border-input"
+                    className="rounded border-border bg-background"
                   />
                   <span className="text-sm">
                     {municipio.nombre}
@@ -617,7 +617,7 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
           </label>
           <div
             className={`max-h-40 overflow-y-auto rounded-lg border p-2 space-y-1 ${
-              fieldErrors.categorias_ids ? "border-destructive" : "border-input"
+              fieldErrors.categorias_ids ? "border-destructive" : "border-border/80"
             }`}
           >
             {categoriasLoading ? (
@@ -635,7 +635,7 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
                     checked={categoriasSeleccionadas.includes(categoria.id)}
                     onChange={() => toggleCategoria(categoria.id)}
                     disabled={isLoading}
-                    className="rounded border-input"
+                    className="rounded border-border bg-background"
                   />
                   <span className="text-sm">{categoria.nombre}</span>
                 </label>
@@ -661,7 +661,7 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
           </label>
           <div
             className={`max-h-40 overflow-y-auto rounded-lg border p-2 space-y-1 ${
-              fieldErrors.roles_ids ? "border-destructive" : "border-input"
+              fieldErrors.roles_ids ? "border-destructive" : "border-border/80"
             }`}
           >
             {rolesLoading ? (
@@ -679,7 +679,7 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
                     checked={rolesSeleccionados.includes(rol.id)}
                     onChange={() => toggleRol(rol.id)}
                     disabled={isLoading}
-                    className="rounded border-input"
+                    className="rounded border-border bg-background"
                   />
                   <span className="text-sm">{rol.nombre}</span>
                 </label>

@@ -257,7 +257,7 @@ function ConfirmacionModal({
             <textarea
               value={comentarios}
               onChange={(e) => onComentariosChange(e.target.value)}
-              className="w-full min-h-[100px] rounded-lg border border-border/80 bg-card/70 px-3 py-2 text-sm shadow-ios focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary"
+              className="field-textarea min-h-[100px]"
               placeholder={esRechazar ? "Explica el motivo del rechazo..." : "Comentarios sobre la aprobación..."}
             />
           </div>

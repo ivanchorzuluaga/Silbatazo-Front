@@ -9,10 +9,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { FormField } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import { validations } from "@/lib/validations";
+import { Eye, EyeOff } from "lucide-react";
 
 export function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
     username?: string;
     password?: string;
@@ -88,7 +90,7 @@ export function LoginForm() {
       <FormField
         label="Contraseña"
         name="password"
-        type="password"
+        type={showPassword ? "text" : "password"}
         value={password}
         onChange={(e) => {
           setPassword(e.target.value);
@@ -100,6 +102,16 @@ export function LoginForm() {
         disabled={isLoading}
         autoComplete="current-password"
         required
+        rightIcon={
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        }
       />
 
       {error && (

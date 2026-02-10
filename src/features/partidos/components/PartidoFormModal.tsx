@@ -239,9 +239,8 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                     onClick={openCalendar}
                     disabled={isLoading}
                     className={cn(
-                      "w-full h-10 px-3 text-left rounded-lg border transition-colors",
-                      "bg-input border-input text-foreground",
-                      "hover:bg-accent hover:border-accent",
+                      "field-select h-10 px-3 text-left",
+                      "hover:bg-accent/60",
                       "focus:outline-none focus:ring-2 focus:ring-primary/50",
                       fieldErrors.fecha && "border-destructive",
                       !formState.fecha && "text-muted-foreground"
@@ -281,7 +280,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                   onChange={(e) => setMunicipioId(e.target.value)}
                   disabled={isLoading || municipiosLoading}
                   className={cn(
-                    "bg-input border-input text-foreground",
+                    "field-select",
                     fieldErrors.municipio_id && "border-destructive"
                   )}
                 >

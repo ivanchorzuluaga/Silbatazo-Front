@@ -3,13 +3,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const cardVariants = cva(
-  "relative overflow-hidden rounded-ios-lg border bg-card/80 text-card-foreground transition-ios backdrop-blur-[2px]",
+  "relative overflow-hidden rounded-ios-lg border text-card-foreground transition-ios",
   {
   variants: {
     variant: {
-      default: "shadow-ios-md hover:shadow-ios-lg border-border/60",
-      elevated: "shadow-ios-lg hover:shadow-ios-xl border-border/40 bg-card/90 backdrop-blur-md",
-      outlined: "shadow-none border-2 border-border/70 hover:border-primary/50",
+      default: "card-surface hover:shadow-ios-lg",
+      elevated: "card-surface-strong hover:shadow-ios-xl",
+      outlined: "shadow-none border-2 border-border/70 bg-card/70 hover:border-primary/50",
       glass: "glass shadow-ios-md border-border/40 backdrop-blur-md",
     },
   },

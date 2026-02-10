@@ -26,12 +26,7 @@ export function TimePicker({ value, onChange, disabled, className }: TimePickerP
     onChange(`${selectedHour || "08"}:${minute}`);
   };
 
-  const selectClass = cn(
-    "flex-1 h-12 rounded-xl border-2 border-border bg-input px-3 text-sm text-foreground",
-    "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
-    "disabled:opacity-50 disabled:cursor-not-allowed",
-    "appearance-none cursor-pointer"
-  );
+  const selectClass = cn("field-select flex-1");
 
   return (
     <div className={cn("flex gap-2", className)}>

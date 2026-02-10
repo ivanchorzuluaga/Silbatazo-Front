@@ -147,12 +147,7 @@ export function FiltrosArbitros({
     });
   };
 
-  const selectBaseClass = cn(
-    "w-full h-12 rounded-xl border-2 border-border bg-input pl-11 pr-4 text-sm text-foreground",
-    "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
-    "disabled:opacity-50 disabled:cursor-not-allowed",
-    "appearance-none cursor-pointer"
-  );
+  const selectBaseClass = cn("field-select pl-11");
 
   return (
     <div className="space-y-6">
@@ -190,10 +185,7 @@ export function FiltrosArbitros({
           placeholder="Buscar árbitro por nombre..."
           disabled={isLoading}
           className={cn(
-            "w-full h-14 rounded-xl border-2 border-border bg-input pl-12 pr-4 text-base text-foreground",
-            "placeholder:text-muted-foreground/50",
-            "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
-            "disabled:opacity-50 disabled:cursor-not-allowed",
+            "field-base h-14 pl-12 text-base",
             "transition-all duration-200"
           )}
         />
@@ -298,10 +290,7 @@ export function FiltrosArbitros({
               onClick={() => (showCalendar ? closeCalendar() : openCalendar())}
               disabled={isLoading}
               className={cn(
-                "w-full h-12 rounded-xl border-2 border-border bg-input pl-11 pr-4 text-sm text-left text-foreground",
-                "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
-                "transition-all duration-200",
+                "field-select pl-11 text-left transition-all duration-200",
                 showCalendar && "ring-2 ring-primary/50 border-primary",
                 !filtros.fecha && "text-muted-foreground"
               )}

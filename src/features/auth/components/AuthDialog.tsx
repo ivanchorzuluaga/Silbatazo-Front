@@ -36,6 +36,8 @@ import {
   Star,
   ArrowRight,
   CheckCircle,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 interface AuthDialogProps {
@@ -65,6 +67,8 @@ export function AuthDialog({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [email, setEmail] = useState("");
   const [userRole, setUserRole] = useState<UserRole>(defaultRole || USER_ROLES.CLIENTE);
   const [fieldErrors, setFieldErrors] = useState<{
@@ -228,7 +232,7 @@ export function AuthDialog({
 
   return (
     <SlidePanel open={open} onOpenChange={onOpenChange}>
-      <SlidePanelContent className="w-full max-w-md mx-auto max-h-[90dvh] md:max-h-none overflow-y-auto rounded-b-2xl sm:rounded-b-xl shadow-xl">
+      <SlidePanelContent className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto max-h-[90dvh] md:max-h-none overflow-y-auto rounded-b-2xl sm:rounded-b-xl shadow-xl">
         <SlidePanelHeader className="pb-3 sm:pb-4 md:pb-3 px-4 sm:px-6">
           <div className="flex items-start justify-between gap-3 sm:gap-4">
             <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
@@ -305,7 +309,7 @@ export function AuthDialog({
             <FormField
               label="Contraseña"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
@@ -318,13 +322,23 @@ export function AuthDialog({
               autoComplete={isLogin ? "current-password" : "new-password"}
               required
               leftIcon={<Lock className="h-4 w-4" />}
+              rightIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              }
             />
 
             {!isLogin && (
               <FormField
                 label="Confirmar Contraseña"
                 name="password_confirm"
-                type="password"
+                type={showPasswordConfirm ? "text" : "password"}
                 value={passwordConfirm}
                 onChange={(e) => {
                   setPasswordConfirm(e.target.value);
@@ -337,6 +351,22 @@ export function AuthDialog({
                 autoComplete="new-password"
                 required
                 leftIcon={<Lock className="h-4 w-4" />}
+                rightIcon={
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordConfirm((prev) => !prev)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={
+                      showPasswordConfirm ? "Ocultar contraseña" : "Mostrar contraseña"
+                    }
+                  >
+                    {showPasswordConfirm ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                }
               />
             )}
           </div>

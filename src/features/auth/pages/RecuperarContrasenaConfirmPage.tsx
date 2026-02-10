@@ -130,7 +130,7 @@ export function RecuperarContrasenaConfirmPage() {
                   }}
                   disabled={isLoading}
                   autoComplete="new-password"
-                  className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"
+                  className="auth-input pl-11 pr-4"
                 />
               </div>
             </div>
@@ -154,7 +154,7 @@ export function RecuperarContrasenaConfirmPage() {
                   }}
                   disabled={isLoading}
                   autoComplete="new-password"
-                  className="w-full h-11 md:h-12 pl-11 pr-4 bg-black/40 border-2 border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 disabled:opacity-50"
+                  className="auth-input pl-11 pr-4"
                 />
               </div>
             </div>

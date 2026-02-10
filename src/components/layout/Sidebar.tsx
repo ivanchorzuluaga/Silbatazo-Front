@@ -42,7 +42,7 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "hidden sm:flex sm:flex-col sm:fixed sm:left-0 sm:top-0 sm:h-screen sm:w-64 sm:border-r sm:border-border/60 sm:bg-card/70 sm:backdrop-blur-xl sm:z-40",
+        "hidden sm:flex sm:flex-col sm:fixed sm:left-0 sm:top-0 sm:h-screen sm:w-64 sm:border-r sm:z-40 sm:nav-surface",
         className
       )}
     >
