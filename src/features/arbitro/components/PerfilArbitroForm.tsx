@@ -2,7 +2,7 @@
  * Formulario para crear/editar perfil de árbitro
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FormField, DateField } from "@/components/forms";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,8 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
   const { roles, isLoading: rolesLoading } = useRoles();
 
   const isEditMode = !!arbitro;
+  const minFechaNacimiento = useMemo(() => new Date(1900, 0, 1), []);
+  const maxFechaNacimiento = useMemo(() => new Date(), []);
 
   // Estados para datos del usuario (nombre y email)
   const [firstName, setFirstName] = useState(arbitro?.first_name || "");
@@ -473,6 +475,8 @@ export function PerfilArbitroForm({ arbitro, onSuccess }: PerfilArbitroFormProps
             }}
             error={fieldErrors.fecha_nacimiento}
             disabled={isLoading}
+            minDate={minFechaNacimiento}
+            maxDate={maxFechaNacimiento}
           />
         </div>
 

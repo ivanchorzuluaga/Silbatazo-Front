@@ -19,6 +19,7 @@ export interface DateFieldProps {
   required?: boolean;
   error?: string;
   minDate?: Date;
+  maxDate?: Date;
   onChange?: (value: string) => void;
   className?: string;
 }
@@ -33,6 +34,7 @@ export function DateField({
   required,
   error,
   minDate,
+  maxDate,
   onChange,
   className,
 }: DateFieldProps) {
@@ -171,6 +173,7 @@ export function DateField({
               onSelect={(date) => onChange?.(date)}
               onClose={closeCalendar}
               minDate={minDate}
+              maxDate={maxDate}
             />
           </div>,
           document.body

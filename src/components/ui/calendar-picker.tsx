@@ -12,9 +12,16 @@ interface CalendarPickerProps {
   onSelect: (date: string) => void;
   onClose: () => void;
   minDate?: Date;
+  maxDate?: Date;
 }
 
-export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: CalendarPickerProps) {
+export function CalendarPicker({
+  selectedDate,
+  onSelect,
+  onClose,
+  minDate,
+  maxDate,
+}: CalendarPickerProps) {
   const [currentMonth, setCurrentMonth] = useState(() => {
     if (selectedDate) {
       return new Date(selectedDate + "T00:00:00");
@@ -22,8 +29,10 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
     return new Date();
   });
 
-  const today = minDate || new Date();
-  today.setHours(0, 0, 0, 0);
+  const minBoundary = minDate ? new Date(minDate) : null;
+  if (minBoundary) minBoundary.setHours(0, 0, 0, 0);
+  const maxBoundary = maxDate ? new Date(maxDate) : null;
+  if (maxBoundary) maxBoundary.setHours(0, 0, 0, 0);
 
   const daysInMonth = new Date(
     currentMonth.getFullYear(),
@@ -60,7 +69,10 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
 
   const handleDateClick = (day: number) => {
     const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    if (date >= today) {
+    if (
+      (!minBoundary || date >= minBoundary) &&
+      (!maxBoundary || date <= maxBoundary)
+    ) {
       const formattedDate = date.toISOString().split("T")[0];
       onSelect(formattedDate);
       onClose();
@@ -75,7 +87,18 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
 
   const isPast = (day: number) => {
     const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    return date < today;
+    if (minBoundary) {
+      return date < minBoundary;
+    }
+    return false;
+  };
+
+  const isFuture = (day: number) => {
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    if (maxBoundary) {
+      return date > maxBoundary;
+    }
+    return false;
   };
 
   const isToday = (day: number) => {
@@ -84,10 +107,17 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
     return date.toISOString().split("T")[0] === todayStr;
   };
 
-  const canGoPrev =
-    currentMonth.getFullYear() > today.getFullYear() ||
-    (currentMonth.getFullYear() === today.getFullYear() &&
-      currentMonth.getMonth() > today.getMonth());
+  const canGoPrev = minBoundary
+    ? currentMonth.getFullYear() > minBoundary.getFullYear() ||
+      (currentMonth.getFullYear() === minBoundary.getFullYear() &&
+        currentMonth.getMonth() > minBoundary.getMonth())
+    : true;
+
+  const canGoNext = maxBoundary
+    ? currentMonth.getFullYear() < maxBoundary.getFullYear() ||
+      (currentMonth.getFullYear() === maxBoundary.getFullYear() &&
+        currentMonth.getMonth() < maxBoundary.getMonth())
+    : true;
 
   return (
     <div
@@ -113,7 +143,11 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
         <button
           type="button"
           onClick={nextMonth}
-          className="p-2 rounded-lg hover:bg-background/10 text-background transition-colors"
+          disabled={!canGoNext}
+          className={cn(
+            "p-2 rounded-lg transition-colors text-background",
+            canGoNext ? "hover:bg-background/10" : "text-background/40 cursor-not-allowed"
+          )}
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -139,19 +173,21 @@ export function CalendarPicker({ selectedDate, onSelect, onClose, minDate }: Cal
         {Array.from({ length: daysInMonth }).map((_, index) => {
           const day = index + 1;
           const past = isPast(day);
+          const future = isFuture(day);
           const selected = isSelected(day);
           const todayDay = isToday(day);
+          const disabled = past || future;
 
           return (
             <button
               type="button"
               key={day}
               onClick={() => handleDateClick(day)}
-              disabled={past}
+              disabled={disabled}
               className={cn(
                 "h-10 w-10 rounded-lg text-sm font-medium transition-all flex items-center justify-center",
-                past && "text-background/40 cursor-not-allowed",
-                !past && !selected && "hover:bg-background/10 text-background",
+                disabled && "text-background/40 cursor-not-allowed",
+                !disabled && !selected && "hover:bg-background/10 text-background",
                 selected && "bg-primary text-primary-foreground",
                 todayDay && !selected && "ring-2 ring-primary"
               )}
