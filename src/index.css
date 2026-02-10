@@ -257,20 +257,18 @@ body {
     font-feature-settings: "kern" 1, "liga" 1;
     background-image:
       radial-gradient(900px 520px at 12% -10%, color-mix(in oklch, var(--color-emerald) 16%, transparent), transparent 60%),
-      radial-gradient(800px 420px at 90% -15%, color-mix(in oklch, var(--color-indigo) 14%, transparent), transparent 55%),
-      url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMjAnIGhlaWdodD0nMTIwJyB2aWV3Qm94PScwIDAgMTIwIDEyMCc+PGZpbHRlciBpZD0nbic+PGZlVHVyYnVsZW5jZSB0eXBlPSdmcmFjdGFsTm9pc2UnIGJhc2VGcmVxdWVuY3k9JzAuOScgbnVtT2N0YXZlcz0nMicgc3RpdGNoVGlsZXM9J3N0aXRjaCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMjAnIGhlaWdodD0nMTIwJyBmaWx0ZXI9J3VybCgjbiknIG9wYWNpdHk9JzAuMTgnLz48L3N2Zz4=");
+      radial-gradient(800px 420px at 90% -15%, color-mix(in oklch, var(--color-indigo) 14%, transparent), transparent 55%);
     background-repeat: no-repeat;
-    background-size: cover, cover, 240px 240px;
+    background-size: cover, cover;
     background-attachment: scroll;
   }
 
   .dark body {
     background-image:
       radial-gradient(900px 520px at 10% -10%, color-mix(in oklch, var(--color-emerald) 18%, transparent), transparent 65%),
-      radial-gradient(800px 420px at 92% -18%, color-mix(in oklch, var(--color-indigo) 16%, transparent), transparent 60%),
-      url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMjAnIGhlaWdodD0nMTIwJyB2aWV3Qm94PScwIDAgMTIwIDEyMCc+PGZpbHRlciBpZD0nbic+PGZlVHVyYnVsZW5jZSB0eXBlPSdmcmFjdGFsTm9pc2UnIGJhc2VGcmVxdWVuY3k9JzAuOScgbnVtT2N0YXZlcz0nMicgc3RpdGNoVGlsZXM9J3N0aXRjaCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMjAnIGhlaWdodD0nMTIwJyBmaWx0ZXI9J3VybCgjbiknIG9wYWNpdHk9JzAuMTgnLz48L3N2Zz4=");
+      radial-gradient(800px 420px at 92% -18%, color-mix(in oklch, var(--color-indigo) 16%, transparent), transparent 60%);
     background-repeat: no-repeat;
-    background-size: cover, cover, 240px 240px;
+    background-size: cover, cover;
   }
 
   /* Tipografía mejorada tipo iOS */

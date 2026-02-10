@@ -33,18 +33,12 @@ export function FilterTabs<T extends string>({
         </p>
       )}
       <div className="relative">
-        {/* Sombras laterales para sugerir scroll en mobile */}
-        <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-6 bg-gradient-to-r from-background via-background/70 to-transparent sm:hidden" />
-        <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-6 bg-gradient-to-l from-background via-background/70 to-transparent sm:hidden" />
-
         <div
           role="tablist"
           aria-label={label || "Filtros"}
           className={cn(
-            "flex items-center gap-1.5 rounded-2xl border border-border/70 bg-muted/30 p-1.5",
-            "overflow-x-auto backdrop-blur-md shadow-ios",
-            "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-            "sm:flex-wrap",
+            "flex flex-wrap items-center gap-1.5 rounded-2xl border border-border/70 bg-muted/30 p-1.5",
+            "backdrop-blur-md shadow-ios",
             isSmall ? "-mx-2 px-2" : ""
           )}
         >

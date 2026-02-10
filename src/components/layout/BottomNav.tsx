@@ -33,6 +33,11 @@ export function BottomNav() {
   }));
   const displayItems = allItems.slice(0, 4);
   const sections = getVisibleNavSections(user.role);
+  const pathname = location.pathname;
+  const routes = allItems.map((item) => item.route);
+  const matchingRoute = routes
+    .filter((r) => pathname === r || (r !== ROUTES.HOME && pathname.startsWith(r + "/")))
+    .sort((a, b) => b.length - a.length)[0];
 
   const handleLogout = async () => {
     try {
@@ -49,10 +54,7 @@ export function BottomNav() {
         <div className="flex h-16 items-center justify-around px-2">
           {displayItems.map((item) => {
             const Icon = item.icon;
-            const pathname = location.pathname;
-            const isExact = pathname === item.route;
-            const isChild = item.route !== ROUTES.HOME && pathname.startsWith(item.route + "/");
-            const isActive = isExact || isChild;
+            const isActive = item.route === matchingRoute;
 
             return (
               <Link
@@ -66,7 +68,7 @@ export function BottomNav() {
               >
                 <div
                   className={cn(
-                    "rounded-xl p-2 transition-ios",
+                    "rounded-xl size-9 flex items-center justify-center transition-ios",
                     isActive && "bg-primary/10 ring-1 ring-primary/20"
                   )}
                 >
@@ -74,7 +76,7 @@ export function BottomNav() {
                 </div>
                 <span
                   className={cn(
-                    "text-[10px] font-medium transition-ios",
+                    "text-[10px] leading-tight text-center px-1 min-h-[24px] font-medium transition-ios",
                     isActive && "font-semibold"
                   )}
                 >
@@ -91,10 +93,12 @@ export function BottomNav() {
               "text-muted-foreground hover:text-foreground"
             )}
           >
-            <div className="rounded-xl p-2">
+            <div className="rounded-xl size-9 flex items-center justify-center">
               <Menu className="size-5" />
             </div>
-            <span className="text-[10px] font-medium">Más</span>
+            <span className="text-[10px] leading-tight text-center px-1 min-h-[24px] font-medium">
+              Más
+            </span>
           </button>
         </div>
       </nav>
