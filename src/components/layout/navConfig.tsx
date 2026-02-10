@@ -8,7 +8,6 @@ import {
   Search,
   User,
   Wallet,
-  Shield,
   Users,
   FileText,
   CreditCard,

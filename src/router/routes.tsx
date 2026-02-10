@@ -2,7 +2,7 @@
  * Configuración de rutas de la aplicación
  */
 
-import { lazy, Suspense } from "react";
+import React, { lazy, Suspense } from "react";
 import { createBrowserRouter, Outlet } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { DashboardRedirect } from "./DashboardRedirect";
@@ -183,7 +183,7 @@ function PageLoader() {
   );
 }
 
-function withSuspense(element: JSX.Element) {
+function withSuspense(element: React.ReactElement) {
   return <Suspense fallback={<PageLoader />}>{element}</Suspense>;
 }
 

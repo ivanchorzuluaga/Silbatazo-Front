@@ -71,6 +71,8 @@ interface PagoCardProps {
 }
 
 function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar, onPreview }: PagoCardProps) {
+  const comprobanteUrl = partido.comprobante_pago_url ?? "";
+
   return (
     <div className="rounded-xl border bg-card p-5 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex flex-col gap-4">
@@ -142,7 +144,7 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar, onPreview }: P
               Comprobante de transferencia
             </p>
             <a
-              href={partido.comprobante_pago_url}
+              href={comprobanteUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
@@ -152,11 +154,11 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar, onPreview }: P
             </a>
             <button
               type="button"
-              onClick={() => onPreview(partido.comprobante_pago_url)}
+              onClick={() => onPreview(comprobanteUrl)}
               className="mt-2 rounded-lg border bg-muted/30 overflow-hidden max-h-40 w-full max-w-xs text-left"
             >
               <img
-                src={partido.comprobante_pago_url}
+                src={comprobanteUrl}
                 alt="Comprobante de pago"
                 className="w-full h-full object-contain object-left-top"
               />
@@ -224,6 +226,8 @@ function AprobarModal({
   isProcessing,
   onPreview,
 }: AprobarModalProps) {
+  const comprobanteUrl = partido?.comprobante_pago_url ?? "";
+
   return (
     <Dialog open={open} onOpenChange={onCancelar}>
       <DialogContent className="max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
@@ -241,7 +245,7 @@ function AprobarModal({
                 Comprobante de transferencia (captura subida por el cliente)
               </p>
               <a
-                href={partido.comprobante_pago_url}
+                href={comprobanteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-primary hover:underline mb-2"
@@ -254,13 +258,13 @@ function AprobarModal({
                 variant="outline"
                 size="sm"
                 className="ml-2"
-                onClick={() => onPreview(partido.comprobante_pago_url)}
+                onClick={() => onPreview(comprobanteUrl)}
               >
                 Ver grande
               </Button>
               <div className="rounded-lg border bg-muted/30 overflow-hidden">
                 <img
-                  src={partido.comprobante_pago_url}
+                  src={comprobanteUrl}
                   alt="Comprobante de pago"
                   className="w-full max-h-64 object-contain object-top"
                 />
@@ -335,6 +339,8 @@ function RechazarModal({
   isProcessing,
   onPreview,
 }: RechazarModalProps) {
+  const comprobanteUrl = partido?.comprobante_pago_url ?? "";
+
   return (
     <Dialog open={open} onOpenChange={onCancelar}>
       <DialogContent className="max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
@@ -352,7 +358,7 @@ function RechazarModal({
                 Comprobante de transferencia (captura subida por el cliente)
               </p>
               <a
-                href={partido.comprobante_pago_url}
+                href={comprobanteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-primary hover:underline mb-2"
@@ -365,13 +371,13 @@ function RechazarModal({
                 variant="outline"
                 size="sm"
                 className="ml-2"
-                onClick={() => onPreview(partido.comprobante_pago_url)}
+                onClick={() => onPreview(comprobanteUrl)}
               >
                 Ver grande
               </Button>
               <div className="rounded-lg border bg-muted/30 overflow-hidden">
                 <img
-                  src={partido.comprobante_pago_url}
+                  src={comprobanteUrl}
                   alt="Comprobante de pago"
                   className="w-full max-h-64 object-contain object-top"
                 />
