@@ -142,6 +142,8 @@ export async function authenticatedApiClient<T>(
         });
       }
       redirectToLogin();
+      // No mostrar mensaje de token inválido al usuario
+      throw new ApiException("", 401);
     }
     throw error;
   }
