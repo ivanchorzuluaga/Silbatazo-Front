@@ -50,11 +50,11 @@ export function Hero() {
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-tight text-balance">
                 <span className="bg-gradient-to-r from-foreground to-primary/80 bg-clip-text text-transparent">
-                  ÁRBITROS
+                  ÁRBITROS PARA PARTIDOS Y TORNEOS
                 </span>
                 <br />
                 <span className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-muted-foreground">
-                  DE CALIDAD Y GARANTIZADOS
+                  EN COLOMBIA, FÁCIL Y CONFIABLE
                 </span>
               </h1>
 
@@ -72,8 +72,11 @@ export function Hero() {
               <div className="aspect-[4/3] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
                 <img
                   src={arbitroImage}
-                  alt="Árbitro certificado"
+                  alt="Árbitro en partido deportivo"
                   className="absolute inset-0 w-full h-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src =
@@ -93,8 +96,9 @@ export function Hero() {
 
             {/* Description */}
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-              Conecta con árbitros certificados para tus partidos, torneos y eventos deportivos.
-              <span className="font-semibold text-foreground"> Rápido, seguro y de confianza.</span>
+              Conecta con árbitros verificados para partidos, amistosos y torneos en el Área
+              Metropolitana de Medellín.
+              <span className="font-semibold text-foreground"> Rápido, seguro y sin enredos.</span>
             </p>
 
             {/* CTA Buttons */}
@@ -166,8 +170,11 @@ export function Hero() {
             <div className="aspect-[4/5] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
               <img
                 src={arbitroImage}
-                alt="Árbitro certificado"
+                alt="Árbitro en partido deportivo"
                 className="absolute inset-0 w-full h-full object-cover"
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.src =
