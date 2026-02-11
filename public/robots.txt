@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /$
+Allow: /index.html
+Allow: /assets/
+Allow: /Logo.png
+Disallow: /
+
+Sitemap: https://silbatazo.com/sitemap.xml

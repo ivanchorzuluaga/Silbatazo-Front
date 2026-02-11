@@ -7,6 +7,7 @@ import { createBrowserRouter, Outlet } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { DashboardRedirect } from "./DashboardRedirect";
 import { ROUTES, USER_ROLES } from "@/lib/constants";
+import { SeoController } from "@/components/seo/SeoController";
 
 const HomePage = lazy(() =>
   import("@/features/auth/pages/HomePage").then((m) => ({ default: m.HomePage }))
@@ -208,10 +209,19 @@ function RouteErrorFallback() {
   );
 }
 
+function SeoLayout() {
+  return (
+    <>
+      <SeoController />
+      <Outlet />
+    </>
+  );
+}
+
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Outlet />,
+    element: <SeoLayout />,
     errorElement: <RouteErrorFallback />,
     children: [
       {
