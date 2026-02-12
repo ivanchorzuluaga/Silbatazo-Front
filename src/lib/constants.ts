@@ -44,6 +44,7 @@ export const ROUTES = {
   ADMIN_ASIGNACION_PARTIDOS: "/admin/partidos/asignacion",
   ADMIN_PARTIDOS_SOLAPADOS: "/admin/partidos/solapados",
   ADMIN_PAGOS_PENDIENTES: "/admin/pagos/pendientes",
+  ADMIN_EMAILS: "/admin/correos",
   // Marketplace (público)
   ARBITROS: "/arbitros",
   ARBITRO_DETALLE: "/arbitros/:id",

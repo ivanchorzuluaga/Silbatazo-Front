@@ -542,9 +542,15 @@ function PaymentStatusCard({ estadoPago, notasPago }: PaymentStatusCardProps) {
             {isAprobado
               ? "Tu pago ha sido verificado y aprobado."
               : isEnRevision
-              ? "Tu pago está siendo revisado por el administrador."
+              ? "Tu pago está siendo revisado por el administrador. Puedes continuar usando la app mientras tanto."
               : notasPago || "El pago fue rechazado. Por favor, verifica la información."}
           </p>
+          {isEnRevision && (
+            <p className="text-muted-foreground text-xs mt-2">
+              La revisión es manual y puede tardar entre 15 y 30 minutos. Te avisaremos por correo
+              electrónico.
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -584,9 +590,15 @@ function PaymentCompletedView({ estadoPago }: PaymentCompletedViewProps) {
         {isAprobado
           ? "Tu pago ha sido verificado exitosamente. El árbitro ha sido notificado y tu partido está confirmado."
           : isEnRevision
-          ? "Tu pago está siendo revisado por nuestro equipo. Te notificaremos cuando sea aprobado."
+          ? "Tu pago está siendo revisado por nuestro equipo. Puedes continuar usando la app mientras tanto."
           : "Hubo un problema con tu pago. Por favor, contacta a soporte o intenta nuevamente."}
       </p>
+      {isEnRevision && (
+        <p className="text-muted-foreground text-sm max-w-md mx-auto mb-6">
+          La revisión es manual y puede tardar entre 15 y 30 minutos. Te avisaremos por correo
+          electrónico.
+        </p>
+      )}
       {!isAprobado && !isEnRevision && (
         <div className="mb-6">
           <WhatsAppButton

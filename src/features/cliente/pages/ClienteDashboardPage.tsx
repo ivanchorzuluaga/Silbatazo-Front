@@ -32,6 +32,7 @@ export function ClienteDashboardPage() {
     proximosPartidos,
     partidosRecientes,
     partidosPagosPendientes,
+    partidosPagosEnRevision,
     navigateToPartidos,
     navigateToPartido,
     navigateToPago,
@@ -143,6 +144,72 @@ export function ClienteDashboardPage() {
                                 </p>
                               )}
                             <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-warning group-hover:translate-x-1 transition-all" />
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Alerta de pagos en revisión */}
+          {!error && partidosPagosEnRevision.length > 0 && (
+            <section className="mb-8">
+              <div className="p-5 bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-primary/20 rounded-xl">
+                    <Clock className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground text-lg mb-1">
+                      Pago en Revisión
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      La revisión es manual y puede tardar entre 15 y 30 minutos. Te avisaremos por
+                      correo electrónico. Puedes seguir usando la app mientras tanto.
+                    </p>
+                    <div className="space-y-2">
+                      {partidosPagosEnRevision.map((partido) => (
+                        <button
+                          key={partido.id}
+                          onClick={() => navigateToPago(partido.id)}
+                          className="w-full flex items-center justify-between p-3 bg-muted/50 hover:bg-muted rounded-xl border border-border transition-colors group"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="text-center">
+                              <p className="text-lg font-bold text-primary">
+                                {parseLocalDate(partido.fecha).getDate()}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {parseLocalDate(partido.fecha)
+                                  .toLocaleDateString("es-CO", { month: "short" })
+                                  .toUpperCase()}
+                              </p>
+                            </div>
+                            <div className="text-left">
+                              <p className="text-foreground font-medium">Partido #{partido.id}</p>
+                              <p className="text-muted-foreground text-sm">{partido.lugar}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {(partido.monto_total != null || "tipo_partido" in partido) &&
+                              (partido.monto_total ??
+                                (partido as { tipo_partido?: { monto: number } }).tipo_partido
+                                  ?.monto) != null && (
+                                <p className="text-sm font-semibold text-primary tabular-nums">
+                                  {formatCop(
+                                    partido.monto_total ??
+                                      (partido as { tipo_partido?: { monto: number } }).tipo_partido
+                                        ?.monto ??
+                                      0
+                                  )}
+                                </p>
+                              )}
+                            <span className="text-xs text-primary/80 border border-primary/30 px-2 py-1 rounded-full">
+                              En revisión
+                            </span>
                           </div>
                         </button>
                       ))}

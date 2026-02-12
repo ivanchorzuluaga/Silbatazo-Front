@@ -38,7 +38,6 @@ export function DisponibilidadList({ municipiosPerfil, onRefresh }: Disponibilid
     listarDisponibilidades,
     crearDisponibilidad,
     actualizarDisponibilidad,
-    eliminarDisponibilidad,
     clearError,
   } = useDisponibilidad();
 

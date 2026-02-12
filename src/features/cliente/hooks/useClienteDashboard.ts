@@ -35,6 +35,7 @@ export interface UseClienteDashboardReturn {
   proximosPartidos: ReturnType<typeof usePartidos>["partidos"];
   partidosRecientes: ReturnType<typeof usePartidos>["partidos"];
   partidosPagosPendientes: ReturnType<typeof usePartidos>["partidos"];
+  partidosPagosEnRevision: ReturnType<typeof usePartidos>["partidos"];
 
   // Navegación
   navigateToCrearPartido: () => void;
@@ -93,6 +94,13 @@ export function useClienteDashboard(): UseClienteDashboardReturn {
       .slice(0, 3);
   }, [partidos]);
 
+  // Partidos con pago en revisión
+  const partidosPagosEnRevision = useMemo(() => {
+    return partidos
+      .filter((p) => p.estado_pago === "en_revision" && p.estado !== "cancelado")
+      .slice(0, 3);
+  }, [partidos]);
+
   // Funciones de navegación
   const navigateToCrearPartido = () => navigate(ROUTES.PARTIDOS_CREAR);
   const navigateToArbitros = () => navigate(ROUTES.ARBITROS);
@@ -110,6 +118,7 @@ export function useClienteDashboard(): UseClienteDashboardReturn {
     proximosPartidos,
     partidosRecientes,
     partidosPagosPendientes,
+    partidosPagosEnRevision,
     navigateToCrearPartido,
     navigateToArbitros,
     navigateToPartidos,

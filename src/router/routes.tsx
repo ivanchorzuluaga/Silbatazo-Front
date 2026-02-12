@@ -155,6 +155,11 @@ const RetirosPage = lazy(() =>
     default: m.RetirosPage,
   }))
 );
+const EmailsOutboxPage = lazy(() =>
+  import("@/features/admin/pages/EmailsOutboxPage").then((m) => ({
+    default: m.EmailsOutboxPage,
+  }))
+);
 const PartidosListPage = lazy(() =>
   import("@/features/partidos/pages/PartidosListPage").then((m) => ({
     default: m.PartidosListPage,
@@ -452,6 +457,15 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
             {withSuspense(<RetirosPage />)}
+          </ProtectedRoute>
+        ),
+      },
+      // Correos fallidos (admin)
+      {
+        path: ROUTES.ADMIN_EMAILS,
+        element: (
+          <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+            {withSuspense(<EmailsOutboxPage />)}
           </ProtectedRoute>
         ),
       },
