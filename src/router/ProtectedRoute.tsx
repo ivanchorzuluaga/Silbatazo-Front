@@ -45,6 +45,7 @@ export function ProtectedRoute({
 
   const email = user?.email?.trim();
   const isEmailVerified = !!user?.email_verificado;
+  const skipEmailVerification = import.meta.env.DEV === true;
   const emailVerificationAllowedPaths: string[] = [
     ROUTES.VERIFICAR_CORREO,
     ROUTES.ARBITRO_ONBOARDING,
@@ -52,7 +53,12 @@ export function ProtectedRoute({
     ROUTES.CLIENTE_PERFIL,
   ];
 
-  if (email && !isEmailVerified && !emailVerificationAllowedPaths.includes(location.pathname)) {
+  if (
+    !skipEmailVerification &&
+    email &&
+    !isEmailVerified &&
+    !emailVerificationAllowedPaths.includes(location.pathname)
+  ) {
     return <Navigate to={ROUTES.VERIFICAR_CORREO} replace />;
   }
 
