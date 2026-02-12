@@ -19,9 +19,13 @@ export function PerfilArbitroPage() {
   const navigate = useNavigate();
   const { arbitro, obtenerPerfil, isLoading, error } = useArbitro();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [focusSection, setFocusSection] = useState<"personal" | "experiencia" | null>(null);
   const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
   const [showDocumentos, setShowDocumentos] = useState(false);
   const [refreshDocumentos, setRefreshDocumentos] = useState(0);
+  const rolesVisibles = (arbitro?.roles ?? [])
+    .map((rol) => rol.nombre)
+    .filter((nombre) => nombre.toLowerCase() !== "central solo");
 
   useEffect(() => {
     let cancelled = false;
@@ -51,6 +55,7 @@ export function PerfilArbitroPage() {
 
   const handleSuccess = () => {
     setIsEditMode(false);
+    setFocusSection(null);
     obtenerPerfil();
   };
 
@@ -92,7 +97,7 @@ export function PerfilArbitroPage() {
     <PageLayout
       title={pageTitle}
       backButton={{ label: "Volver", to: ROUTES.ARBITRO_DASHBOARD }}
-      contentClassName="page-surface max-w-2xl"
+      contentClassName="page-surface max-w-5xl"
     >
       <div>
         {isLoading && !hasCheckedProfile ? (
@@ -107,86 +112,115 @@ export function PerfilArbitroPage() {
             </div>
           </div>
         ) : isEditMode ? (
-          <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
-            <PerfilArbitroForm arbitro={arbitro || undefined} onSuccess={handleSuccess} />
+          <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-8 shadow-lg backdrop-blur">
+            <PerfilArbitroForm
+              arbitro={arbitro || undefined}
+              onSuccess={handleSuccess}
+              focusSection={focusSection}
+            />
           </div>
         ) : arbitro ? (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Información del perfil */}
-            <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
-              <div className="flex items-start justify-between mb-4">
-                <h2 className="text-lg font-semibold">Información Personal</h2>
-                <Button variant="outline" size="sm" onClick={() => setIsEditMode(true)}>
+            <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-8 shadow-lg backdrop-blur">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-semibold">Información Personal</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Tu perfil público y datos de contacto
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setFocusSection("personal");
+                    setIsEditMode(true);
+                  }}
+                >
                   Editar
                 </Button>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-6 mb-6">
-                <div className="rounded-full overflow-hidden border-2 border-border bg-muted w-24 h-24 sm:w-28 sm:h-28 shrink-0">
-                  <img
-                    src={getRefereeImage(
-                      arbitro.foto_perfil,
-                      arbitro.id,
-                      arbitro.experiencia_anos,
-                      arbitro.full_name || arbitro.username
-                    )}
-                    alt="Foto de perfil"
-                    className="w-full h-full object-cover"
-                  />
+              <div className="grid gap-4 lg:grid-cols-[180px_1fr]">
+                <div className="flex flex-col items-start gap-4">
+                  <div className="rounded-full overflow-hidden border-2 border-border/70 bg-muted w-24 h-24 sm:w-28 sm:h-28 shrink-0 shadow-md">
+                    <img
+                      src={getRefereeImage(
+                        arbitro.foto_perfil,
+                        arbitro.id,
+                        arbitro.experiencia_anos,
+                        arbitro.full_name || arbitro.username
+                      )}
+                      alt="Foto de perfil"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Perfil visible para organizadores
+                  </div>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 flex-1">
+
+                <div className="grid gap-3 sm:grid-cols-2">
                   {arbitro.username && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Usuario</p>
-                      <p className="text-base font-medium">{arbitro.username}</p>
+                    <div className="rounded-2xl border border-border/50 bg-background/60 p-4">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Usuario
+                      </p>
+                      <p className="text-base font-semibold">{arbitro.username}</p>
                     </div>
                   )}
                   {arbitro.email && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Email</p>
+                    <div className="rounded-2xl border border-border/50 bg-background/60 p-4">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Email
+                      </p>
                       <p className="text-base">{arbitro.email}</p>
                     </div>
                   )}
                   {arbitro.full_name && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Nombre Completo</p>
+                    <div className="rounded-2xl border border-border/50 bg-background/60 p-4">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Nombre Completo
+                      </p>
                       <p className="text-base">{arbitro.full_name}</p>
+                    </div>
+                  )}
+                  {arbitro.telefono && (
+                    <div className="rounded-2xl border border-border/50 bg-background/60 p-4">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Teléfono
+                      </p>
+                      <p className="text-base">{arbitro.telefono}</p>
+                    </div>
+                  )}
+                  {arbitro.fecha_nacimiento && (
+                    <div className="rounded-2xl border border-border/50 bg-background/60 p-4">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Fecha de Nacimiento
+                      </p>
+                      <p className="text-base">
+                        {new Date(arbitro.fecha_nacimiento).toLocaleDateString("es-CO")}
+                      </p>
+                    </div>
+                  )}
+                  {arbitro.documento_identidad && (
+                    <div className="rounded-2xl border border-border/50 bg-background/60 p-4">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Documento de Identidad
+                      </p>
+                      <p className="text-base">{arbitro.documento_identidad}</p>
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                {arbitro.telefono && (
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Teléfono</p>
-                    <p className="text-base">{arbitro.telefono}</p>
-                  </div>
-                )}
-
-                {arbitro.fecha_nacimiento && (
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Fecha de Nacimiento</p>
-                    <p className="text-base">
-                      {new Date(arbitro.fecha_nacimiento).toLocaleDateString("es-CO")}
-                    </p>
-                  </div>
-                )}
-
-                {arbitro.documento_identidad && (
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Documento de Identidad
-                    </p>
-                    <p className="text-base">{arbitro.documento_identidad}</p>
-                  </div>
-                )}
-              </div>
-
               {arbitro.biografia && (
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-sm font-medium text-muted-foreground mb-2">Biografía</p>
-                  <p className="text-base whitespace-pre-wrap text-muted-foreground">
+                <div className="mt-6 pt-6 border-t border-border/60">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+                    Biografía
+                  </p>
+                  <p className="text-base whitespace-pre-wrap text-muted-foreground leading-relaxed">
                     {arbitro.biografia}
                   </p>
                 </div>
@@ -194,23 +228,63 @@ export function PerfilArbitroPage() {
             </div>
 
             {/* Experiencia y categorías */}
-            <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">Experiencia y categorías</h2>
+            <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-8 shadow-lg backdrop-blur">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-semibold">
+                    Experiencia y categorías
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Lo que ofreces como árbitro
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setFocusSection("experiencia");
+                    setIsEditMode(true);
+                  }}
+                >
+                  Editar
+                </Button>
+              </div>
               <div className="grid gap-4 sm:grid-cols-2 mb-4">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Años de Experiencia</p>
-                  <p className="text-xl font-semibold">{arbitro.experiencia_anos} años</p>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Años de Experiencia
+                  </p>
+                  <p className="text-2xl font-semibold">{arbitro.experiencia_anos} años</p>
                 </div>
+                {rolesVisibles.length > 0 && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Roles
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {rolesVisibles.map((rol) => (
+                        <span
+                          key={rol}
+                          className="inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold"
+                        >
+                          {rol}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {arbitro.municipios.length > 0 && (
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Municipios</p>
+                <div className="mt-6 pt-6 border-t border-border/60">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
+                    Municipios
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {arbitro.municipios.map((municipio) => (
                       <span
                         key={municipio.id}
-                        className="inline-flex items-center rounded-md bg-primary/10 text-primary px-3 py-1.5 text-sm font-medium"
+                        className="inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1.5 text-sm font-medium"
                       >
                         {municipio.nombre}
                         {municipio.departamento && `, ${municipio.departamento}`}
@@ -221,13 +295,15 @@ export function PerfilArbitroPage() {
               )}
 
               {arbitro.categorias.length > 0 && (
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Categorías</p>
+                <div className="mt-6 pt-6 border-t border-border/60">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
+                    Categorías
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {arbitro.categorias.map((categoria) => (
                       <span
                         key={categoria.id}
-                        className="inline-flex items-center rounded-md bg-secondary text-secondary-foreground px-3 py-1.5 text-sm font-medium"
+                        className="inline-flex items-center rounded-full bg-secondary text-secondary-foreground px-3 py-1.5 text-sm font-medium"
                       >
                         {categoria.nombre}
                       </span>
@@ -238,8 +314,8 @@ export function PerfilArbitroPage() {
             </div>
 
             {/* Estado de verificación */}
-            <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">Estado de Verificación</h2>
+            <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-8 shadow-lg backdrop-blur">
+              <h2 className="text-lg sm:text-xl font-semibold mb-4">Estado de Verificación</h2>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span
@@ -269,9 +345,14 @@ export function PerfilArbitroPage() {
             </div>
 
             {/* Gestión de Documentos */}
-            <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Documentos</h2>
+            <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-8 shadow-lg backdrop-blur">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-semibold">Documentos</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Sube y gestiona tus documentos de verificación
+                  </p>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -282,7 +363,7 @@ export function PerfilArbitroPage() {
               </div>
 
               {showDocumentos && (
-                <div className="space-y-6 pt-4 border-t">
+                <div className="space-y-6 pt-6 border-t border-border/60">
                   <DocumentoUpload
                     onSuccess={() => {
                       setRefreshDocumentos((prev) => prev + 1);
@@ -301,7 +382,25 @@ export function PerfilArbitroPage() {
             </div>
 
             {/* Gestión de Disponibilidad */}
-            <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
+            <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-8 shadow-lg backdrop-blur">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-semibold">Disponibilidad</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Define tus horarios disponibles
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setFocusSection(null);
+                    setIsEditMode(true);
+                  }}
+                >
+                  Editar
+                </Button>
+              </div>
               <DisponibilidadList municipiosPerfil={arbitro?.municipios ?? []} />
             </div>
           </div>

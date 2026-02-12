@@ -84,50 +84,77 @@ export function PerfilClienteForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
         <div className="rounded-lg border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
           {error}
         </div>
       )}
-      <FormField
-        label="Nombre"
-        name="first_name"
-        value={firstName}
-        onChange={(e) => setFirstName(e.target.value)}
-        placeholder="Tu nombre"
-        error={fieldErrors.first_name}
-        autoComplete="given-name"
-      />
-      <FormField
-        label="Apellido"
-        name="last_name"
-        value={lastName}
-        onChange={(e) => setLastName(e.target.value)}
-        placeholder="Tu apellido"
-        error={fieldErrors.last_name}
-        autoComplete="family-name"
-      />
-      <FormField
-        label="Correo electrónico"
-        name="email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="correo@ejemplo.com"
-        error={fieldErrors.email}
-        autoComplete="email"
-      />
-      <FormField
-        label="Teléfono"
-        name="telefono"
-        type="tel"
-        value={telefono}
-        onChange={(e) => setTelefono(e.target.value)}
-        placeholder="Ej: 300 123 4567"
-        error={fieldErrors.telefono}
-        autoComplete="tel"
-      />
+      <div className="space-y-2">
+        <h3 className="text-base font-semibold">Información básica</h3>
+        <p className="text-sm text-muted-foreground">
+          Así te identificamos dentro de la plataforma.
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <FormField
+          label="Nombre"
+          name="first_name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          placeholder="Tu nombre"
+          error={fieldErrors.first_name}
+          autoComplete="given-name"
+        />
+        <FormField
+          label="Apellido"
+          name="last_name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          placeholder="Tu apellido"
+          error={fieldErrors.last_name}
+          autoComplete="family-name"
+        />
+      </div>
+
+      <div className="space-y-2 pt-2 border-t border-border/60">
+        <h3 className="text-base font-semibold">Contacto</h3>
+        <p className="text-sm text-muted-foreground">
+          Te enviaremos novedades y recordatorios sobre tus partidos.
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <FormField
+          label="Correo electrónico"
+          name="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="correo@ejemplo.com"
+          error={fieldErrors.email}
+          autoComplete="email"
+        />
+        <FormField
+          label="Teléfono"
+          name="telefono"
+          type="tel"
+          value={telefono}
+          onChange={(e) => setTelefono(e.target.value)}
+          placeholder="Ej: 300 123 4567"
+          error={fieldErrors.telefono}
+          autoComplete="tel"
+        />
+      </div>
+
+      <div className="space-y-2 pt-2 border-t border-border/60">
+        <h3 className="text-base font-semibold">Documento</h3>
+        <p className="text-sm text-muted-foreground">
+          Necesario para validar pagos y soporte.
+        </p>
+      </div>
+
       <FormField
         label="Número de documento"
         name="documento_identidad"
@@ -137,9 +164,12 @@ export function PerfilClienteForm({
         error={fieldErrors.documento_identidad}
         autoComplete="off"
       />
-      <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
-        {isLoading ? "Guardando..." : "Guardar perfil"}
-      </Button>
+
+      <div className="pt-2">
+        <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+          {isLoading ? "Guardando..." : "Guardar perfil"}
+        </Button>
+      </div>
     </form>
   );
 }

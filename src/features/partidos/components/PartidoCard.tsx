@@ -8,12 +8,19 @@ import { getPartidoDetailRoute } from "@/lib/constants";
 import type { Partido } from "../types/partido.types";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PartidoCardProps {
   partido: Partido;
 }
 
 export function PartidoCard({ partido }: PartidoCardProps) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const titulo = isAdmin
+    ? `Partido #${partido.id}`
+    : `Partido en ${partido.municipio?.nombre ?? partido.lugar}`;
+
   return (
     <Link
       to={getPartidoDetailRoute(partido.id)}
@@ -26,7 +33,7 @@ export function PartidoCard({ partido }: PartidoCardProps) {
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <h3 className="text-base sm:text-xl font-semibold text-foreground">
-                  Partido #{partido.id}
+                  {titulo}
                 </h3>
                 <Badge
                   variant={

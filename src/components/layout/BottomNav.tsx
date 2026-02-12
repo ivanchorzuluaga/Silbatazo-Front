@@ -15,12 +15,14 @@ import { getVisibleNavSections, getVisibleNavItems } from "./navConfig";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useNavBadges } from "./useNavBadges";
 
 export function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const badges = useNavBadges();
 
   if (!isAuthenticated || !user) {
     return null;
@@ -68,11 +70,16 @@ export function BottomNav() {
               >
                 <div
                   className={cn(
-                    "rounded-xl size-9 flex items-center justify-center transition-ios",
+                    "relative rounded-xl size-9 flex items-center justify-center transition-ios",
                     isActive && "bg-primary/10 ring-1 ring-primary/20"
                   )}
                 >
                   <Icon className="size-5" />
+                  {badges[item.route] && badges[item.route] > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold flex items-center justify-center tabular-nums">
+                      {badges[item.route] > 99 ? "99+" : badges[item.route]}
+                    </span>
+                  )}
                 </div>
                 <span
                   className={cn(
@@ -120,6 +127,7 @@ export function BottomNav() {
                   {section.items.map((item) => {
                     const Icon = item.icon;
                     const route = item.route || dashboardRoute;
+                    const badgeValue = badges[route];
                     return (
                       <Link
                         key={route}
@@ -129,6 +137,11 @@ export function BottomNav() {
                       >
                         <Icon className="size-4" />
                         <span className="truncate">{item.label}</span>
+                        {badgeValue && badgeValue > 0 && (
+                          <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-[11px] text-primary-foreground tabular-nums">
+                            {badgeValue > 99 ? "99+" : badgeValue}
+                          </span>
+                        )}
                       </Link>
                     );
                   })}

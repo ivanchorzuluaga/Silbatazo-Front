@@ -7,6 +7,7 @@ import { parseLocalDate, formatCop } from "@/lib/utils";
 import { useCalificaciones } from "../hooks/useCalificaciones";
 import { Star } from "lucide-react";
 import type { PartidoDetail as PartidoDetailType } from "../types/partido.types";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PartidoDetailProps {
   partido: PartidoDetailType;
@@ -30,6 +31,11 @@ const estadoPagoColors: Record<string, string> = {
 export function PartidoDetail({ partido }: PartidoDetailProps) {
   const estadoColor = estadoColors[partido.estado] || estadoColors.pendiente;
   const { promedio, obtenerPromedio, isLoading: isLoadingPromedio } = useCalificaciones();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const titulo = isAdmin
+    ? `Partido #${partido.id}`
+    : `Partido en ${partido.municipio?.nombre ?? partido.lugar}`;
 
   // Cargar promedio de calificaciones del árbitro si hay árbitro asignado
   useEffect(() => {
@@ -43,10 +49,10 @@ export function PartidoDetail({ partido }: PartidoDetailProps) {
       {/* Header */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Partido #{partido.id}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">{titulo}</h1>
           {partido.codigo && (
             <p className="text-xs sm:text-sm font-mono text-muted-foreground mb-2 break-all">
-              Código: {partido.codigo}
+              {isAdmin ? "Código" : "Referencia"}: {partido.codigo}
             </p>
           )}
           <p className="text-sm sm:text-base text-muted-foreground">

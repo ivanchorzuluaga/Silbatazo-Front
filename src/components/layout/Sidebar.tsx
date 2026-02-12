@@ -13,6 +13,7 @@ import logoImage from "@/assets/Silvato.png";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getVisibleNavSections } from "./navConfig";
+import { useNavBadges } from "./useNavBadges";
 
 interface SidebarProps {
   className?: string;
@@ -22,6 +23,7 @@ export function Sidebar({ className }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
+  const badges = useNavBadges();
 
   if (!isAuthenticated || !user) {
     return null;
@@ -88,6 +90,7 @@ export function Sidebar({ className }: SidebarProps) {
                     const Icon = item.icon;
                     const route = item.route || dashboardRoute;
                     const isActive = route === matchingRoute;
+                    const badgeValue = badges[route];
 
                     return (
                       <li key={item.route || "dashboard"}>
@@ -102,9 +105,9 @@ export function Sidebar({ className }: SidebarProps) {
                         >
                           <Icon className="size-4 shrink-0" />
                           <span className="flex-1">{item.label}</span>
-                          {item.badge && (
-                            <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                              {item.badge}
+                          {badgeValue && badgeValue > 0 && (
+                            <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground tabular-nums">
+                              {badgeValue > 99 ? "99+" : badgeValue}
                             </span>
                           )}
                         </Link>

@@ -4,14 +4,17 @@
  */
 
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLayout } from "@/components/layout";
 import { useAdminDashboardStats } from "../hooks/useAdminDashboardStats";
 import { getTodayLocalDate } from "@/lib/utils";
 import { Users, Shield, Clock, AlertCircle, Trophy } from "lucide-react";
+import { ROUTES } from "@/lib/constants";
 
 export function AdminDashboardPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { stats, isLoading, error } = useAdminDashboardStats();
 
   const quickStats = [
@@ -22,6 +25,7 @@ export function AdminDashboardPage() {
       color: "from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900",
       textColor: "text-blue-600 dark:text-blue-300",
       iconColor: "text-blue-500",
+      route: ROUTES.ADMIN_GESTION_ARBITROS,
     },
     {
       title: "Partidos Hoy",
@@ -30,6 +34,7 @@ export function AdminDashboardPage() {
       color: "from-green-50 to-green-100 dark:from-green-950 dark:to-green-900",
       textColor: "text-green-600 dark:text-green-300",
       iconColor: "text-green-500",
+      route: ROUTES.ADMIN_GESTION_PARTIDOS,
     },
     {
       title: "Pendientes",
@@ -38,6 +43,7 @@ export function AdminDashboardPage() {
       color: "from-yellow-50 to-orange-100 dark:from-yellow-950 dark:to-orange-900",
       textColor: "text-orange-600 dark:text-orange-300",
       iconColor: "text-orange-500",
+      route: ROUTES.ADMIN_PAGOS_PENDIENTES,
     },
     {
       title: "Verificaciones",
@@ -46,6 +52,7 @@ export function AdminDashboardPage() {
       color: "from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900",
       textColor: "text-purple-600 dark:text-purple-300",
       iconColor: "text-purple-500",
+      route: ROUTES.ADMIN_VERIFICACION,
     },
   ];
 
@@ -88,7 +95,16 @@ export function AdminDashboardPage() {
         {quickStats.map((stat) => (
           <Card
             key={stat.title}
-            className={`group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br ${stat.color}`}
+            className={`group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br ${stat.color} cursor-pointer`}
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate(stat.route)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                navigate(stat.route);
+              }
+            }}
           >
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">

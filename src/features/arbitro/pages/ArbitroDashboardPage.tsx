@@ -10,6 +10,7 @@ import { PageLayout } from "@/components/layout";
 import { usePartidos } from "@/features/partidos/hooks/usePartidos";
 import { Calendar, Clock, CheckCircle, DollarSign, Shield, Activity } from "lucide-react";
 import { parseLocalDate, getTodayLocalDate, formatCop } from "@/lib/utils";
+import { ROUTES } from "@/lib/constants";
 
 export function ArbitroDashboardPage() {
   const { user } = useAuth();
@@ -73,7 +74,18 @@ export function ArbitroDashboardPage() {
 
       {/* Cards de métricas */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900">
+        <Card
+          className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate(ROUTES.PARTIDOS)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              navigate(ROUTES.PARTIDOS);
+            }
+          }}
+        >
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-blue-600 dark:text-blue-300">
@@ -90,7 +102,18 @@ export function ArbitroDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-yellow-50 to-orange-100 dark:from-yellow-950 dark:to-orange-900">
+        <Card
+          className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-yellow-50 to-orange-100 dark:from-yellow-950 dark:to-orange-900 cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate(ROUTES.PARTIDOS)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              navigate(ROUTES.PARTIDOS);
+            }
+          }}
+        >
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-orange-600 dark:text-orange-300">
@@ -107,7 +130,18 @@ export function ArbitroDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900">
+        <Card
+          className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900 cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate(ROUTES.PARTIDOS)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              navigate(ROUTES.PARTIDOS);
+            }
+          }}
+        >
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-green-600 dark:text-green-300">
@@ -124,7 +158,18 @@ export function ArbitroDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-950 dark:to-teal-900">
+        <Card
+          className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-950 dark:to-teal-900 cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate(ROUTES.ARBITRO_BILLETERA)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              navigate(ROUTES.ARBITRO_BILLETERA);
+            }
+          }}
+        >
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-emerald-600 dark:text-emerald-300">
@@ -166,7 +211,7 @@ export function ArbitroDashboardPage() {
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-primary" />
-                    Partido #{partido.id}
+                    Partido en {partido.municipio?.nombre ?? partido.lugar}
                   </CardTitle>
                   <CardDescription>
                     {parseLocalDate(partido.fecha).toLocaleDateString("es-CO", {

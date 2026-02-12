@@ -150,6 +150,11 @@ const DisponibilidadSemanal = memo(function DisponibilidadSemanal({
   onGuardar: (payload: { id?: number; crear?: boolean; data: DisponibilidadCreateData }[]) => void;
   isLoading: boolean;
 }) {
+  const normalizarHora = useCallback((valor: string) => {
+    const hora = valor?.split(":")[0] ?? "00";
+    return `${hora.padStart(2, "0")}:00`;
+  }, []);
+
   const rowsBase = useMemo(() => {
     return dias.map((dia) => {
       const disponiblesDia = disponibilidades.filter((d) => d.dia_semana === dia);
@@ -158,17 +163,36 @@ const DisponibilidadSemanal = memo(function DisponibilidadSemanal({
         dia,
         id: activo?.id,
         activo: activo?.activo ?? false,
-        hora_inicio: activo?.hora_inicio?.substring(0, 5) ?? "08:00",
-        hora_fin: activo?.hora_fin?.substring(0, 5) ?? "18:00",
+        hora_inicio: normalizarHora(activo?.hora_inicio?.substring(0, 5) ?? "08:00"),
+        hora_fin: normalizarHora(activo?.hora_fin?.substring(0, 5) ?? "18:00"),
       };
     });
-  }, [dias, disponibilidades]);
+  }, [dias, disponibilidades, normalizarHora]);
 
   const [rows, setRows] = useState<SemanaRow[]>(rowsBase);
   const [guardando, setGuardando] = useState(false);
+  const [usarTodosDias, setUsarTodosDias] = useState(false);
+  const [todosHorario, setTodosHorario] = useState({ hora_inicio: "08:00", hora_fin: "18:00" });
 
   useEffect(() => {
     setRows(rowsBase);
+    const todosActivos = rowsBase.every((row) => row.activo);
+    const mismoHorario =
+      rowsBase.length > 0 &&
+      rowsBase.every(
+        (row) =>
+          row.hora_inicio === rowsBase[0].hora_inicio &&
+          row.hora_fin === rowsBase[0].hora_fin
+      );
+    if (todosActivos && mismoHorario) {
+      setUsarTodosDias(true);
+      setTodosHorario({
+        hora_inicio: rowsBase[0].hora_inicio,
+        hora_fin: rowsBase[0].hora_fin,
+      });
+    } else {
+      setUsarTodosDias(false);
+    }
   }, [rowsBase]);
 
   const handleToggle = useCallback((dia: DiaSemana) => {
@@ -180,10 +204,46 @@ const DisponibilidadSemanal = memo(function DisponibilidadSemanal({
   const handleHoraChange = useCallback(
     (dia: DiaSemana, campo: "hora_inicio" | "hora_fin", valor: string) => {
       setRows((prev) =>
-        prev.map((row) => (row.dia === dia ? { ...row, [campo]: valor } : row))
+        prev.map((row) =>
+          row.dia === dia ? { ...row, [campo]: normalizarHora(valor) } : row
+        )
       );
     },
-    []
+    [normalizarHora]
+  );
+
+  const handleToggleTodos = useCallback(() => {
+    setUsarTodosDias((prev) => {
+      const next = !prev;
+      if (next) {
+        setRows((current) =>
+          current.map((row) => ({
+            ...row,
+            activo: true,
+            hora_inicio: todosHorario.hora_inicio,
+            hora_fin: todosHorario.hora_fin,
+          }))
+        );
+      }
+      return next;
+    });
+  }, [todosHorario.hora_fin, todosHorario.hora_inicio]);
+
+  const handleTodosHorarioChange = useCallback(
+    (campo: "hora_inicio" | "hora_fin", valor: string) => {
+      const nuevoValor = normalizarHora(valor);
+      setTodosHorario((prev) => ({ ...prev, [campo]: nuevoValor }));
+      if (usarTodosDias) {
+        setRows((current) =>
+          current.map((row) => ({
+            ...row,
+            activo: true,
+            [campo]: nuevoValor,
+          }))
+        );
+      }
+    },
+    [normalizarHora, usarTodosDias]
   );
 
   const handleGuardar = useCallback(async () => {
@@ -192,8 +252,8 @@ const DisponibilidadSemanal = memo(function DisponibilidadSemanal({
       const payload = rows.map((row) => {
         const data: DisponibilidadCreateData = {
           dia_semana: row.dia,
-          hora_inicio: row.hora_inicio,
-          hora_fin: row.hora_fin,
+          hora_inicio: normalizarHora(row.hora_inicio),
+          hora_fin: normalizarHora(row.hora_fin),
           activo: row.activo,
           municipios_ids: municipiosIds,
         };
@@ -212,6 +272,51 @@ const DisponibilidadSemanal = memo(function DisponibilidadSemanal({
     <div className="space-y-4">
       <div className="rounded-md border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-200">
         Activa el día y define el rango horario.
+      </div>
+      <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-medium text-foreground">Todos los días</p>
+            <p className="text-xs text-muted-foreground">
+              Aplica el mismo horario a lunes–domingo.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={usarTodosDias}
+            onClick={handleToggleTodos}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              usarTodosDias ? "bg-primary" : "bg-muted"
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-background transition-transform ${
+                usarTodosDias ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
+        </div>
+        {usarTodosDias && (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Desde</span>
+            <div className="min-w-[110px]">
+              <TimePicker24h
+                value={todosHorario.hora_inicio}
+                onChange={(valor) => handleTodosHorarioChange("hora_inicio", valor)}
+                soloHoras
+              />
+            </div>
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Hasta</span>
+            <div className="min-w-[110px]">
+              <TimePicker24h
+                value={todosHorario.hora_fin}
+                onChange={(valor) => handleTodosHorarioChange("hora_fin", valor)}
+                soloHoras
+              />
+            </div>
+          </div>
+        )}
       </div>
       {diasConMultiples.length > 0 && (
         <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
@@ -258,6 +363,7 @@ const DisponibilidadSemanal = memo(function DisponibilidadSemanal({
                     value={row.hora_inicio}
                     onChange={(valor) => handleHoraChange(row.dia, "hora_inicio", valor)}
                     className="gap-1"
+                    soloHoras
                   />
                 </div>
                 <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
@@ -268,6 +374,7 @@ const DisponibilidadSemanal = memo(function DisponibilidadSemanal({
                     value={row.hora_fin}
                     onChange={(valor) => handleHoraChange(row.dia, "hora_fin", valor)}
                     className="gap-1"
+                    soloHoras
                   />
                 </div>
               </div>

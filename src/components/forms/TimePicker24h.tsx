@@ -15,6 +15,7 @@ export interface TimePicker24hProps {
   required?: boolean;
   className?: string;
   error?: string;
+  soloHoras?: boolean;
 }
 
 export function TimePicker24h({
@@ -26,6 +27,7 @@ export function TimePicker24h({
   required = false,
   className,
   error,
+  soloHoras = false,
 }: TimePicker24hProps) {
   // Parsear el valor actual (HH:MM)
   const [horaActual, minutoActual] = value
@@ -33,11 +35,16 @@ export function TimePicker24h({
     : [null, null];
 
   const handleHoraChange = (hora: string) => {
-    const minuto = minutoActual !== null ? String(minutoActual).padStart(2, "0") : "00";
+    const minuto = soloHoras
+      ? "00"
+      : minutoActual !== null
+        ? String(minutoActual).padStart(2, "0")
+        : "00";
     onChange(`${hora.padStart(2, "0")}:${minuto}`);
   };
 
   const handleMinutoChange = (minuto: string) => {
+    if (soloHoras) return;
     const hora = horaActual !== null ? String(horaActual).padStart(2, "0") : "00";
     onChange(`${hora}:${minuto.padStart(2, "0")}`);
   };
@@ -48,7 +55,7 @@ export function TimePicker24h({
     return { value: hora, label: hora };
   });
 
-  // Generar opciones de minutos (00-59, cada 15 minutos para facilitar selección)
+  // Generar opciones de minutos (00-59)
   const minutos = Array.from({ length: 60 }, (_, i) => {
     const minuto = String(i).padStart(2, "0");
     return { value: minuto, label: minuto };
@@ -73,23 +80,29 @@ export function TimePicker24h({
             </option>
           ))}
         </Select>
-        <span className="text-lg font-medium text-muted-foreground">:</span>
-        <Select
-          id={id ? `${id}-minuto` : undefined}
-          name={name ? `${name}-minuto` : undefined}
-          value={minutoActual !== null ? String(minutoActual).padStart(2, "0") : ""}
-          onChange={(e) => handleMinutoChange(e.target.value)}
-          disabled={disabled}
-          required={required}
-          className={cn("flex-1", error && "border-destructive")}
-        >
-          <option value="">--</option>
-          {minutos.map((minuto) => (
-            <option key={minuto.value} value={minuto.value}>
-              {minuto.label}
-            </option>
-          ))}
-        </Select>
+        {soloHoras ? (
+          <span className="text-sm font-medium text-muted-foreground">:00</span>
+        ) : (
+          <>
+            <span className="text-lg font-medium text-muted-foreground">:</span>
+            <Select
+              id={id ? `${id}-minuto` : undefined}
+              name={name ? `${name}-minuto` : undefined}
+              value={minutoActual !== null ? String(minutoActual).padStart(2, "0") : ""}
+              onChange={(e) => handleMinutoChange(e.target.value)}
+              disabled={disabled}
+              required={required}
+              className={cn("flex-1", error && "border-destructive")}
+            >
+              <option value="">--</option>
+              {minutos.map((minuto) => (
+                <option key={minuto.value} value={minuto.value}>
+                  {minuto.label}
+                </option>
+              ))}
+            </Select>
+          </>
+        )}
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>

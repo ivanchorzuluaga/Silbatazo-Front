@@ -125,8 +125,10 @@ export function ClienteDashboardPage() {
                               </p>
                             </div>
                             <div className="text-left">
-                              <p className="text-foreground font-medium">Partido #{partido.id}</p>
-                              <p className="text-muted-foreground text-sm">{partido.lugar}</p>
+                              <p className="text-foreground font-medium">Partido en {partido.lugar}</p>
+                              <p className="text-muted-foreground text-sm">
+                                {partido.municipio?.nombre ?? "Ubicación pendiente"}
+                              </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
@@ -189,8 +191,10 @@ export function ClienteDashboardPage() {
                               </p>
                             </div>
                             <div className="text-left">
-                              <p className="text-foreground font-medium">Partido #{partido.id}</p>
-                              <p className="text-muted-foreground text-sm">{partido.lugar}</p>
+                              <p className="text-foreground font-medium">Partido en {partido.lugar}</p>
+                              <p className="text-muted-foreground text-sm">
+                                {partido.municipio?.nombre ?? "Ubicación pendiente"}
+                              </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
@@ -227,19 +231,33 @@ export function ClienteDashboardPage() {
               <StatsLoading />
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard icon={TrendingUp} label="Total" value={stats.total} color="blue" />
-                <StatCard icon={Clock} label="Pendientes" value={stats.pendientes} color="amber" />
+                <StatCard
+                  icon={TrendingUp}
+                  label="Total"
+                  value={stats.total}
+                  color="blue"
+                  onClick={navigateToPartidos}
+                />
+                <StatCard
+                  icon={Clock}
+                  label="Pendientes"
+                  value={stats.pendientes}
+                  color="amber"
+                  onClick={navigateToPartidos}
+                />
                 <StatCard
                   icon={CheckCircle}
                   label="Confirmados"
                   value={stats.aceptados}
                   color="green"
+                  onClick={navigateToPartidos}
                 />
                 <StatCard
                   icon={Star}
                   label="Completados"
                   value={stats.completados}
                   color="purple"
+                  onClick={navigateToPartidos}
                 />
               </div>
             )}
@@ -351,9 +369,10 @@ interface StatCardProps {
   label: string;
   value: number;
   color: "blue" | "amber" | "green" | "purple";
+  onClick?: () => void;
 }
 
-function StatCard({ icon: Icon, label, value, color }: StatCardProps) {
+function StatCard({ icon: Icon, label, value, color, onClick }: StatCardProps) {
   const colorClasses = {
     blue: "border-primary/20 text-primary",
     amber: "border-warning/20 text-warning",
@@ -362,13 +381,21 @@ function StatCard({ icon: Icon, label, value, color }: StatCardProps) {
   };
 
   return (
-    <div className={cn("p-4 rounded-xl border bg-card backdrop-blur-md", colorClasses[color])}>
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "p-4 rounded-xl border bg-card backdrop-blur-md text-left transition-all",
+        onClick && "hover:border-primary/40 hover:bg-muted/60",
+        colorClasses[color]
+      )}
+    >
       <div className="flex items-center justify-between mb-2">
         <Icon className="w-5 h-5" />
         <span className="text-2xl font-bold text-foreground">{value}</span>
       </div>
       <p className="text-muted-foreground text-sm">{label}</p>
-    </div>
+    </button>
   );
 }
 
@@ -429,9 +456,9 @@ function PartidoCard({ partido, onClick }: PartidoCardProps) {
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <code className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
-              #{partido.id}
-            </code>
+            <Badge className="text-xs bg-muted text-muted-foreground border-border/60">
+              {partido.categoria?.nombre ?? "Partido"}
+            </Badge>
             <Badge
               className={cn(
                 "text-xs",
@@ -519,9 +546,7 @@ function ActivityItem({ partido, onClick }: ActivityItemProps) {
       </div>
 
       <div className="flex-1 min-w-0 text-left">
-        <p className="text-foreground font-medium truncate">
-          Partido #{partido.id} - {partido.lugar}
-        </p>
+        <p className="text-foreground font-medium truncate">Partido en {partido.lugar}</p>
         <p className="text-muted-foreground text-sm">
           {fecha.toLocaleDateString("es-CO", {
             day: "numeric",

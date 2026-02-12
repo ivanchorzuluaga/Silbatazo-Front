@@ -443,6 +443,7 @@ export interface AdminDashboardStats {
   arbitros_activos: number;
   partidos_hoy: number;
   pendientes: number;
+  pagos_pendientes?: number;
   verificaciones: number;
 }
 

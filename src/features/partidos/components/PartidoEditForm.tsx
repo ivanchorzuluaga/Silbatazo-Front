@@ -16,6 +16,7 @@ import {
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { usePartido } from "../hooks/usePartido";
 import { getTodayLocalDate, compareDates, normalizeDateForInput } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 import type { PartidoDetail, PartidoUpdateData } from "../types/partido.types";
 
 interface PartidoEditFormProps {
@@ -27,6 +28,8 @@ interface PartidoEditFormProps {
 
 export function PartidoEditForm({ partido, open, onClose, onSuccess }: PartidoEditFormProps) {
   const { actualizarPartido, isLoading, error, clearError } = usePartido();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   // Estados del formulario
   const [fecha, setFecha] = useState("");
@@ -115,10 +118,10 @@ export function PartidoEditForm({ partido, open, onClose, onSuccess }: PartidoEd
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            Editar Partido #{partido.id}
+            {isAdmin ? `Editar Partido #${partido.id}` : "Editar partido"}
             {partido.codigo && (
               <span className="text-sm font-mono text-muted-foreground block mt-1">
-                Código: {partido.codigo}
+                {isAdmin ? "Código" : "Referencia"}: {partido.codigo}
               </span>
             )}
           </DialogTitle>
