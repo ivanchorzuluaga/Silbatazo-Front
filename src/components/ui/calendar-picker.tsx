@@ -59,6 +59,20 @@ export function CalendarPicker({
 
   const dayNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
+  const minYear = minBoundary ? minBoundary.getFullYear() : currentMonth.getFullYear() - 100;
+  const maxYear = maxBoundary ? maxBoundary.getFullYear() : currentMonth.getFullYear() + 2;
+  const years = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
+
+  const handleMonthChange = (value: string) => {
+    const nextMonthIndex = Number(value);
+    setCurrentMonth(new Date(currentMonth.getFullYear(), nextMonthIndex, 1));
+  };
+
+  const handleYearChange = (value: string) => {
+    const nextYear = Number(value);
+    setCurrentMonth(new Date(nextYear, currentMonth.getMonth(), 1));
+  };
+
   const prevMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
   };
@@ -125,7 +139,7 @@ export function CalendarPicker({
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header del calendario */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 gap-2">
         <button
           type="button"
           onClick={prevMonth}
@@ -137,9 +151,38 @@ export function CalendarPicker({
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h3 className="font-semibold text-background">
-          {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-        </h3>
+        <div className="flex items-center gap-2">
+          <label className="sr-only" htmlFor="calendar-month">
+            Mes
+          </label>
+          <select
+            id="calendar-month"
+            value={currentMonth.getMonth()}
+            onChange={(event) => handleMonthChange(event.target.value)}
+            className="bg-background/10 text-background text-sm rounded-md px-2 py-1 border border-foreground/20"
+          >
+            {monthNames.map((month, index) => (
+              <option key={month} value={index} className="text-foreground">
+                {month}
+              </option>
+            ))}
+          </select>
+          <label className="sr-only" htmlFor="calendar-year">
+            Año
+          </label>
+          <select
+            id="calendar-year"
+            value={currentMonth.getFullYear()}
+            onChange={(event) => handleYearChange(event.target.value)}
+            className="bg-background/10 text-background text-sm rounded-md px-2 py-1 border border-foreground/20"
+          >
+            {years.map((year) => (
+              <option key={year} value={year} className="text-foreground">
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
         <button
           type="button"
           onClick={nextMonth}
