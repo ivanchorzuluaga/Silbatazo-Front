@@ -3,7 +3,8 @@
  * Tabs por estado y filtros adicionales
  */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FilterTabs } from "@/components/ui/FilterTabs";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,8 @@ const TABS_ESTADO: { value: "" | EstadoPartido; label: string }[] = [
 ];
 
 export function GestionPartidosPage() {
+  const [searchParams] = useSearchParams();
+  const initializedFromQuery = useRef(false);
   const { municipios } = useMunicipios();
   const { categorias } = useCategorias();
 
@@ -50,6 +53,17 @@ export function GestionPartidosPage() {
   if (arbitroId) filtros.arbitro_id = parseInt(arbitroId);
 
   const { partidos, isLoading, error } = usePartidos(filtros);
+
+  useEffect(() => {
+    if (initializedFromQuery.current) return;
+    const estadoParam = searchParams.get("estado");
+    if (!estadoParam) return;
+    const valido = TABS_ESTADO.some((tab) => tab.value === estadoParam);
+    if (valido) {
+      setTabEstado(estadoParam as EstadoPartido);
+      initializedFromQuery.current = true;
+    }
+  }, [searchParams]);
 
   const handleLimpiarFiltros = () => {
     setTabEstado("");

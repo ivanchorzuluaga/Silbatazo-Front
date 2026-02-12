@@ -16,7 +16,7 @@ const Dialog = ({ open, onOpenChange, children }: DialogProps) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-y-auto overscroll-contain px-3 py-4 sm:p-6 touch-pan-y"
       onClick={() => onOpenChange(false)}
     >
       <div
@@ -34,8 +34,8 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
       <div
         ref={ref}
         className={cn(
-          "relative z-50 w-full max-w-lg max-h-[85vh] overflow-y-auto modal-surface p-4 sm:p-6 mx-4 sm:mx-6",
-          "overscroll-contain",
+          "relative z-50 w-full max-w-lg max-h-[90dvh] sm:max-h-[85vh] overflow-y-auto modal-surface p-4 sm:p-6 mx-4 sm:mx-6",
+          "overscroll-contain touch-pan-y ios-scroll",
           className
         )}
         {...props}

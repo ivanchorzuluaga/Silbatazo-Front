@@ -3,11 +3,14 @@
  * Muestra información relevante: estadísticas, próximos partidos, pagos pendientes
  */
 
+import { useNavigate } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useClienteDashboard } from "../hooks/useClienteDashboard";
 import { PageLayout } from "@/components/layout";
+import { useClienteDashboard } from "../hooks/useClienteDashboard";
 import logoImage from "@/assets/Logo.png";
+import { ROUTES } from "@/lib/constants";
 import {
   Calendar,
   Clock,
@@ -23,6 +26,7 @@ import {
 import { parseLocalDate, cn, formatCop } from "@/lib/utils";
 
 export function ClienteDashboardPage() {
+  const navigate = useNavigate();
   const {
     username,
     isLoading,
@@ -33,6 +37,7 @@ export function ClienteDashboardPage() {
     partidosRecientes,
     partidosPagosPendientes,
     partidosPagosEnRevision,
+    navigateToArbitros,
     navigateToPartidos,
     navigateToPartido,
     navigateToPago,
@@ -263,6 +268,45 @@ export function ClienteDashboardPage() {
             )}
           </section>
 
+          {/* Accesos por sesión */}
+          <section className="mb-8">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Accesos rápidos</h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <QuickActionCard
+                icon={Calendar}
+                label="Mis Partidos"
+                helper="Ver agenda completa"
+                value={stats.total}
+                color="blue"
+                onClick={navigateToPartidos}
+              />
+              <QuickActionCard
+                icon={CreditCard}
+                label="Pagos"
+                helper="Pagos pendientes y revisión"
+                value={stats.pagosPendientes}
+                color="amber"
+                onClick={navigateToPartidos}
+              />
+              <QuickActionCard
+                icon={MapPin}
+                label="Buscar árbitros"
+                helper="Explorar árbitros disponibles"
+                value="→"
+                color="green"
+                onClick={navigateToArbitros}
+              />
+              <QuickActionCard
+                icon={Star}
+                label="Mi perfil"
+                helper="Actualiza tus datos"
+                value="→"
+                color="purple"
+                onClick={() => navigate(ROUTES.CLIENTE_PERFIL)}
+              />
+            </div>
+          </section>
+
           {/* Próximos partidos */}
           {error ? null : isLoading ? (
             <PartidosLoading title="Próximos Partidos" />
@@ -395,6 +439,49 @@ function StatCard({ icon: Icon, label, value, color, onClick }: StatCardProps) {
         <span className="text-2xl font-bold text-foreground">{value}</span>
       </div>
       <p className="text-muted-foreground text-sm">{label}</p>
+    </button>
+  );
+}
+
+interface QuickActionCardProps {
+  icon: React.ElementType;
+  label: string;
+  helper: string;
+  value: number | string;
+  color: "blue" | "amber" | "green" | "purple";
+  onClick: () => void;
+}
+
+function QuickActionCard({
+  icon: Icon,
+  label,
+  helper,
+  value,
+  color,
+  onClick,
+}: QuickActionCardProps) {
+  const colorClasses = {
+    blue: "border-primary/20 text-primary",
+    amber: "border-warning/20 text-warning",
+    green: "border-success/20 text-success",
+    purple: "border-accent/20 text-accent",
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "p-4 rounded-xl border bg-card backdrop-blur-md text-left transition-all hover:bg-muted/60 hover:border-primary/40",
+        colorClasses[color]
+      )}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <Icon className="w-5 h-5" />
+        <span className="text-2xl font-bold text-foreground">{value}</span>
+      </div>
+      <p className="text-muted-foreground text-sm">{label}</p>
+      <p className="text-muted-foreground text-xs mt-1">{helper}</p>
     </button>
   );
 }

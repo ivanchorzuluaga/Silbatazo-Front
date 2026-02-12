@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLayout } from "@/components/layout";
 import { usePartidos } from "@/features/partidos/hooks/usePartidos";
-import { Calendar, Clock, CheckCircle, DollarSign, Shield, Activity } from "lucide-react";
+import { Calendar, Clock, CheckCircle, DollarSign, Shield, Activity, User, Wallet } from "lucide-react";
 import { parseLocalDate, getTodayLocalDate, formatCop } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 
@@ -184,6 +184,121 @@ export function ArbitroDashboardPage() {
             </div>
             <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">
               {partidosCompletados} completados
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Accesos rápidos por sesión */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card
+          className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-primary/10 to-secondary/10 cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate(ROUTES.PARTIDOS)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              navigate(ROUTES.PARTIDOS);
+            }
+          }}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-primary">Partidos</CardTitle>
+              <Calendar className="w-5 h-5 text-primary" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-primary">{totalPartidos}</div>
+            <p className="text-xs text-primary/80 mt-1">Ver agenda completa</p>
+          </CardContent>
+        </Card>
+
+        <Card
+          className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-950 dark:to-teal-900 cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate(ROUTES.ARBITRO_BILLETERA)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              navigate(ROUTES.ARBITRO_BILLETERA);
+            }
+          }}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-emerald-600 dark:text-emerald-300">
+                Billetera
+              </CardTitle>
+              <Wallet className="w-5 h-5 text-emerald-500" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-300">
+              {formatCop(gananciasTotal)}
+            </div>
+            <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">
+              Movimientos y retiros
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card
+          className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-900 cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate(ROUTES.ARBITRO_PERFIL)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              navigate(ROUTES.ARBITRO_PERFIL);
+            }
+          }}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-blue-600 dark:text-blue-300">
+                Mi Perfil
+              </CardTitle>
+              <User className="w-5 h-5 text-blue-500" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-300">
+              {user?.username || "Perfil"}
+            </div>
+            <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">
+              Actualiza tu información
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card
+          className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate(ROUTES.ARBITRO_PERFIL)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              navigate(ROUTES.ARBITRO_PERFIL);
+            }
+          }}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                Disponibilidad
+              </CardTitle>
+              <Clock className="w-5 h-5 text-slate-500" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-slate-600 dark:text-slate-300">Ir</div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Configura tus horarios
             </p>
           </CardContent>
         </Card>

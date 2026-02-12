@@ -103,7 +103,7 @@ export function useClienteDashboard(): UseClienteDashboardReturn {
 
   // Funciones de navegación
   const navigateToCrearPartido = () => navigate(ROUTES.PARTIDOS_CREAR);
-  const navigateToArbitros = () => navigate(ROUTES.ARBITROS);
+  const navigateToArbitros = () => navigate(ROUTES.CLIENTE_ARBITROS);
   const navigateToPartidos = () => navigate(ROUTES.PARTIDOS);
   const navigateToPartido = (id: number) => navigate(getPartidoDetailRoute(id));
   const navigateToPago = (id: number) => navigate(getPartidoPagoRoute(id));

@@ -440,6 +440,11 @@ body {
     -webkit-tap-highlight-color: transparent;
   }
 
+  .ios-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
   /* Sombras tipo iOS (múltiples capas) */
   .shadow-ios {
     box-shadow: 0 1px 2px rgba(2, 6, 23, 0.08), 0 1px 1px rgba(2, 6, 23, 0.05);
