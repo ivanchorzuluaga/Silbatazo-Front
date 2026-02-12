@@ -237,12 +237,17 @@ export function PagoPartidoPage() {
 
                   {/* Datos de transferencia */}
                   <div className="space-y-4">
-                    <CopyField
-                      label="Número Nequi"
-                      value={nequiConfig.phone}
-                      onCopy={handleCopy}
-                      sublabel={`Nombre: ${nequiConfig.name}`}
-                    />
+                    <div className="rounded-xl border border-dashed border-border/70 bg-muted/30 px-4 py-3">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Número Nequi
+                      </p>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Oculto en modo prueba
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Nombre: {nequiConfig.name}
+                      </p>
+                    </div>
                     <CopyField
                       label="Monto"
                       value={formatCurrency(monto)}
@@ -263,7 +268,6 @@ export function PagoPartidoPage() {
                   {[
                     "Abre la app de Nequi en tu celular",
                     'Ve a "Enviar" o "Transferir"',
-                    `Ingresa el número: ${nequiConfig.phone}`,
                     `Ingresa el monto: ${formatCurrency(monto)}`,
                     `En la referencia, escribe: ${referencia}`,
                     "Confirma y realiza la transferencia",

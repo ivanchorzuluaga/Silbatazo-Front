@@ -11,6 +11,7 @@ import {
   EyeOff,
   Lock,
   Mail,
+  Phone,
   Shield,
   Star,
   User,
@@ -48,6 +49,7 @@ export function RegisterPage() {
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [telefono, setTelefono] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -60,6 +62,7 @@ export function RegisterPage() {
   const [fieldErrors, setFieldErrors] = useState<{
     username?: string;
     email?: string;
+    telefono?: string;
     password?: string;
     password_confirm?: string;
     role?: string;
@@ -87,6 +90,10 @@ export function RegisterPage() {
       errors.email = "El correo es requerido";
     } else if (!validations.email(email)) {
       errors.email = "Ingresa un correo válido";
+    }
+
+    if (!validations.required(telefono)) {
+      errors.telefono = "El teléfono es requerido";
     }
 
     if (!validations.required(password)) {
@@ -125,6 +132,7 @@ export function RegisterPage() {
       const authResponse = await register({
         username,
         email,
+        telefono,
         password,
         password_confirm: passwordConfirm,
         role: userRole as "cliente" | "arbitro",
@@ -240,6 +248,25 @@ export function RegisterPage() {
                     autoComplete="email"
                     required
                     leftIcon={<Mail className="h-4 w-4" />}
+                  />
+
+                  <FormField
+                    label="Teléfono"
+                    name="telefono"
+                    type="tel"
+                    placeholder="Ej: 300 123 4567"
+                    value={telefono}
+                    onChange={(e) => {
+                      setTelefono(e.target.value);
+                      if (fieldErrors.telefono) {
+                        setFieldErrors((prev) => ({ ...prev, telefono: undefined }));
+                      }
+                    }}
+                    error={fieldErrors.telefono}
+                    disabled={isLoading}
+                    autoComplete="tel"
+                    required
+                    leftIcon={<Phone className="h-4 w-4" />}
                   />
 
                   <FormField

@@ -66,6 +66,9 @@ export function PerfilClienteForm({
     } else if (!validations.email(email)) {
       errors.email = "El formato del correo no es válido";
     }
+    if (!telefono?.trim()) {
+      errors.telefono = "El teléfono es requerido";
+    }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -78,7 +81,7 @@ export function PerfilClienteForm({
       first_name: firstName.trim(),
       last_name: lastName.trim(),
       email: email.trim(),
-      telefono: telefono.trim() || undefined,
+      telefono: telefono.trim(),
       documento_identidad: documentoIdentidad.trim() || undefined,
     });
   };
@@ -145,6 +148,7 @@ export function PerfilClienteForm({
           placeholder="Ej: 300 123 4567"
           error={fieldErrors.telefono}
           autoComplete="tel"
+          required
         />
       </div>
 

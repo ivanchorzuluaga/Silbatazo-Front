@@ -162,6 +162,10 @@ export function PerfilArbitroForm({
       }
     }
 
+    if (showPersonal && !telefono?.trim()) {
+      errors.telefono = "El teléfono es requerido";
+    }
+
     if (showExperiencia) {
       // Validar experiencia (requerido)
       const experienciaNum = parseInt(experienciaAnos);
@@ -241,7 +245,7 @@ export function PerfilArbitroForm({
 
       // Actualizar datos del perfil de árbitro
       const data = {
-        telefono: telefono || undefined,
+        telefono: telefono.trim(),
         fecha_nacimiento: fechaNacimiento || undefined,
         documento_identidad: documentoIdentidad || undefined,
         biografia: biografia || undefined,
@@ -488,6 +492,7 @@ export function PerfilArbitroForm({
                 error={fieldErrors.telefono}
                 disabled={isLoading}
                 placeholder="+57 300 123 4567"
+                required
               />
 
               <DateField
