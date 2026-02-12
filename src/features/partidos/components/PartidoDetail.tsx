@@ -4,6 +4,7 @@
 
 import { useEffect } from "react";
 import { parseLocalDate, formatCop } from "@/lib/utils";
+import { getGrossAmount, getRoleAmounts } from "@/lib/pricing";
 import { useCalificaciones } from "../hooks/useCalificaciones";
 import { Star } from "lucide-react";
 import type { PartidoDetail as PartidoDetailType } from "../types/partido.types";
@@ -126,13 +127,27 @@ export function PartidoDetail({ partido }: PartidoDetailProps) {
           )}
           <div>
             <p className="text-xs sm:text-sm text-muted-foreground mb-1">Valor a cobrar</p>
-            <p className="font-medium text-sm sm:text-base">
-              {partido.monto_total != null
-                ? formatCop(partido.monto_total)
-                : partido.tipo_partido
-                ? formatCop(partido.tipo_partido.monto)
-                : "—"}
-            </p>
+            {partido.monto_total != null || partido.tipo_partido?.monto != null ? (() => {
+              const gross = getGrossAmount(partido.monto_total ?? null, partido.tipo_partido?.monto ?? null);
+              const { gross: grossAmount, net, showBoth, showNetOnly } = getRoleAmounts(
+                gross,
+                user?.role
+              );
+              return (
+                <div>
+                  <p className="font-medium text-sm sm:text-base">
+                    {formatCop(showNetOnly ? net : grossAmount)}
+                  </p>
+                  {showBoth && (
+                    <p className="text-xs text-muted-foreground">
+                      Árbitro: {formatCop(net)}
+                    </p>
+                  )}
+                </div>
+              );
+            })() : (
+              <p className="font-medium text-sm sm:text-base">—</p>
+            )}
           </div>
         </div>
       </div>

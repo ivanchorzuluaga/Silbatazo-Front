@@ -4,6 +4,7 @@
 
 import { Link } from "react-router-dom";
 import { parseLocalDate, formatCop } from "@/lib/utils";
+import { getGrossAmount, getRoleAmounts } from "@/lib/pricing";
 import { getPartidoDetailRoute } from "@/lib/constants";
 import type { Partido } from "../types/partido.types";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -139,11 +140,25 @@ export function PartidoCard({ partido }: PartidoCardProps) {
                 {partido.municipio.nombre}
               </Badge>
             </div>
-            {(partido.monto_total != null || partido.tipo_partido?.monto != null) && (
-              <p className="text-sm font-semibold text-primary tabular-nums">
-                {formatCop(partido.monto_total ?? partido.tipo_partido?.monto ?? 0)}
-              </p>
-            )}
+            {(partido.monto_total != null || partido.tipo_partido?.monto != null) && (() => {
+              const gross = getGrossAmount(partido.monto_total, partido.tipo_partido?.monto ?? null);
+              const { gross: grossAmount, net, showBoth, showNetOnly } = getRoleAmounts(
+                gross,
+                user?.role
+              );
+              return (
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-primary tabular-nums">
+                    {formatCop(showNetOnly ? net : grossAmount)}
+                  </p>
+                  {showBoth && (
+                    <p className="text-[11px] text-muted-foreground tabular-nums">
+                      Árbitro: {formatCop(net)}
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </CardContent>
       </Card>

@@ -5,6 +5,7 @@
 import { Button } from "@/components/ui/button";
 import type { TipoPartidoAdmin } from "@/features/partidos/types/partido.types";
 import { formatCop } from "@/lib/utils";
+import { getNetAmount } from "@/lib/pricing";
 
 interface TipoPartidoCardProps {
   tipo: TipoPartidoAdmin;
@@ -67,6 +68,9 @@ export function TipoPartidoCard({
               <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Precio</p>
               <p className="text-sm font-semibold text-primary tabular-nums">
                 {formatCop(tipo.monto)}
+              </p>
+              <p className="text-[10px] text-muted-foreground tabular-nums">
+                Árbitro: {formatCop(getNetAmount(tipo.monto))}
               </p>
             </div>
             <div className="rounded-xl bg-background/70 border border-border/60 px-3 py-2">

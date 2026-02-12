@@ -21,6 +21,7 @@ import { usePartidos } from "@/features/partidos/hooks/usePartidos";
 import { usePagosPendientes } from "../hooks/usePagosPendientes";
 import { ROUTES, getPartidoDetailRoute } from "@/lib/constants";
 import { formatCop } from "@/lib/utils";
+import { getGrossAmount, getNetAmount } from "@/lib/pricing";
 import type { Partido, EstadoPago } from "@/features/partidos/types/partido.types";
 
 const TABS_PAGO: { value: EstadoPago; label: string }[] = [
@@ -116,11 +117,22 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar, onPreview }: P
           </div>
           <div>
             <p className="text-muted-foreground text-xs sm:text-sm mb-1">Monto</p>
-            <p className="font-medium text-primary text-base sm:text-lg tabular-nums">
-              {partido.monto_total != null || partido.tipo_partido?.monto != null
-                ? formatCop(partido.monto_total ?? partido.tipo_partido?.monto ?? 0)
-                : "—"}
-            </p>
+            {partido.monto_total != null || partido.tipo_partido?.monto != null ? (() => {
+              const gross = getGrossAmount(partido.monto_total ?? null, partido.tipo_partido?.monto ?? null);
+              const net = getNetAmount(gross);
+              return (
+                <div>
+                  <p className="font-medium text-primary text-base sm:text-lg tabular-nums">
+                    {formatCop(gross)}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground tabular-nums">
+                    Árbitro: {formatCop(net)}
+                  </p>
+                </div>
+              );
+            })() : (
+              <p className="font-medium text-primary text-base sm:text-lg tabular-nums">—</p>
+            )}
           </div>
         </div>
 

@@ -8,9 +8,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLayout } from "@/components/layout";
 import { usePartidos } from "@/features/partidos/hooks/usePartidos";
-import { Calendar, Clock, CheckCircle, DollarSign, Shield, Activity, User, Wallet } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  CheckCircle,
+  DollarSign,
+  Shield,
+  Activity,
+  User,
+  Wallet,
+} from "lucide-react";
 import { parseLocalDate, getTodayLocalDate, formatCop } from "@/lib/utils";
-import { ROUTES } from "@/lib/constants";
+import { COMISION_PLATAFORMA_PARTIDO, ROUTES } from "@/lib/constants";
 
 export function ArbitroDashboardPage() {
   const { user } = useAuth();
@@ -30,7 +39,8 @@ export function ArbitroDashboardPage() {
     .filter((p) => p.estado === "completado")
     .reduce((total, partido) => {
       const monto = partido.monto_total ?? partido.tipo_partido?.monto ?? 0;
-      return total + monto;
+      const neto = Math.max(monto - COMISION_PLATAFORMA_PARTIDO, 0);
+      return total + neto;
     }, 0);
 
   // Próximos partidos
@@ -349,7 +359,13 @@ export function ArbitroDashboardPage() {
                     <div className="flex items-center justify-between pt-2 border-t">
                       <span className="text-sm text-muted-foreground">Valor</span>
                       <span className="font-semibold text-primary tabular-nums">
-                        {formatCop(partido.monto_total ?? partido.tipo_partido?.monto ?? 0)}
+                        {formatCop(
+                          Math.max(
+                            (partido.monto_total ?? partido.tipo_partido?.monto ?? 0) -
+                              COMISION_PLATAFORMA_PARTIDO,
+                            0
+                          )
+                        )}
                       </span>
                     </div>
                   )}

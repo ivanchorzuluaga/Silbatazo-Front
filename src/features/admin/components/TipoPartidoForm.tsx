@@ -11,6 +11,7 @@ import type {
   TipoPartidoUpdateData,
 } from "@/features/partidos/types/partido.types";
 import { formatCop } from "@/lib/utils";
+import { getNetAmount } from "@/lib/pricing";
 
 interface TipoPartidoFormProps {
   tipo?: TipoPartidoAdmin;
@@ -306,6 +307,9 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Precio</p>
               <p className="text-lg font-semibold text-primary">
                 {formatCop(montoNum || 0)}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Árbitro: {formatCop(getNetAmount(montoNum || 0))}
               </p>
               <p className="text-xs text-muted-foreground">
                 {formatCop(costoHora)} aprox / hora

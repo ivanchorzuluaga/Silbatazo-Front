@@ -24,6 +24,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { parseLocalDate, cn, formatCop } from "@/lib/utils";
+import { getGrossAmount } from "@/lib/pricing";
 
 export function ClienteDashboardPage() {
   const navigate = useNavigate();
@@ -143,10 +144,11 @@ export function ClienteDashboardPage() {
                                   ?.monto) != null && (
                                 <p className="text-sm font-semibold text-warning tabular-nums">
                                   {formatCop(
-                                    partido.monto_total ??
+                                    getGrossAmount(
+                                      partido.monto_total ?? null,
                                       (partido as { tipo_partido?: { monto: number } }).tipo_partido
-                                        ?.monto ??
-                                      0
+                                        ?.monto ?? null
+                                    )
                                   )}
                                 </p>
                               )}
@@ -209,10 +211,11 @@ export function ClienteDashboardPage() {
                                   ?.monto) != null && (
                                 <p className="text-sm font-semibold text-primary tabular-nums">
                                   {formatCop(
-                                    partido.monto_total ??
+                                    getGrossAmount(
+                                      partido.monto_total ?? null,
                                       (partido as { tipo_partido?: { monto: number } }).tipo_partido
-                                        ?.monto ??
-                                      0
+                                        ?.monto ?? null
+                                    )
                                   )}
                                 </p>
                               )}
@@ -578,7 +581,7 @@ function PartidoCard({ partido, onClick }: PartidoCardProps) {
         <div className="text-right flex flex-col items-end justify-center gap-0.5">
           {(partido.monto_total != null || partido.tipo_partido?.monto != null) && (
             <p className="text-sm font-semibold text-primary tabular-nums">
-              {formatCop(partido.monto_total ?? partido.tipo_partido?.monto ?? 0)}
+              {formatCop(getGrossAmount(partido.monto_total ?? null, partido.tipo_partido?.monto ?? null))}
             </p>
           )}
           <p className="text-xs text-muted-foreground group-hover:text-primary transition-colors">

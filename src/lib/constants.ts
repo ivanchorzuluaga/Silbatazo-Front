@@ -19,6 +19,7 @@ export const STORAGE_KEYS = {
 } as const;
 
 export const MAX_FOTO_PERFIL_MB = 2;
+export const COMISION_PLATAFORMA_PARTIDO = 10000;
 
 export const ROUTES = {
   LOGIN: "/login",

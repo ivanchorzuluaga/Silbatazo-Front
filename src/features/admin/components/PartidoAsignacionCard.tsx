@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select } from "@/components/ui/select";
 import { parseLocalDate, formatCop } from "@/lib/utils";
+import { getGrossAmount, getNetAmount } from "@/lib/pricing";
 import type { PartidoDetail, PartidoAsignarData } from "@/features/partidos/types/partido.types";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
@@ -179,14 +180,19 @@ export function PartidoAsignacionCard({
                 {partido.municipio.departamento && `, ${partido.municipio.departamento}`}
               </span>
             </div>
-            {(partido.monto_total != null || partido.tipo_partido?.monto != null) && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <span className="font-medium">Valor a cobrar:</span>
-                <span className="font-semibold text-primary tabular-nums">
-                  {formatCop(partido.monto_total ?? partido.tipo_partido?.monto ?? 0)}
-                </span>
-              </div>
-            )}
+            {(partido.monto_total != null || partido.tipo_partido?.monto != null) && (() => {
+              const gross = getGrossAmount(partido.monto_total ?? null, partido.tipo_partido?.monto ?? null);
+              const net = getNetAmount(gross);
+              return (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="font-medium">Valor a cobrar:</span>
+                  <span className="font-semibold text-primary tabular-nums">{formatCop(gross)}</span>
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    Árbitro: {formatCop(net)}
+                  </span>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Postulaciones */}
