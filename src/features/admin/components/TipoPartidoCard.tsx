@@ -22,7 +22,6 @@ export function TipoPartidoCard({
   isLoading,
 }: TipoPartidoCardProps) {
   const duracionMin = tipo.duracion_servicio_minutos ?? 90;
-  const horas = Math.max(1, Math.round((duracionMin / 60) * 10) / 10);
   const costoHora =
     duracionMin > 0 ? Math.round((Number(tipo.monto || 0) / duracionMin) * 60) : 0;
   const handleToggleActivo = () => {
