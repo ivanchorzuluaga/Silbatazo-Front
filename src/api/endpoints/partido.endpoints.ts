@@ -446,6 +446,9 @@ export interface AdminDashboardStats {
   pendientes_busqueda?: number;
   pendientes_confirmacion?: number;
   pagos_pendientes?: number;
+  total_cobrado?: number;
+  comision_plataforma?: number;
+  saldo_arbitros?: number;
   verificaciones: number;
 }
 

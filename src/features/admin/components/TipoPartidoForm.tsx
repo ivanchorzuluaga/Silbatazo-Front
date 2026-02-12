@@ -2,7 +2,7 @@
  * Formulario para crear/editar tipo de partido (admin)
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/forms";
 import type {
@@ -10,6 +10,7 @@ import type {
   TipoPartidoCreateData,
   TipoPartidoUpdateData,
 } from "@/features/partidos/types/partido.types";
+import { formatCop } from "@/lib/utils";
 
 interface TipoPartidoFormProps {
   tipo?: TipoPartidoAdmin;
@@ -44,6 +45,15 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
   const [activo, setActivo] = useState(tipo?.activo ?? true);
   const [orden, setOrden] = useState(tipo?.orden?.toString() ?? "0");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const duracionMin = useMemo(
+    () => Math.max(1, parseInt(duracionServicioMin || "0", 10) || 0),
+    [duracionServicioMin]
+  );
+  const montoNum = useMemo(() => parseInt(monto || "0", 10) || 0, [monto]);
+  const costoHora = useMemo(
+    () => (duracionMin > 0 ? Math.round((montoNum / duracionMin) * 60) : 0),
+    [duracionMin, montoNum]
+  );
 
   useEffect(() => {
     if (tipo) {
@@ -121,124 +131,205 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <FormField
-        label="Nombre *"
-        name="nombre"
-        type="text"
-        value={nombre}
-        onChange={(e) => handleNombreChange(e.target.value)}
-        error={fieldErrors.nombre}
-        disabled={isLoading}
-        required
-        placeholder="Ej: Fútbol 11 – Central"
-      />
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="mx-auto grid w-full max-w-5xl gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="card-surface p-4 space-y-4">
+          <div className="space-y-1">
+            <div>
+              <h3 className="text-sm font-semibold">Información principal</h3>
+              <p className="text-xs text-muted-foreground">
+                Esto es lo que verán los clientes al crear un partido.
+              </p>
+            </div>
+            <div className="grid gap-3 lg:grid-cols-2">
+              <FormField
+                label="Nombre *"
+                name="nombre"
+                type="text"
+                value={nombre}
+                onChange={(e) => handleNombreChange(e.target.value)}
+                error={fieldErrors.nombre}
+                disabled={isLoading}
+                required
+                placeholder="Ej: Fútbol 11 – Central"
+              />
 
-      <FormField
-        label="Slug *"
-        name="slug"
-        type="text"
-        value={slug}
-        onChange={(e) => {
-          setSlug(e.target.value);
-          if (fieldErrors.slug) {
-            setFieldErrors((prev) => {
-              const { slug: _, ...rest } = prev;
-              return rest;
-            });
-          }
-        }}
-        error={fieldErrors.slug}
-        disabled={isLoading}
-        required
-        placeholder="Ej: futbol_11_central"
-      />
+              <FormField
+                label="Slug *"
+                name="slug"
+                type="text"
+                value={slug}
+                onChange={(e) => {
+                  setSlug(e.target.value);
+                  if (fieldErrors.slug) {
+                    setFieldErrors((prev) => {
+                      const { slug: _, ...rest } = prev;
+                      return rest;
+                    });
+                  }
+                }}
+                error={fieldErrors.slug}
+                disabled={isLoading}
+                required
+                placeholder="Ej: futbol_11_central"
+              />
+            </div>
 
-      <FormField
-        label="Duración referencial"
-        name="duracion_referencial"
-        type="text"
-        value={duracionReferencial}
-        onChange={(e) => setDuracionReferencial(e.target.value)}
-        disabled={isLoading}
-        placeholder="Ej: 40–45 min x tiempo"
-      />
+            <FormField
+              label="Duración referencial"
+              name="duracion_referencial"
+              type="text"
+              value={duracionReferencial}
+              onChange={(e) => setDuracionReferencial(e.target.value)}
+              disabled={isLoading}
+              placeholder="Ej: 40–45 min x tiempo"
+            />
+          </div>
 
-      <FormField
-        label="Duración del servicio (minutos) *"
-        name="duracion_servicio_minutos"
-        type="number"
-        min={1}
-        value={duracionServicioMin}
-        onChange={(e) => {
-          setDuracionServicioMin(e.target.value);
-          if (fieldErrors.duracion_servicio_minutos) {
-            setFieldErrors((prev) => {
-              const { duracion_servicio_minutos: _, ...rest } = prev;
-              return rest;
-            });
-          }
-        }}
-        error={fieldErrors.duracion_servicio_minutos}
-        disabled={isLoading}
-        required
-        helperText="Usado para la brecha de 30 min entre partidos del mismo árbitro (ej: 90, 120)"
-      />
+          <div className="space-y-1 border-t border-border/60 pt-4">
+            <div>
+              <h3 className="text-sm font-semibold">Precio y duración</h3>
+              <p className="text-xs text-muted-foreground">
+                La duración define la brecha entre partidos del mismo árbitro.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <FormField
+                label="Duración del servicio (minutos) *"
+                name="duracion_servicio_minutos"
+                type="number"
+                min={1}
+                value={duracionServicioMin}
+                onChange={(e) => {
+                  setDuracionServicioMin(e.target.value);
+                  if (fieldErrors.duracion_servicio_minutos) {
+                    setFieldErrors((prev) => {
+                      const { duracion_servicio_minutos: _, ...rest } = prev;
+                      return rest;
+                    });
+                  }
+                }}
+                error={fieldErrors.duracion_servicio_minutos}
+                disabled={isLoading}
+                required
+                helperText="Incluye brecha de 30 min"
+              />
 
-      <FormField
-        label="Monto (COP) *"
-        name="monto"
-        type="number"
-        min={0}
-        value={monto}
-        onChange={(e) => {
-          setMonto(e.target.value);
-          if (fieldErrors.monto) {
-            setFieldErrors((prev) => {
-              const { monto: _, ...rest } = prev;
-              return rest;
-            });
-          }
-        }}
-        error={fieldErrors.monto}
-        disabled={isLoading}
-        required
-      />
+              <FormField
+                label="Monto (COP) *"
+                name="monto"
+                type="number"
+                min={0}
+                value={monto}
+                onChange={(e) => {
+                  setMonto(e.target.value);
+                  if (fieldErrors.monto) {
+                    setFieldErrors((prev) => {
+                      const { monto: _, ...rest } = prev;
+                      return rest;
+                    });
+                  }
+                }}
+                error={fieldErrors.monto}
+                disabled={isLoading}
+                required
+              />
+            </div>
+          </div>
 
-      <FormField
-        label="Orden"
-        name="orden"
-        type="number"
-        min={0}
-        value={orden}
-        onChange={(e) => {
-          setOrden(e.target.value);
-          if (fieldErrors.orden) {
-            setFieldErrors((prev) => {
-              const { orden: _, ...rest } = prev;
-              return rest;
-            });
-          }
-        }}
-        error={fieldErrors.orden}
-        disabled={isLoading}
-      />
+          <div className="space-y-1 border-t border-border/60 pt-4">
+            <div>
+              <h3 className="text-sm font-semibold">Visibilidad y orden</h3>
+              <p className="text-xs text-muted-foreground">
+                Controla el orden y si estará disponible para los clientes.
+              </p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <FormField
+                label="Orden"
+                name="orden"
+                type="number"
+                min={0}
+                value={orden}
+                onChange={(e) => {
+                  setOrden(e.target.value);
+                  if (fieldErrors.orden) {
+                    setFieldErrors((prev) => {
+                      const { orden: _, ...rest } = prev;
+                      return rest;
+                    });
+                  }
+                }}
+                error={fieldErrors.orden}
+                disabled={isLoading}
+              />
 
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="activo"
-          checked={activo}
-          onChange={(e) => setActivo(e.target.checked)}
-          disabled={isLoading}
-          className="h-4 w-4 rounded border-border bg-background"
-        />
-        <label htmlFor="activo" className="text-sm font-medium">
-          Activo (visible en el selector de creación de partidos)
-        </label>
+              <div className="flex items-center gap-2 self-end">
+                <input
+                  type="checkbox"
+                  id="activo"
+                  checked={activo}
+                  onChange={(e) => setActivo(e.target.checked)}
+                  disabled={isLoading}
+                  className="h-4 w-4 rounded border-border bg-background"
+                />
+                <label htmlFor="activo" className="text-sm font-medium">
+                  Activo (visible en el selector)
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside className="card-surface p-4 h-fit lg:sticky lg:top-4">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-sm font-semibold">Vista previa</h4>
+            <span className="text-[11px] text-muted-foreground">Cliente</span>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-background/70 p-4 space-y-3">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Tipo</p>
+              <p className="text-base font-semibold">{nombre || "Nombre del tipo"}</p>
+            </div>
+            {duracionReferencial && (
+              <p className="text-sm text-muted-foreground">{duracionReferencial}</p>
+            )}
+            <div className="flex items-center gap-2 text-[11px]">
+              <span className="rounded-full bg-primary/10 text-primary px-2.5 py-1">
+                {duracionMin || 90} min
+              </span>
+              <span className="rounded-full bg-muted/60 text-muted-foreground px-2.5 py-1">
+                +30 min brecha
+              </span>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Precio</p>
+              <p className="text-lg font-semibold text-primary">
+                {formatCop(montoNum || 0)}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {formatCop(costoHora)} aprox / hora
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span
+                className={`rounded-full px-2.5 py-1 ${
+                  activo
+                    ? "bg-green-500/10 text-green-700 dark:text-green-400"
+                    : "bg-gray-500/10 text-gray-700 dark:text-gray-400"
+                }`}
+              >
+                {activo ? "Activo" : "Inactivo"}
+              </span>
+              <span className="rounded-full bg-muted/60 text-muted-foreground px-2.5 py-1">
+                Orden {orden || 0}
+              </span>
+            </div>
+          </div>
+        </aside>
       </div>
 
-      <div className="flex gap-3 pt-4">
+      <div className="flex gap-3 pt-2 sticky bottom-0 bg-card/95 backdrop-blur border-t border-border/60 py-3 px-1">
         <Button type="submit" disabled={isLoading} className="flex-1">
           {isLoading ? "Guardando..." : tipo ? "Actualizar" : "Crear"}
         </Button>

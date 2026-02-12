@@ -21,6 +21,10 @@ export function TipoPartidoCard({
   onDelete,
   isLoading,
 }: TipoPartidoCardProps) {
+  const duracionMin = tipo.duracion_servicio_minutos ?? 90;
+  const horas = Math.max(1, Math.round((duracionMin / 60) * 10) / 10);
+  const costoHora =
+    duracionMin > 0 ? Math.round((Number(tipo.monto || 0) / duracionMin) * 60) : 0;
   const handleToggleActivo = () => {
     if (
       confirm(
@@ -40,47 +44,64 @@ export function TipoPartidoCard({
   };
 
   return (
-    <div className="rounded-lg border bg-card p-4 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <h3 className="text-lg font-semibold">{tipo.nombre}</h3>
-            {tipo.activo ? (
-              <span className="inline-flex items-center rounded-md bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20 px-2 py-0.5 text-xs font-medium">
-                Activo
-              </span>
-            ) : (
-              <span className="inline-flex items-center rounded-md bg-gray-500/10 text-gray-700 dark:text-gray-400 border border-gray-500/20 px-2 py-0.5 text-xs font-medium">
-                Inactivo
-              </span>
-            )}
+    <div className="card-surface p-4">
+        <div className="space-y-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="text-base font-semibold truncate">{tipo.nombre}</h3>
+            <p className="text-[11px] text-muted-foreground font-mono truncate">{tipo.slug}</p>
           </div>
-
-          <p className="text-sm text-muted-foreground font-mono mb-1">{tipo.slug}</p>
-
-          {tipo.duracion_referencial && (
-            <p className="text-sm text-muted-foreground mb-1">{tipo.duracion_referencial}</p>
+          {tipo.activo ? (
+            <span className="inline-flex items-center rounded-full bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20 px-2.5 py-0.5 text-xs font-medium">
+              Activo
+            </span>
+          ) : (
+            <span className="inline-flex items-center rounded-full bg-gray-500/10 text-gray-700 dark:text-gray-400 border border-gray-500/20 px-2.5 py-0.5 text-xs font-medium">
+              Inactivo
+            </span>
           )}
-          <p className="text-sm text-muted-foreground mb-2">
-            Duración servicio: {tipo.duracion_servicio_minutos ?? 90} min
-            <span className="text-xs ml-1">(+ 30 min brecha)</span>
-          </p>
-
-          <p className="text-lg font-semibold text-primary tabular-nums">{formatCop(tipo.monto)}</p>
-
-          <p className="text-xs text-muted-foreground mt-1">Orden: {tipo.orden}</p>
         </div>
 
-        <div className="flex flex-col gap-2 shrink-0">
+        <div className="grid gap-3">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="rounded-xl bg-background/70 border border-border/60 px-3 py-2">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Precio</p>
+              <p className="text-sm font-semibold text-primary tabular-nums">
+                {formatCop(tipo.monto)}
+              </p>
+            </div>
+            <div className="rounded-xl bg-background/70 border border-border/60 px-3 py-2">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Duración</p>
+              <p className="text-xs font-semibold text-foreground">{duracionMin} min</p>
+            </div>
+            <div className="rounded-xl bg-background/70 border border-border/60 px-3 py-2">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Costo/h</p>
+              <p className="text-xs font-semibold text-foreground tabular-nums">
+                {formatCop(costoHora)}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 text-[11px]">
+            {tipo.duracion_referencial && (
+              <span className="rounded-full bg-muted/60 text-muted-foreground px-2.5 py-1">
+                {tipo.duracion_referencial}
+              </span>
+            )}
+            <span className="rounded-full bg-primary/10 text-primary px-2.5 py-1">
+              +30 min brecha
+            </span>
+            <span className="rounded-full bg-muted/60 text-muted-foreground px-2.5 py-1">
+              Orden {tipo.orden}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
           <Button variant="outline" size="sm" onClick={() => onEdit(tipo)} disabled={isLoading}>
             Editar
           </Button>
-          <Button
-            variant={tipo.activo ? "outline" : "outline"}
-            size="sm"
-            onClick={handleToggleActivo}
-            disabled={isLoading}
-          >
+          <Button variant="outline" size="sm" onClick={handleToggleActivo} disabled={isLoading}>
             {tipo.activo ? "Desactivar" : "Activar"}
           </Button>
           <Button variant="destructive" size="sm" onClick={handleDelete} disabled={isLoading}>

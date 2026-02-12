@@ -22,6 +22,8 @@ export function TiposPartidoPage() {
 
   const [showForm, setShowForm] = useState(false);
   const [tipoEditando, setTipoEditando] = useState<TipoPartidoAdmin | null>(null);
+  const activos = tipos.filter((tipo) => tipo.activo).length;
+  const inactivos = tipos.length - activos;
 
   const handleCreate = () => {
     setTipoEditando(null);
@@ -74,17 +76,29 @@ export function TiposPartidoPage() {
       contentClassName="page-surface"
     >
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Tipos de partido</h1>
-            <p className="text-muted-foreground mt-1">
-              Gestiona los tipos de partido y sus precios. Los clientes eligen uno al crear un
-              partido.
-            </p>
+        <div className="card-surface-strong p-5 sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold">Tipos de partido</h1>
+              <p className="text-muted-foreground mt-1">
+                Define lo que verá el cliente al crear un partido: nombre, duración y precio.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                <span className="rounded-full bg-primary/10 text-primary px-3 py-1 font-semibold">
+                  {activos} activos
+                </span>
+                <span className="rounded-full bg-muted/60 text-muted-foreground px-3 py-1 font-semibold">
+                  {inactivos} inactivos
+                </span>
+                <span className="rounded-full bg-muted/60 text-muted-foreground px-3 py-1 font-semibold">
+                  {tipos.length} total
+                </span>
+              </div>
+            </div>
+            <Button onClick={handleCreate} disabled={isLoading} className="h-10">
+              Crear tipo de partido
+            </Button>
           </div>
-          <Button onClick={handleCreate} disabled={isLoading}>
-            Crear tipo de partido
-          </Button>
         </div>
 
         {error && (
@@ -115,7 +129,7 @@ export function TiposPartidoPage() {
         )}
 
         {tipos.length > 0 && (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {tipos.map((tipo) => (
               <TipoPartidoCard
                 key={tipo.id}
@@ -130,7 +144,7 @@ export function TiposPartidoPage() {
         )}
 
         <Dialog open={showForm} onOpenChange={setShowForm}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl max-h-[94dvh] overflow-y-auto pb-6 sm:pb-4 ios-scroll">
             <DialogHeader>
               <DialogTitle>
                 {tipoEditando ? "Editar tipo de partido" : "Crear tipo de partido"}

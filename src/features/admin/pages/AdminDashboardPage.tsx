@@ -20,6 +20,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { ROUTES } from "@/lib/constants";
+import { formatCop } from "@/lib/utils";
 
 export function AdminDashboardPage() {
   const { user } = useAuth();
@@ -43,6 +44,48 @@ export function AdminDashboardPage() {
       color: "from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900",
       textColor: "text-blue-600 dark:text-blue-300",
       iconColor: "text-blue-500",
+      route: ROUTES.ADMIN_GESTION_PARTIDOS,
+    },
+    {
+      title: "Caja total",
+      value:
+        stats?.total_cobrado != null
+          ? formatCop(stats.total_cobrado)
+          : isLoading
+          ? "…"
+          : "$0",
+      icon: CreditCard,
+      color: "from-emerald-50 to-teal-100 dark:from-emerald-950 dark:to-teal-900",
+      textColor: "text-emerald-600 dark:text-emerald-300",
+      iconColor: "text-emerald-500",
+      route: ROUTES.ADMIN_PAGOS_PENDIENTES,
+    },
+    {
+      title: "Comisión plataforma",
+      value:
+        stats?.comision_plataforma != null
+          ? formatCop(stats.comision_plataforma)
+          : isLoading
+          ? "…"
+          : "$0",
+      icon: CreditCard,
+      color: "from-amber-50 to-orange-100 dark:from-amber-950 dark:to-orange-900",
+      textColor: "text-orange-600 dark:text-orange-300",
+      iconColor: "text-orange-500",
+      route: ROUTES.ADMIN_PAGOS_PENDIENTES,
+    },
+    {
+      title: "Saldo árbitros",
+      value:
+        stats?.saldo_arbitros != null
+          ? formatCop(stats.saldo_arbitros)
+          : isLoading
+          ? "…"
+          : "$0",
+      icon: CreditCard,
+      color: "from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900",
+      textColor: "text-slate-600 dark:text-slate-300",
+      iconColor: "text-slate-500",
       route: ROUTES.ADMIN_GESTION_PARTIDOS,
     },
     {
@@ -191,6 +234,41 @@ export function AdminDashboardPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Caja y distribución */}
+      <div className="card-surface-strong p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-lg font-semibold">Caja y distribución</h2>
+            <p className="text-sm text-muted-foreground">
+              Resumen de lo cobrado, comisión de la plataforma y saldo de árbitros.
+            </p>
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Caja total</p>
+            <p className="text-2xl font-semibold text-emerald-500">
+              {stats?.total_cobrado != null ? formatCop(stats.total_cobrado) : "—"}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">Total cobrado a clientes</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Comisión plataforma</p>
+            <p className="text-2xl font-semibold text-orange-500">
+              {stats?.comision_plataforma != null ? formatCop(stats.comision_plataforma) : "—"}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">$10.000 por partido completado</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Saldo árbitros</p>
+            <p className="text-2xl font-semibold text-slate-500">
+              {stats?.saldo_arbitros != null ? formatCop(stats.saldo_arbitros) : "—"}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">Pendiente por retirar</p>
+          </div>
+        </div>
       </div>
 
       {/* Accesos por categoría */}

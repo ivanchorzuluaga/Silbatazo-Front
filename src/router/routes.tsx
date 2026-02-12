@@ -90,6 +90,11 @@ const AdminDashboardPage = lazy(() =>
     default: m.AdminDashboardPage,
   }))
 );
+const FinanzasPage = lazy(() =>
+  import("@/features/admin/pages/FinanzasPage").then((m) => ({
+    default: m.FinanzasPage,
+  }))
+);
 const PerfilArbitroPage = lazy(() =>
   import("@/features/arbitro/pages/PerfilArbitroPage").then((m) => ({
     default: m.PerfilArbitroPage,
@@ -448,6 +453,15 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
             {withSuspense(<PagosPendientesPage />)}
+          </ProtectedRoute>
+        ),
+      },
+      // Finanzas (admin)
+      {
+        path: ROUTES.ADMIN_FINANZAS,
+        element: (
+          <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+            {withSuspense(<FinanzasPage />)}
           </ProtectedRoute>
         ),
       },

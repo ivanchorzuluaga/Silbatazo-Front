@@ -270,7 +270,7 @@ const DisponibilidadSemanal = memo(function DisponibilidadSemanal({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-200">
+      <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-200">
         Activa el día y define el rango horario.
       </div>
       <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
@@ -286,13 +286,17 @@ const DisponibilidadSemanal = memo(function DisponibilidadSemanal({
             role="switch"
             aria-checked={usarTodosDias}
             onClick={handleToggleTodos}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              usarTodosDias ? "bg-primary" : "bg-muted"
+            className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-all ${
+              usarTodosDias
+                ? "bg-primary/90 border-primary/70 shadow-[0_0_0_1px_rgba(16,185,129,0.45)] dark:bg-primary/80"
+                : "bg-muted/30 border-border/70 dark:bg-muted/50"
             }`}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-background transition-transform ${
-                usarTodosDias ? "translate-x-6" : "translate-x-1"
+              className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
+                usarTodosDias
+                  ? "translate-x-6 bg-white shadow-[0_4px_10px_rgba(0,0,0,0.28)]"
+                  : "translate-x-1 bg-background shadow-[0_2px_6px_rgba(0,0,0,0.2)]"
               }`}
             />
           </button>
@@ -331,8 +335,8 @@ const DisponibilidadSemanal = memo(function DisponibilidadSemanal({
             key={row.dia}
             className={`rounded-md border px-3 py-2 ${
               row.activo
-                ? "border-emerald-500/40 bg-emerald-500/5"
-                : "border-border bg-card/30"
+                ? "border-emerald-500/40 bg-emerald-500/10"
+                : "border-border/70 bg-card/40"
             }`}
           >
             <div className="flex items-center justify-between gap-3">
@@ -342,13 +346,17 @@ const DisponibilidadSemanal = memo(function DisponibilidadSemanal({
                 role="switch"
                 aria-checked={row.activo}
                 onClick={() => handleToggle(row.dia)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  row.activo ? "bg-emerald-500" : "bg-muted"
+                className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-all ${
+                  row.activo
+                    ? "bg-emerald-500/90 border-emerald-500/70 shadow-[0_0_0_1px_rgba(16,185,129,0.45)] dark:bg-emerald-400/80"
+                    : "bg-muted/30 border-border/70 dark:bg-muted/50"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-background transition-transform ${
-                    row.activo ? "translate-x-6" : "translate-x-1"
+                  className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
+                    row.activo
+                      ? "translate-x-6 bg-white shadow-[0_4px_10px_rgba(0,0,0,0.28)]"
+                      : "translate-x-1 bg-background shadow-[0_2px_6px_rgba(0,0,0,0.2)]"
                   }`}
                 />
               </button>

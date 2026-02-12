@@ -15,6 +15,7 @@ import {
   ClipboardList,
   AlertTriangle,
   Mail,
+  DollarSign,
 } from "lucide-react";
 import { ROUTES, USER_ROLES, type UserRole } from "@/lib/constants";
 
@@ -118,6 +119,12 @@ export const navSections: NavSection[] = [
         label: "Pagos",
         icon: CreditCard,
         route: ROUTES.ADMIN_PAGOS_PENDIENTES,
+        roles: [USER_ROLES.ADMIN],
+      },
+      {
+        label: "Finanzas",
+        icon: DollarSign,
+        route: ROUTES.ADMIN_FINANZAS,
         roles: [USER_ROLES.ADMIN],
       },
       {
