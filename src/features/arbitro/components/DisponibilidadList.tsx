@@ -9,21 +9,6 @@ import { TimePicker24h } from "@/components/forms/TimePicker24h";
 import type { DisponibilidadArbitro } from "../types/arbitro.types";
 import type { DiaSemana, DisponibilidadCreateData } from "../types/arbitro.types";
 
-/**
- * Formatea una hora a formato HH:MM (sin segundos)
- */
-function formatHora(hora: string): string {
-  // Si ya está en formato HH:MM, retornar tal cual
-  if (hora && hora.length === 5 && hora.includes(":")) {
-    return hora;
-  }
-  // Si viene con segundos (HH:MM:SS), tomar solo HH:MM
-  if (hora && hora.includes(":")) {
-    return hora.substring(0, 5);
-  }
-  return hora;
-}
-
 interface DisponibilidadListProps {
   /** Municipios del perfil del árbitro. Si se pasan, el formulario no pregunta por municipios. */
   municipiosPerfil?: { id: number }[];

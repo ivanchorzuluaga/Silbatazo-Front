@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { authService } from "@/features/auth/services/auth.service";
 import { notificacionesEndpoints } from "@/api/endpoints/notificaciones.endpoints";
 import type { EmailOutbox } from "../types/emailOutbox.types";
 
@@ -12,13 +12,13 @@ interface UseEmailOutboxReturn {
 }
 
 export function useEmailOutbox(): UseEmailOutboxReturn {
-  const { token } = useAuth();
   const [emails, setEmails] = useState<EmailOutbox[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const listar = useCallback(
     async (estado?: string) => {
+      const token = authService.getAccessToken();
       if (!token) return;
       setIsLoading(true);
       setError(null);
@@ -31,11 +31,12 @@ export function useEmailOutbox(): UseEmailOutboxReturn {
         setIsLoading(false);
       }
     },
-    [token]
+    []
   );
 
   const reenviar = useCallback(
     async (id: number) => {
+      const token = authService.getAccessToken();
       if (!token) return;
       setIsLoading(true);
       setError(null);
@@ -48,7 +49,7 @@ export function useEmailOutbox(): UseEmailOutboxReturn {
         setIsLoading(false);
       }
     },
-    [token]
+    []
   );
 
   return { emails, isLoading, error, listar, reenviar };
