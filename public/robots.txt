@@ -1,9 +1,10 @@
 User-agent: *
-Allow: /$
-Allow: /index.html
-Allow: /sitemap.xml
-Allow: /assets/
-Allow: /Logo.png
-Disallow: /
+Allow: /
+Disallow: /login
+Disallow: /registro
+Disallow: /dashboard
+Disallow: /cliente
+Disallow: /arbitro
+Disallow: /admin
 
 Sitemap: https://silbatazo.com/sitemap.xml

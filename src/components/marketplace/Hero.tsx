@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Star, Clock, Users, Trophy } from "lucide-react";
 import arbitroImage1200 from "@/assets/arbitro-1200.jpg";
 import arbitroImage800 from "@/assets/arbitro-800.jpg";
+import arbitroImage600 from "@/assets/arbitro-600.jpg";
 import { useLandingStats } from "@/features/marketplace/hooks/useLandingStats";
 
 /** Formatea "HH:MM" a "H:MM" o "HH:MM" para mostrar (ej. "08:00" → "8:00") */
@@ -73,13 +74,15 @@ export function Hero() {
               <div className="aspect-[4/3] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
                 <img
                   src={arbitroImage1200}
-                  srcSet={`${arbitroImage800} 800w, ${arbitroImage1200} 1200w`}
+                  srcSet={`${arbitroImage600} 600w, ${arbitroImage800} 800w, ${arbitroImage1200} 1200w`}
                   sizes="(min-width: 1024px) 50vw, 100vw"
                   alt="Árbitro en partido deportivo"
                   className="absolute inset-0 w-full h-full object-cover"
                   loading="eager"
                   decoding="async"
                   fetchPriority="high"
+                  width={1200}
+                  height={900}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src =
@@ -173,13 +176,15 @@ export function Hero() {
             <div className="aspect-[4/5] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
               <img
                 src={arbitroImage1200}
-                srcSet={`${arbitroImage800} 800w, ${arbitroImage1200} 1200w`}
+                srcSet={`${arbitroImage600} 600w, ${arbitroImage800} 800w, ${arbitroImage1200} 1200w`}
                 sizes="(min-width: 1024px) 50vw, 100vw"
                 alt="Árbitro en partido deportivo"
                 className="absolute inset-0 w-full h-full object-cover"
                 loading="eager"
                 decoding="async"
                 fetchPriority="high"
+                width={1200}
+                height={1500}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.src =
