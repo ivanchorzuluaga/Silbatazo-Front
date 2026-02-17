@@ -4,18 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
 
-    <!-- Google Fonts: Poppins -->
+    <!-- Google Fonts: Poppins (carga no bloqueante) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+      />
+    </noscript>
 
     <!-- Favicon: logo como icono (PNG; opcional: genera favicon.ico en favicon.io) -->
     <link rel="icon" type="image/png" href="/Logo.png" />
     <link rel="apple-touch-icon" href="/Logo.png" />
 
-    <title>Silbatazo | Árbitros para partidos y torneos en Colombia</title>
-    <meta name="description" content="Pide un árbitro para amistosos, torneos o partidos en el Área Metropolitana de Medellín. Reserva fácil y rápida con árbitros verificados." />
-    <meta name="keywords" content="árbitros deportivos, árbitros en Medellín, pedir árbitro, partidos amistosos, torneos, Silbatazo, árbitros verificados" />
+    <title>Silbatazo | Árbitros Medellín para partidos y torneos</title>
+    <meta name="description" content="Arbitraje Medellín y Valle de Aburrá: pide un árbitro para amistosos, torneos o partidos. Reserva fácil y rápida con árbitros verificados." />
+    <meta name="keywords" content="arbitraje Medellín, árbitros Medellín, árbitros deportivos, pedir árbitro, partidos amistosos, torneos, Silbatazo, árbitros verificados" />
     <meta name="author" content="Silbatazo" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="__APP_URL__/" />
@@ -23,8 +34,8 @@
     <!-- Open Graph (Facebook, LinkedIn, WhatsApp al compartir) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Silbatazo" />
-    <meta property="og:title" content="Silbatazo | Árbitros para partidos y torneos en Colombia" />
-    <meta property="og:description" content="Pide un árbitro para amistosos, torneos o partidos en el Área Metropolitana de Medellín. Reserva fácil y rápida con árbitros verificados." />
+    <meta property="og:title" content="Silbatazo | Árbitros Medellín para partidos y torneos" />
+    <meta property="og:description" content="Arbitraje Medellín y Valle de Aburrá: pide un árbitro para amistosos, torneos o partidos. Reserva fácil y rápida con árbitros verificados." />
     <meta property="og:url" content="__APP_URL__/" />
     <meta property="og:image" content="__APP_URL__/Logo.png" />
     <meta property="og:image:secure_url" content="__APP_URL__/Logo.png" />
@@ -36,8 +47,8 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Silbatazo | Árbitros para partidos y torneos en Colombia" />
-    <meta name="twitter:description" content="Pide un árbitro para amistosos, torneos o partidos en el Área Metropolitana de Medellín. Reserva fácil y rápida con árbitros verificados." />
+    <meta name="twitter:title" content="Silbatazo | Árbitros Medellín para partidos y torneos" />
+    <meta name="twitter:description" content="Arbitraje Medellín y Valle de Aburrá: pide un árbitro para amistosos, torneos o partidos. Reserva fácil y rápida con árbitros verificados." />
     <meta name="twitter:image" content="__APP_URL__/Logo.png" />
     <meta name="twitter:image:alt" content="Silbatazo - Logo de Árbitros de Confianza" />
   </head>
@@ -50,11 +61,13 @@
               Árbitros para partidos y torneos en el Área Metropolitana de Medellín
             </h1>
             <p class="text-lg text-muted-foreground mb-6">
-              Silbatazo conecta a cualquier persona que necesite un árbitro con gente verificada y
-              de confianza. Ideal para amistosos, partidos en el barrio, unidad cerrada o torneos.
+              Silbatazo conecta a cualquier persona que necesite arbitraje en Medellín con gente
+              verificada y de confianza. Ideal para amistosos, partidos en el barrio, unidad
+              cerrada o torneos.
             </p>
             <p class="text-base text-muted-foreground">
-              Reserva fácil, rápida y sin enredos. Disponible en Medellín y el Valle de Aburrá.
+              Reserva fácil, rápida y sin enredos. Disponible en Medellín, Itagüí, Bello,
+              Envigado, Sabaneta y otros municipios del Valle de Aburrá.
             </p>
           </div>
         </section>
@@ -64,7 +77,7 @@
             <h2 class="text-2xl font-semibold text-foreground mb-4">Preguntas frecuentes</h2>
             <div class="space-y-4 text-muted-foreground">
               <p><strong>¿Puedo pedir un árbitro para un partido entre amigos?</strong> Sí, está pensado para amistosos y juegos casuales.</p>
-              <p><strong>¿En qué ciudades funciona?</strong> Por ahora, en el Área Metropolitana de Medellín.</p>
+              <p><strong>¿En qué ciudades funciona?</strong> Medellín, Itagüí, Bello, Envigado, Sabaneta y el resto del Valle de Aburrá.</p>
               <p><strong>¿Los árbitros son verificados?</strong> Sí, pasan un proceso de verificación.</p>
             </div>
           </div>

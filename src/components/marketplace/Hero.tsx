@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Star, Clock, Users, Trophy } from "lucide-react";
-import arbitroImage from "@/assets/arbitro.png";
+import arbitroImage1200 from "@/assets/arbitro-1200.jpg";
+import arbitroImage800 from "@/assets/arbitro-800.jpg";
 import { useLandingStats } from "@/features/marketplace/hooks/useLandingStats";
 
 /** Formatea "HH:MM" a "H:MM" o "HH:MM" para mostrar (ej. "08:00" → "8:00") */
@@ -71,7 +72,9 @@ export function Hero() {
             <div className="relative lg:hidden">
               <div className="aspect-[4/3] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
                 <img
-                  src={arbitroImage}
+                  src={arbitroImage1200}
+                  srcSet={`${arbitroImage800} 800w, ${arbitroImage1200} 1200w`}
+                  sizes="(min-width: 1024px) 50vw, 100vw"
                   alt="Árbitro en partido deportivo"
                   className="absolute inset-0 w-full h-full object-cover"
                   loading="eager"
@@ -97,7 +100,7 @@ export function Hero() {
             {/* Description */}
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
               Conecta con árbitros verificados para partidos, amistosos y torneos en el Área
-              Metropolitana de Medellín.
+              Metropolitana de Medellín. Arbitraje fácil y de confianza.
               <span className="font-semibold text-foreground"> Rápido, seguro y sin enredos.</span>
             </p>
 
@@ -169,7 +172,9 @@ export function Hero() {
             {/* Main image container */}
             <div className="aspect-[4/5] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
               <img
-                src={arbitroImage}
+                src={arbitroImage1200}
+                srcSet={`${arbitroImage800} 800w, ${arbitroImage1200} 1200w`}
+                sizes="(min-width: 1024px) 50vw, 100vw"
                 alt="Árbitro en partido deportivo"
                 className="absolute inset-0 w-full h-full object-cover"
                 loading="eager"

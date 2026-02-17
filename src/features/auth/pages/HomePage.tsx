@@ -39,6 +39,20 @@ export function HomePage() {
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@type": "LocalBusiness",
+        name: "Silbatazo",
+        url: `${baseUrl}/`,
+        telephone: "+57 315 988 8384",
+        areaServed: [
+          "Medellín",
+          "Itagüí",
+          "Bello",
+          "Envigado",
+          "Sabaneta",
+          "Valle de Aburrá",
+        ],
+      },
+      {
         "@type": "Organization",
         name: "Silbatazo",
         url: `${baseUrl}/`,

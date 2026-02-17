@@ -12,7 +12,12 @@ export const FAQ_ITEMS = [
   {
     question: "¿En qué ciudades funciona?",
     answer:
-      "Por ahora estamos disponibles en el Área Metropolitana de Medellín y seguiremos expandiéndonos.",
+      "Medellín, Itagüí, Bello, Envigado, Sabaneta y el resto del Valle de Aburrá.",
+  },
+  {
+    question: "¿Ofrecen arbitraje en Medellín para partidos amateurs?",
+    answer:
+      "Sí. Puedes pedir arbitraje para amistosos, partidos de barrio, unidad cerrada o torneos.",
   },
   {
     question: "¿Cómo se paga el servicio?",

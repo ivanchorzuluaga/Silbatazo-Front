@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /$
 Allow: /index.html
+Allow: /sitemap.xml
 Allow: /assets/
 Allow: /Logo.png
 Disallow: /
