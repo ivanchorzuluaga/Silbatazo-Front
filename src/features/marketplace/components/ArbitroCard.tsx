@@ -24,7 +24,8 @@ export function ArbitroCard({ arbitro }: ArbitroCardProps) {
     arbitro.foto_perfil,
     arbitro.id,
     arbitro.experiencia_anos,
-    nombre
+    nombre,
+    arbitro.foto_perfil_thumb
   );
 
   return (

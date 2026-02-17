@@ -38,8 +38,12 @@ export function getRefereeImage(
   fotoPerfil: string | null | undefined,
   arbitroId: number,
   _experienciaAnos?: number,
-  nombre?: string
+  nombre?: string,
+  fotoPerfilThumb?: string | null
 ): string {
+  if (fotoPerfilThumb && fotoPerfilThumb.trim() !== "") {
+    return fotoPerfilThumb;
+  }
   if (fotoPerfil && fotoPerfil.trim() !== "" && !fotoPerfil.includes("placeholder")) {
     return fotoPerfil;
   }

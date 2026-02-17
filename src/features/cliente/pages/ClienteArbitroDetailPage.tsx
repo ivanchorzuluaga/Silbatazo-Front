@@ -78,7 +78,8 @@ export function ClienteArbitroDetailPage() {
     arbitro.foto_perfil,
     arbitro.id,
     arbitro.experiencia_anos,
-    nombre
+    nombre,
+    arbitro.foto_perfil_thumb
   );
   const rating = promedio?.promedio ?? arbitro.calificacion_promedio ?? 0;
   const totalCalificaciones = promedio?.total_calificaciones ?? arbitro.total_calificaciones ?? 0;

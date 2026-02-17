@@ -65,7 +65,8 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
               arbitro.foto_perfil,
               arbitro.id,
               arbitro.experiencia_anos,
-              nombre
+              nombre,
+              arbitro.foto_perfil_thumb
             );
             const disponibilidad = arbitro.estado_verificacion === "aprobado";
 
@@ -82,6 +83,11 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
                       src={imagen}
                       alt={nombre}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      decoding="async"
+                      fetchPriority="low"
+                      width={400}
+                      height={500}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src =

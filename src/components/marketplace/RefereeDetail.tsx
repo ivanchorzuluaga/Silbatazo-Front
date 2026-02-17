@@ -14,7 +14,13 @@ export function RefereeDetail({ arbitro }: RefereeDetailProps) {
   const especialidad =
     arbitro.categorias.length > 0 ? arbitro.categorias.map((c) => c.nombre).join(", ") : "Árbitro";
   const partidos = arbitro.total_partidos || 0;
-  const imagen = getRefereeImage(arbitro.foto_perfil, arbitro.id, arbitro.experiencia_anos, nombre);
+  const imagen = getRefereeImage(
+    arbitro.foto_perfil,
+    arbitro.id,
+    arbitro.experiencia_anos,
+    nombre,
+    arbitro.foto_perfil_thumb
+  );
   const municipio =
     arbitro.municipios.length > 0
       ? arbitro.municipios.map((m) => m.nombre).join(", ")

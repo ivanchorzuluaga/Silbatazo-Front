@@ -77,7 +77,8 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
     arbitro.foto_perfil,
     arbitro.id,
     arbitro.experiencia_anos,
-    arbitro.full_name || arbitro.username
+    arbitro.full_name || arbitro.username,
+    arbitro.foto_perfil_thumb
   );
 
   // Rating del árbitro

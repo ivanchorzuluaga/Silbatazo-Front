@@ -15,7 +15,13 @@ export function RefereeCard({ arbitro }: RefereeCardProps) {
   const experiencia = arbitro.experiencia_anos ? `${arbitro.experiencia_anos} años` : "Experiencia";
   const especialidad = arbitro.categorias.length > 0 ? arbitro.categorias[0].nombre : "Árbitro";
   const partidos = arbitro.total_partidos || 0;
-  const imagen = getRefereeImage(arbitro.foto_perfil, arbitro.id, arbitro.experiencia_anos, nombre);
+  const imagen = getRefereeImage(
+    arbitro.foto_perfil,
+    arbitro.id,
+    arbitro.experiencia_anos,
+    nombre,
+    arbitro.foto_perfil_thumb
+  );
   const municipio = arbitro.municipios.length > 0 ? arbitro.municipios[0].nombre : "Ubicación";
 
   return (

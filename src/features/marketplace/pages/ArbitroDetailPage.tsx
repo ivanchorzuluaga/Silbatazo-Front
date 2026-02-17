@@ -140,7 +140,13 @@ export function ArbitroDetailPage() {
   }
 
   const nombre = arbitro.full_name || arbitro.username;
-  const imagen = getRefereeImage(arbitro.foto_perfil, arbitro.id, arbitro.experiencia_anos, nombre);
+  const imagen = getRefereeImage(
+    arbitro.foto_perfil,
+    arbitro.id,
+    arbitro.experiencia_anos,
+    nombre,
+    arbitro.foto_perfil_thumb
+  );
   const rating = promedio?.promedio || arbitro.calificacion_promedio || 0;
   const totalCalificaciones = promedio?.total_calificaciones || 0;
 

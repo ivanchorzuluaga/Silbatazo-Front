@@ -95,6 +95,7 @@ export interface Arbitro {
   total_calificaciones?: number;
   total_partidos?: number;
   foto_perfil?: string;
+  foto_perfil_thumb?: string;
 }
 
 export interface ArbitroCreateData {

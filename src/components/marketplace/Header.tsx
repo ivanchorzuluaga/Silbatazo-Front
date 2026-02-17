@@ -38,11 +38,13 @@ export function Header() {
             onClick={() => setMobileMenuOpen(false)}
           >
             <img
-              src={isDark ? "/Logo-completo.png" : "/Logo-completo-Negro.png"}
+              src={isDark ? "/Logo-completo-480.png" : "/Logo-completo-Negro-480.png"}
               alt={`${APP_NAME} - Árbitro de confianza`}
               className="h-12 sm:h-16 md:h-20 w-auto object-contain transition-opacity duration-200"
               loading="eager"
               decoding="async"
+              width={480}
+              height={120}
             />
           </Link>
 

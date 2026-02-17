@@ -326,7 +326,8 @@ export function PerfilArbitroForm({
       arbitro?.foto_perfil,
       arbitro?.id ?? 0,
       arbitro?.experiencia_anos,
-      nombreCompleto
+      nombreCompleto,
+      arbitro?.foto_perfil_thumb
     );
 
   return (
