@@ -1,5 +1,4 @@
 import { BadgeCheck, Calendar, CreditCard, Shield, Users } from "lucide-react";
-import { APP_NAME } from "@/lib/constants";
 
 export function ReembolsoModalContent() {
   const sections = [
