@@ -11,18 +11,36 @@ import { DocumentoUpload } from "../components/DocumentoUpload";
 import { DocumentosList } from "../components/DocumentosList";
 import { DisponibilidadList } from "../components/DisponibilidadList";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { PageLayout } from "@/components/layout";
 import { ROUTES } from "@/lib/constants";
 import { getRefereeImage } from "@/lib/referee-images";
+import { authService } from "@/features/auth/services/auth.service";
+import { useAuth } from "@/hooks/useAuth";
 
 export function PerfilArbitroPage() {
   const navigate = useNavigate();
   const { arbitro, obtenerPerfil, isLoading, error } = useArbitro();
+  const { logout } = useAuth();
   const [isEditMode, setIsEditMode] = useState(false);
-  const [focusSection, setFocusSection] = useState<"personal" | "experiencia" | null>(null);
+  const [focusSection, setFocusSection] = useState<
+    "personal" | "experiencia" | null
+  >(null);
   const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
   const [showDocumentos, setShowDocumentos] = useState(false);
   const [refreshDocumentos, setRefreshDocumentos] = useState(0);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const confirmPhrase = "ELIMINAR CUENTA";
   const rolesVisibles = (arbitro?.roles ?? [])
     .map((rol) => rol.nombre)
     .filter((nombre) => nombre.toLowerCase() !== "central solo");
@@ -59,6 +77,20 @@ export function PerfilArbitroPage() {
     obtenerPerfil();
   };
 
+  const handleDeactivate = async () => {
+    if (confirmText !== confirmPhrase) return;
+    setIsDeleting(true);
+    try {
+      await authService.deactivateAccount();
+      await logout();
+      navigate(ROUTES.LOGIN, { replace: true });
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      setConfirmText("");
+    }
+  };
+
   // Si no hay perfil y no está en modo edición y ya se verificó, mostrar mensaje
   if (!arbitro && !isEditMode && !isLoading && hasCheckedProfile) {
     return (
@@ -91,7 +123,11 @@ export function PerfilArbitroPage() {
     );
   }
 
-  const pageTitle = isEditMode ? (arbitro ? "Editar Perfil" : "Completar Perfil") : "Mi Perfil";
+  const pageTitle = isEditMode
+    ? arbitro
+      ? "Editar Perfil"
+      : "Completar Perfil"
+    : "Mi Perfil";
 
   return (
     <PageLayout
@@ -125,7 +161,9 @@ export function PerfilArbitroPage() {
             <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-8 shadow-lg backdrop-blur">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
                 <div>
-                  <h2 className="text-lg sm:text-xl font-semibold">Información Personal</h2>
+                  <h2 className="text-lg sm:text-xl font-semibold">
+                    Información Personal
+                  </h2>
                   <p className="text-sm text-muted-foreground">
                     Tu perfil público y datos de contacto
                   </p>
@@ -151,7 +189,7 @@ export function PerfilArbitroPage() {
                         arbitro.id,
                         arbitro.experiencia_anos,
                         arbitro.full_name || arbitro.username,
-                        arbitro.foto_perfil_thumb
+                        arbitro.foto_perfil_thumb,
                       )}
                       alt="Foto de perfil"
                       className="w-full h-full object-cover"
@@ -168,7 +206,9 @@ export function PerfilArbitroPage() {
                       <p className="text-xs uppercase tracking-wide text-muted-foreground">
                         Usuario
                       </p>
-                      <p className="text-base font-semibold">{arbitro.username}</p>
+                      <p className="text-base font-semibold">
+                        {arbitro.username}
+                      </p>
                     </div>
                   )}
                   {arbitro.email && (
@@ -201,7 +241,9 @@ export function PerfilArbitroPage() {
                         Fecha de Nacimiento
                       </p>
                       <p className="text-base">
-                        {new Date(arbitro.fecha_nacimiento).toLocaleDateString("es-CO")}
+                        {new Date(arbitro.fecha_nacimiento).toLocaleDateString(
+                          "es-CO",
+                        )}
                       </p>
                     </div>
                   )}
@@ -255,7 +297,9 @@ export function PerfilArbitroPage() {
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">
                     Años de Experiencia
                   </p>
-                  <p className="text-2xl font-semibold">{arbitro.experiencia_anos} años</p>
+                  <p className="text-2xl font-semibold">
+                    {arbitro.experiencia_anos} años
+                  </p>
                 </div>
                 {rolesVisibles.length > 0 && (
                   <div>
@@ -288,7 +332,8 @@ export function PerfilArbitroPage() {
                         className="inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1.5 text-sm font-medium"
                       >
                         {municipio.nombre}
-                        {municipio.departamento && `, ${municipio.departamento}`}
+                        {municipio.departamento &&
+                          `, ${municipio.departamento}`}
                       </span>
                     ))}
                   </div>
@@ -316,7 +361,9 @@ export function PerfilArbitroPage() {
 
             {/* Estado de verificación */}
             <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-8 shadow-lg backdrop-blur">
-              <h2 className="text-lg sm:text-xl font-semibold mb-4">Estado de Verificación</h2>
+              <h2 className="text-lg sm:text-xl font-semibold mb-4">
+                Estado de Verificación
+              </h2>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span
@@ -324,10 +371,10 @@ export function PerfilArbitroPage() {
                       arbitro.esta_aprobado
                         ? "bg-green-500/10 text-green-700 dark:text-green-400"
                         : arbitro.estado_verificacion === "en_revision"
-                        ? "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400"
-                        : arbitro.estado_verificacion === "rechazado"
-                        ? "bg-red-500/10 text-red-700 dark:text-red-400"
-                        : "bg-gray-500/10 text-gray-700 dark:text-gray-400"
+                          ? "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400"
+                          : arbitro.estado_verificacion === "rechazado"
+                            ? "bg-red-500/10 text-red-700 dark:text-red-400"
+                            : "bg-gray-500/10 text-gray-700 dark:text-gray-400"
                     }`}
                   >
                     {arbitro.estado_verificacion_display}
@@ -336,7 +383,9 @@ export function PerfilArbitroPage() {
 
                 {arbitro.comentarios_verificacion && (
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">Comentarios</p>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                      Comentarios
+                    </p>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                       {arbitro.comentarios_verificacion}
                     </p>
@@ -349,7 +398,9 @@ export function PerfilArbitroPage() {
             <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-8 shadow-lg backdrop-blur">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div>
-                  <h2 className="text-lg sm:text-xl font-semibold">Documentos</h2>
+                  <h2 className="text-lg sm:text-xl font-semibold">
+                    Documentos
+                  </h2>
                   <p className="text-sm text-muted-foreground">
                     Sube y gestiona tus documentos de verificación
                   </p>
@@ -386,7 +437,9 @@ export function PerfilArbitroPage() {
             <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-8 shadow-lg backdrop-blur">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div>
-                  <h2 className="text-lg sm:text-xl font-semibold">Disponibilidad</h2>
+                  <h2 className="text-lg sm:text-xl font-semibold">
+                    Disponibilidad
+                  </h2>
                   <p className="text-sm text-muted-foreground">
                     Define tus horarios disponibles
                   </p>
@@ -402,11 +455,65 @@ export function PerfilArbitroPage() {
                   Editar
                 </Button>
               </div>
-              <DisponibilidadList municipiosPerfil={arbitro?.municipios ?? []} />
+              <DisponibilidadList
+                municipiosPerfil={arbitro?.municipios ?? []}
+              />
+            </div>
+
+            <div className="rounded-2xl border border-destructive/40 bg-destructive/5 p-4 sm:p-6">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-base font-semibold text-destructive">
+                    Eliminar cuenta
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Se desactivará tu cuenta y se anonimizarán tus datos
+                    sensibles. El historial de partidos se conserva.
+                  </p>
+                </div>
+                <Button
+                  variant="destructive"
+                  onClick={() => setShowDeleteModal(true)}
+                >
+                  Eliminar cuenta
+                </Button>
+              </div>
             </div>
           </div>
         ) : null}
       </div>
+
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmar eliminación de cuenta</DialogTitle>
+            <DialogDescription>
+              Escribe <strong>{confirmPhrase}</strong> para confirmar. Luego
+              podrás reactivar la cuenta con tu usuario y contraseña, pero
+              deberás completar los datos nuevamente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Input
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder={confirmPhrase}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={confirmText !== confirmPhrase || isDeleting}
+              onClick={handleDeactivate}
+            >
+              {isDeleting ? "Eliminando..." : "Eliminar cuenta"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageLayout>
   );
 }

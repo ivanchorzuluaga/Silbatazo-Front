@@ -12,8 +12,17 @@ import { getDashboardRoute } from "@/lib/routing";
 import { Button } from "@/components/ui/button";
 import { validations } from "@/lib/validations";
 import logoImage from "@/assets/Logo.png";
-import { User, Lock, LogIn, ArrowLeft, AlertCircle, Eye, EyeOff } from "lucide-react";
+import {
+  User,
+  Lock,
+  LogIn,
+  ArrowLeft,
+  AlertCircle,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { authService } from "@/features/auth/services/auth.service";
 
 export function LoginPage() {
   const { isAuthenticated, user, login: setAuth } = useAuth();
@@ -24,12 +33,16 @@ export function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isReactivating, setIsReactivating] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
     username?: string;
     password?: string;
   }>({});
 
   const { login, isLoading, error, clearError } = useLogin();
+  const isDeactivated = Boolean(
+    error && error.toLowerCase().includes("desactivada"),
+  );
 
   // Scroll al inicio al cargar la página
   useEffect(() => {
@@ -84,7 +97,7 @@ export function LoginPage() {
         authResponse.user.username,
         authResponse.user.email,
         authResponse.user.id,
-        authResponse.user.email_verificado
+        authResponse.user.email_verificado,
       );
 
       // Redirigir
@@ -98,6 +111,36 @@ export function LoginPage() {
       }, 100);
     } catch (err) {
       console.error("Error en login:", err);
+    }
+  };
+
+  const handleReactivate = async () => {
+    clearError();
+    if (!validateForm()) return;
+    setIsReactivating(true);
+    try {
+      const authResponse = await authService.reactivateAccount({
+        username,
+        password,
+      });
+      setAuth(
+        authResponse.tokens.access,
+        authResponse.tokens.refresh,
+        authResponse.user.role,
+        authResponse.user.username,
+        authResponse.user.email,
+        authResponse.user.id,
+        authResponse.user.email_verificado,
+      );
+      if (authResponse.user.role === "arbitro") {
+        navigate(ROUTES.ARBITRO_ONBOARDING, { replace: true });
+      } else {
+        navigate(ROUTES.CLIENTE_PERFIL, { replace: true });
+      }
+    } catch (err) {
+      console.error("Error al reactivar cuenta:", err);
+    } finally {
+      setIsReactivating(false);
     }
   };
 
@@ -144,7 +187,11 @@ export function LoginPage() {
           <div className="relative rounded-3xl border border-border/60 bg-card/70 text-card-foreground shadow-2xl p-6 md:p-10 overflow-hidden">
             {/* Logo de fondo dentro de la card - Solo visible en móvil */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none md:hidden">
-              <img src={logoImage} alt="" className="w-64 h-64 object-contain opacity-15" />
+              <img
+                src={logoImage}
+                alt=""
+                className="w-64 h-64 object-contain opacity-15"
+              />
             </div>
 
             {/* Contenido del formulario */}
@@ -177,7 +224,10 @@ export function LoginPage() {
                       onChange={(e) => {
                         setUsername(e.target.value);
                         if (fieldErrors.username) {
-                          setFieldErrors((prev) => ({ ...prev, username: undefined }));
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            username: undefined,
+                          }));
                         }
                         clearError();
                       }}
@@ -210,7 +260,10 @@ export function LoginPage() {
                       onChange={(e) => {
                         setPassword(e.target.value);
                         if (fieldErrors.password) {
-                          setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            password: undefined,
+                          }));
                         }
                         clearError();
                       }}
@@ -223,9 +276,17 @@ export function LoginPage() {
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
-                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                      aria-label={
+                        showPassword
+                          ? "Ocultar contraseña"
+                          : "Mostrar contraseña"
+                      }
                     >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
                     </button>
                   </div>
                   {fieldErrors.password && (
@@ -247,9 +308,22 @@ export function LoginPage() {
 
                 {/* Error */}
                 {error && (
-                  <div className="flex items-center gap-2 p-3 bg-red-500/20 border border-red-500/30 rounded-xl">
-                    <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
-                    <p className="text-sm text-red-300">{error}</p>
+                  <div className="space-y-3 p-3 bg-red-500/20 border border-red-500/30 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
+                      <p className="text-sm text-red-300">{error}</p>
+                    </div>
+                    {isDeactivated && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleReactivate}
+                        disabled={isReactivating}
+                        className="w-full border-red-400/40 text-red-100 hover:bg-red-500/20"
+                      >
+                        {isReactivating ? "Reactivando..." : "Reactivar cuenta"}
+                      </Button>
+                    )}
                   </div>
                 )}
 

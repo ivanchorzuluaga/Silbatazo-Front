@@ -23,7 +23,7 @@ export function LegalTerminosPage() {
       <main className="max-w-4xl mx-auto px-4 py-10">
         <h1 className="text-2xl sm:text-3xl font-semibold mb-2">Términos y Condiciones</h1>
         <p className="text-muted-foreground mb-6">
-          Última actualización: Enero 2026 · {APP_NAME}
+          Última actualización: febrero 2026 · {APP_NAME}
         </p>
         <TerminosModalContent />
       </main>

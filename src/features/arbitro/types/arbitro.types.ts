@@ -45,7 +45,11 @@ export type EstadoVerificacion =
   | "rechazado"
   | "suspendido";
 
-export type TipoDocumento = "certificacion" | "identificacion" | "seguro" | "otro";
+export type TipoDocumento =
+  | "certificacion"
+  | "identificacion"
+  | "seguro"
+  | "otro";
 export type EstadoDocumento = "pendiente" | "aprobado" | "rechazado";
 
 export interface DocumentoArbitro {
@@ -71,6 +75,8 @@ export interface Arbitro {
   first_name?: string;
   last_name?: string;
   full_name: string;
+  nombre_publico?: string;
+  edad?: number | null;
   telefono?: string;
   fecha_nacimiento?: string;
   documento_identidad?: string;
@@ -103,6 +109,7 @@ export interface ArbitroCreateData {
   fecha_nacimiento?: string;
   documento_identidad?: string;
   biografia?: string;
+  nombre_publico?: string;
   experiencia_anos: number;
   municipios_ids: number[];
   categorias_ids: number[];
@@ -157,7 +164,12 @@ export type DisponibilidadUpdateData = Partial<DisponibilidadCreateData>;
 
 export type EstadoRetiro = "pendiente" | "procesado" | "rechazado";
 
-export type TipoCuenta = "ahorros" | "corriente" | "nequi" | "daviplata" | "otro";
+export type TipoCuenta =
+  | "ahorros"
+  | "corriente"
+  | "nequi"
+  | "daviplata"
+  | "otro";
 
 export interface Retiro {
   id: number;

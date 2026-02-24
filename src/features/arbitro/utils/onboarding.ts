@@ -11,6 +11,18 @@ import type { Arbitro } from "../types/arbitro.types";
 export function necesitaOnboardingArbitro(arbitro: Arbitro | null): boolean {
   if (!arbitro) return true;
   const sinFoto = !arbitro.foto_perfil || arbitro.foto_perfil.trim() === "";
-  const sinDisponibilidad = !arbitro.disponibilidades || arbitro.disponibilidades.length === 0;
-  return sinFoto || sinDisponibilidad;
+  const sinDisponibilidad =
+    !arbitro.disponibilidades || arbitro.disponibilidades.length === 0;
+  const sinEmail = !arbitro.email?.trim();
+  const sinTelefono = !arbitro.telefono?.trim();
+  const sinDocumento = !arbitro.documento_identidad?.trim();
+  const sinNacimiento = !arbitro.fecha_nacimiento?.trim();
+  return (
+    sinFoto ||
+    sinDisponibilidad ||
+    sinEmail ||
+    sinTelefono ||
+    sinDocumento ||
+    sinNacimiento
+  );
 }

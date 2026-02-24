@@ -101,6 +101,26 @@ export const partidoService = {
   },
 
   /**
+   * Crear un nuevo partido abierto (solo admin)
+   */
+  async crearPartidoAdmin(data: PartidoCreateData): Promise<PartidoDetail> {
+    const token = this.getToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await partidoEndpoints.crearPartidoAdmin(token, data);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        if (error.status === 403) {
+          throw new Error("Solo los administradores pueden crear partidos abiertos");
+        }
+        throw new Error(extractErrorMessage(error.data) || "Error al crear partido");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
    * Lista de tipos de partido con precio fijo (selector único)
    */
   async listarTiposPartido(): Promise<TipoPartido[]> {
@@ -248,6 +268,26 @@ export const partidoService = {
           throw new Error("Solo los árbitros pueden ver partidos disponibles");
         }
         throw new Error(extractErrorMessage(error.data) || "Error al obtener partidos disponibles");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
+   * Tomar un partido disponible (solo árbitros)
+   */
+  async tomarPartidoDisponible(id: number): Promise<PartidoDetail> {
+    const token = this.getToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await partidoEndpoints.tomarPartidoDisponible(token, id);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        if (error.status === 400) {
+          throw new Error(extractErrorMessage(error.data) || "Este partido ya fue asignado");
+        }
+        throw new Error(extractErrorMessage(error.data) || "Error al tomar partido");
       }
       throw new Error("Error de conexión. Intenta nuevamente.");
     }

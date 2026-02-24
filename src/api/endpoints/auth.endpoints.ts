@@ -133,6 +133,28 @@ export const authEndpoints = {
     });
   },
 
+  /**
+   * Desactivar cuenta (anonimiza datos sensibles)
+   */
+  async deactivateAccount(accessToken: string): Promise<{ message: string }> {
+    return authenticatedApiClient<{ message: string }>("/api/users/deactivate/", accessToken, {
+      method: "POST",
+    });
+  },
+
+  /**
+   * Reactivar cuenta con usuario y contraseña
+   */
+  async reactivateAccount(data: {
+    username: string;
+    password: string;
+  }): Promise<AuthResponse> {
+    return apiClient<AuthResponse>("/api/users/reactivate/", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
   // TODO: Reactivar cuando se implemente Google OAuth
   // /**
   //  * Autenticación con Google OAuth2

@@ -85,6 +85,11 @@ const ArbitroOnboardingPage = lazy(() =>
     default: m.ArbitroOnboardingPage,
   }))
 );
+const ArbitroPartidosDisponiblesPage = lazy(() =>
+  import("@/features/arbitro/pages/ArbitroPartidosDisponiblesPage").then((m) => ({
+    default: m.ArbitroPartidosDisponiblesPage,
+  }))
+);
 const AdminDashboardPage = lazy(() =>
   import("@/features/admin/pages/AdminDashboardPage").then((m) => ({
     default: m.AdminDashboardPage,
@@ -128,6 +133,11 @@ const GestionArbitrosPage = lazy(() =>
 const GestionPartidosPage = lazy(() =>
   import("@/features/admin/pages/GestionPartidosPage").then((m) => ({
     default: m.GestionPartidosPage,
+  }))
+);
+const AdminPartidoCreatePage = lazy(() =>
+  import("@/features/admin/pages/AdminPartidoCreatePage").then((m) => ({
+    default: m.AdminPartidoCreatePage,
   }))
 );
 const CategoriasPage = lazy(() =>
@@ -349,6 +359,15 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      // Partidos disponibles para árbitros
+      {
+        path: ROUTES.ARBITRO_PARTIDOS_DISPONIBLES,
+        element: (
+          <ProtectedRoute allowedRoles={[USER_ROLES.ARBITRO]}>
+            {withSuspense(<ArbitroPartidosDisponiblesPage />)}
+          </ProtectedRoute>
+        ),
+      },
       // Perfil de árbitro
       {
         path: ROUTES.ARBITRO_PERFIL,
@@ -408,6 +427,15 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
             {withSuspense(<GestionPartidosPage />)}
+          </ProtectedRoute>
+        ),
+      },
+      // Crear partido abierto (admin)
+      {
+        path: ROUTES.ADMIN_PARTIDOS_CREAR,
+        element: (
+          <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+            {withSuspense(<AdminPartidoCreatePage />)}
           </ProtectedRoute>
         ),
       },

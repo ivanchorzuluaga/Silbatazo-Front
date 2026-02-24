@@ -45,6 +45,17 @@ export function useNavBadges(): NavBadgeMap {
           return;
         }
 
+        if (user.role === USER_ROLES.ARBITRO) {
+          const disponibles = await partidoService.listarPartidosDisponibles();
+          if (cancelled) return;
+          const nextBadges: NavBadgeMap = {};
+          if (disponibles.length > 0) {
+            nextBadges[ROUTES.ARBITRO_PARTIDOS_DISPONIBLES] = disponibles.length;
+          }
+          setBadges(nextBadges);
+          return;
+        }
+
         const partidos = await partidoService.listarPartidos();
         if (cancelled) return;
 

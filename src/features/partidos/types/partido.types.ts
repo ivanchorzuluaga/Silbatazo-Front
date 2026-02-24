@@ -46,6 +46,7 @@ export interface Partido {
   fecha_pago?: string;
   /** URL del comprobante de pago (captura de transferencia) subido por el cliente */
   comprobante_pago_url?: string | null;
+  tiene_conflicto_horario?: boolean;
   notas_pago?: string;
   notas_cliente?: string;
   notas_arbitro?: string;

@@ -183,4 +183,23 @@ export const authService = {
       throw new Error("Error de conexión. Intenta nuevamente.");
     }
   },
+
+  /**
+   * Desactivar cuenta (anonimiza datos sensibles)
+   */
+  async deactivateAccount(): Promise<{ message: string }> {
+    const token = this.getAccessToken();
+    if (!token) throw new Error("No estás autenticado");
+    return authEndpoints.deactivateAccount(token);
+  },
+
+  /**
+   * Reactivar cuenta con usuario y contraseña
+   */
+  async reactivateAccount(data: {
+    username: string;
+    password: string;
+  }) {
+    return authEndpoints.reactivateAccount(data);
+  },
 };

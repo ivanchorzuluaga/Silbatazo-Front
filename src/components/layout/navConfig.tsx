@@ -16,6 +16,7 @@ import {
   AlertTriangle,
   Mail,
   DollarSign,
+  PlusCircle,
 } from "lucide-react";
 import { ROUTES, USER_ROLES, type UserRole } from "@/lib/constants";
 
@@ -69,6 +70,12 @@ export const navSections: NavSection[] = [
     title: "Árbitro",
     items: [
       {
+        label: "Partidos disponibles",
+        icon: Search,
+        route: ROUTES.ARBITRO_PARTIDOS_DISPONIBLES,
+        roles: [USER_ROLES.ARBITRO],
+      },
+      {
         label: "Mi Perfil",
         icon: User,
         route: ROUTES.ARBITRO_PERFIL,
@@ -85,6 +92,12 @@ export const navSections: NavSection[] = [
   {
     title: "Administración",
     items: [
+      {
+        label: "Crear partido",
+        icon: PlusCircle,
+        route: ROUTES.ADMIN_PARTIDOS_CREAR,
+        roles: [USER_ROLES.ADMIN],
+      },
       {
         label: "Árbitros",
         icon: Users,

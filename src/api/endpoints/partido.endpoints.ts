@@ -82,6 +82,16 @@ export const partidoEndpoints = {
   },
 
   /**
+   * Crear un partido abierto (solo admin)
+   */
+  async crearPartidoAdmin(token: string, data: PartidoCreateData): Promise<PartidoDetail> {
+    return authenticatedApiClient<PartidoDetail>("/api/partidos/admin/crear/", token, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
    * Lista de tipos de partido con precio fijo (selector único)
    */
   async listarTiposPartido(token: string): Promise<TipoPartido[]> {
@@ -217,6 +227,15 @@ export const partidoEndpoints = {
       token
     );
     return unwrapPaginated(data);
+  },
+
+  /**
+   * Tomar un partido disponible (solo árbitros)
+   */
+  async tomarPartidoDisponible(token: string, id: number): Promise<PartidoDetail> {
+    return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/tomar/`, token, {
+      method: "POST",
+    });
   },
 
   /**

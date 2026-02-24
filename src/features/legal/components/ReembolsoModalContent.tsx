@@ -5,48 +5,101 @@ export function ReembolsoModalContent() {
   const sections = [
     {
       icon: BadgeCheck,
-      title: "1. Política general",
+      title: "1. Condiciones Generales",
       content: (
-        <p>
-          En {APP_NAME} buscamos transparencia. Los reembolsos aplican según el estado del partido
-          y las condiciones de cancelación acordadas.
-        </p>
+        <p>Los reembolsos se rigen exclusivamente por esta política.</p>
       ),
     },
     {
       icon: Calendar,
-      title: "2. Cancelación por el cliente",
+      title: "2. Cancelaciones del Cliente",
       content: (
-        <p>
-          Si el cliente cancela con suficiente antelación, puede aplicar un reembolso total o
-          parcial según el caso.
-        </p>
+        <ul className="space-y-2">
+          <li className="flex items-start gap-2">
+            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+            <span>Cancelación con 24 horas o más: reembolso del 100%.</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+            <span>Cancelación con menos de 12 horas: reembolso del 50%.</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+            <span>
+              Cancelaciones entre 12 y 24 horas serán evaluadas caso a caso y las decisiones serán
+              comunicadas a cada cliente, con respuesta de menos de 4 horas.
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+            <span>Partidos que se cancelen antes de 3 horas no tendrán reembolso.</span>
+          </li>
+        </ul>
       ),
     },
     {
       icon: Users,
-      title: "3. Cancelación por el árbitro",
+      title: "3. Cancelaciones del Árbitro",
       content: (
-        <p>
-          Cuando el árbitro cancela, el cliente puede optar por reprogramar o solicitar reembolso.
-        </p>
+        <ul className="space-y-2">
+          <li className="flex items-start gap-2">
+            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+            <span>
+              Si el árbitro cancela con mínimo 4 horas de anticipación, se intentará asignar un
+              reemplazo.
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+            <span>
+              Si no es posible, se realizará reembolso total y se dará descuento de $10.000 pesos
+              en el próximo partido.
+            </span>
+          </li>
+        </ul>
       ),
     },
     {
       icon: CreditCard,
-      title: "4. Procesamiento de pagos",
+      title: "4. Exclusiones de Reembolso",
+      content: (
+        <>
+          <ul className="space-y-2">
+            <li className="flex items-start gap-2">
+              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+              <span>El servicio ya haya iniciado.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+              <span>
+                Existan agresiones, disturbios o conductas violentas atribuibles a los
+                participantes.
+              </span>
+            </li>
+          </ul>
+          <p className="mt-3">
+            Si el cliente está insatisfecho con el servicio prestado por parte del árbitro, se
+            evaluarán los motivos y se obsequiará un 50% de descuento en el próximo servicio del
+            usuario, pero no se devolverá dinero.
+          </p>
+        </>
+      ),
+    },
+    {
+      icon: Shield,
+      title: "5. Plazo de Devolución",
       content: (
         <p>
-          Los reembolsos se procesan por el mismo medio de pago. Los tiempos dependen del proveedor
-          financiero.
+          Los reembolsos se realizarán al medio de pago original dentro de un plazo máximo de 5
+          días hábiles.
         </p>
       ),
     },
     {
       icon: Shield,
-      title: "5. Contacto",
+      title: "6. Contacto",
       content: (
-        <p>Si tienes dudas, contáctanos por los canales oficiales del soporte.</p>
+        <p>Para solicitudes de reembolso: soporte@silbatazo.com</p>
       ),
     },
   ];
@@ -54,7 +107,7 @@ export function ReembolsoModalContent() {
   return (
     <div className="space-y-4 text-foreground">
       <div>
-        <p className="text-sm text-muted-foreground">Última actualización: Enero 2026</p>
+        <p className="text-sm text-muted-foreground">Última actualización: febrero 2026</p>
       </div>
       <div className="space-y-3">
         {sections.map((section, idx) => (

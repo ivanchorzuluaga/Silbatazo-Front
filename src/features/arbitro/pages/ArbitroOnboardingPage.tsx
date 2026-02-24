@@ -63,18 +63,28 @@ export function ArbitroOnboardingPage() {
   useEffect(() => {
     if (!inicializado || loadingPerfil) return;
     const sinPerfil = !arbitro;
-    const sinFoto = arbitro && (!arbitro.foto_perfil || arbitro.foto_perfil.trim() === "");
-    const sinDisponibilidad = !disponibilidades || disponibilidades.length === 0;
+    const sinFoto =
+      arbitro && (!arbitro.foto_perfil || arbitro.foto_perfil.trim() === "");
+    const sinDisponibilidad =
+      !disponibilidades || disponibilidades.length === 0;
+    const sinDatosPersonales =
+      !!arbitro &&
+      (!arbitro.email?.trim() ||
+        !arbitro.telefono?.trim() ||
+        !arbitro.documento_identidad?.trim() ||
+        !arbitro.fecha_nacimiento?.trim());
 
     let siguientePaso: 1 | 2 | 3;
-    if (sinPerfil || sinFoto) {
+    if (sinPerfil || sinFoto || sinDatosPersonales) {
       siguientePaso = 1;
     } else if (sinDisponibilidad) {
       siguientePaso = 2;
     } else {
       siguientePaso = 3;
     }
-    setPasoActual((actual) => (actual === siguientePaso ? actual : siguientePaso));
+    setPasoActual((actual) =>
+      actual === siguientePaso ? actual : siguientePaso,
+    );
   }, [inicializado, loadingPerfil, arbitro, disponibilidades]);
 
   const handlePerfilSuccess = useCallback(async () => {
@@ -106,7 +116,11 @@ export function ArbitroOnboardingPage() {
       backButton={
         pasoActual === 1
           ? null
-          : { label: "Atrás", onClick: () => setPasoActual((p) => Math.max(1, p - 1) as 1 | 2 | 3) }
+          : {
+              label: "Atrás",
+              onClick: () =>
+                setPasoActual((p) => Math.max(1, p - 1) as 1 | 2 | 3),
+            }
       }
       contentClassName="page-surface max-w-2xl pb-nav-mobile"
     >
@@ -125,11 +139,15 @@ export function ArbitroOnboardingPage() {
                       completado
                         ? "bg-primary border-primary text-primary-foreground"
                         : activo
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-muted-foreground/30 text-muted-foreground"
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-muted-foreground/30 text-muted-foreground"
                     }`}
                   >
-                    {completado ? <Check className="size-5" /> : <Icon className="size-5" />}
+                    {completado ? (
+                      <Check className="size-5" />
+                    ) : (
+                      <Icon className="size-5" />
+                    )}
                   </div>
                   <span
                     className={`mt-2 text-xs font-medium hidden sm:block text-center ${
@@ -156,12 +174,17 @@ export function ArbitroOnboardingPage() {
       <div className="space-y-6">
         {pasoActual === 1 && (
           <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
-            <h2 className="text-lg font-semibold mb-2">Datos personales y foto</h2>
+            <h2 className="text-lg font-semibold mb-2">
+              Datos personales y foto
+            </h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Completa tu información y sube una foto de perfil para que los organizadores te
-              conozcan.
+              Completa tu información y sube una foto de perfil para que los
+              organizadores te conozcan.
             </p>
-            <PerfilArbitroForm arbitro={arbitro ?? undefined} onSuccess={handlePerfilSuccess} />
+            <PerfilArbitroForm
+              arbitro={arbitro ?? undefined}
+              onSuccess={handlePerfilSuccess}
+            />
           </div>
         )}
 
@@ -169,15 +192,18 @@ export function ArbitroOnboardingPage() {
           <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold">Tu disponibilidad</h2>
             <p className="text-sm text-muted-foreground">
-              Indica en qué días y horarios puedes arbitrar. Añade al menos un horario para
-              continuar.
+              Indica en qué días y horarios puedes arbitrar. Añade al menos un
+              horario para continuar.
             </p>
             <DisponibilidadList
               municipiosPerfil={arbitro?.municipios ?? []}
               onRefresh={listarDisponibilidades}
             />
             {disponibilidades && disponibilidades.length > 0 && (
-              <Button onClick={() => setPasoActual(3)} className="w-full sm:w-auto">
+              <Button
+                onClick={() => setPasoActual(3)}
+                className="w-full sm:w-auto"
+              >
                 Siguiente: ver resumen
               </Button>
             )}
@@ -192,11 +218,15 @@ export function ArbitroOnboardingPage() {
             <div>
               <h2 className="text-xl font-bold mb-2">¡Todo listo!</h2>
               <p className="text-muted-foreground">
-                Tu perfil está completo. Cuando un administrador verifique tu cuenta, podrás recibir
-                solicitudes de partidos.
+                Tu perfil está completo. Cuando un administrador verifique tu
+                cuenta, podrás recibir solicitudes de partidos.
               </p>
             </div>
-            <Button onClick={handleIrAlDashboard} size="lg" className="w-full sm:w-auto">
+            <Button
+              onClick={handleIrAlDashboard}
+              size="lg"
+              className="w-full sm:w-auto"
+            >
               Ir al Dashboard
             </Button>
           </div>

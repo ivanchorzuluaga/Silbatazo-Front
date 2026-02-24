@@ -1,11 +1,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Star, ArrowRight, MapPin, CheckCircle, Shield } from "lucide-react";
+import { ArrowRight, CheckCircle, Shield, Sparkles, Star } from "lucide-react";
 import { ROUTES } from "@/lib/constants";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
-import { getArbitroDetailRoute } from "@/lib/constants";
-import { getRefereeImage } from "@/lib/referee-images";
+import { RefereeCard } from "./RefereeCard";
 
 interface RefereesPreviewProps {
   arbitros: Arbitro[];
@@ -51,125 +49,11 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
 
         {/* Referee Cards - Slider en móvil, Grid en desktop */}
         <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible pb-4 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory sm:snap-none scrollbar-hide">
-          {arbitrosPreview.map((arbitro) => {
-            const rating = arbitro.calificacion_promedio || 0;
-            const totalCalificaciones = arbitro.total_calificaciones || 0;
-            const nombre = arbitro.full_name || arbitro.username;
-            const experiencia = arbitro.experiencia_anos
-              ? `${arbitro.experiencia_anos} años`
-              : "Experiencia";
-            const especialidad =
-              arbitro.categorias.length > 0 ? arbitro.categorias[0].nombre : "Árbitro";
-            const partidos = arbitro.total_partidos || 0;
-            const imagen = getRefereeImage(
-              arbitro.foto_perfil,
-              arbitro.id,
-              arbitro.experiencia_anos,
-              nombre,
-              arbitro.foto_perfil_thumb
-            );
-            const disponibilidad = arbitro.estado_verificacion === "aprobado";
-
-            return (
-              <Link
-                key={arbitro.id}
-                to={getArbitroDetailRoute(arbitro.id)}
-                className="group block shrink-0 w-[280px] sm:w-auto snap-center sm:snap-align-none"
-              >
-                <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card hover:shadow-xl transition-all duration-300 hover:border-primary/20">
-                  {/* Image */}
-                  <div className="relative aspect-[4/5] overflow-hidden">
-                    <img
-                      src={imagen}
-                      alt={nombre}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                      decoding="async"
-                      fetchPriority="low"
-                      width={400}
-                      height={500}
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src =
-                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='250' viewBox='0 0 200 250'%3E%3Crect width='200' height='250' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='14' fill='%239ca3af'%3EÁrbitro%3C/text%3E%3C/svg%3E";
-                      }}
-                    />
-
-                    {/* Status badges */}
-                    <div className="absolute top-3 left-3 flex flex-col gap-2">
-                      {disponibilidad && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-green-500 text-white border-none shadow-md"
-                        >
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Disponible
-                        </Badge>
-                      )}
-                      {rating > 4.5 && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-yellow-500 text-white border-none shadow-md"
-                        >
-                          <Star className="h-3 w-3 mr-1 fill-white" />
-                          Top Rated
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Rating overlay */}
-                    {rating > 0 && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-white font-semibold">{rating.toFixed(1)}</span>
-                          </div>
-                          <div className="text-white text-sm">{partidos} partidos</div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-4 space-y-3">
-                    {/* Name and specialization */}
-                    <div className="space-y-1">
-                      <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors truncate">
-                        {nombre}
-                      </h3>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span className="font-medium text-foreground">{especialidad}</span>
-                        <span className="w-1 h-1 bg-muted-foreground rounded-full" />
-                        <span>{experiencia}</span>
-                      </div>
-                    </div>
-
-                    {/* Stats: calificaciones y disponibilidad */}
-                    <div className="flex items-center justify-between pt-2 border-t border-border/50">
-                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 shrink-0" />
-                        <span className="font-medium text-foreground">
-                          {rating && rating > 0 ? Number(rating).toFixed(1) : "0.0"}
-                        </span>
-                        <span className="text-xs">
-                          {totalCalificaciones === 0
-                            ? "(sin calificaciones)"
-                            : `(${totalCalificaciones} ${
-                                totalCalificaciones === 1 ? "calificación" : "calificaciones"
-                              })`}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4 text-primary shrink-0" />
-                        <span>Disponible</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+          {arbitrosPreview.map((arbitro) => (
+            <div key={arbitro.id} className="shrink-0 w-[280px] sm:w-auto snap-center sm:snap-none">
+              <RefereeCard arbitro={arbitro} />
+            </div>
+          ))}
         </div>
 
         {/* Trust indicators */}
@@ -188,6 +72,11 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-blue-500" />
               <span className="text-sm font-medium">Certificados</span>
+            </div>
+            <div className="hidden sm:block w-px h-6 bg-border" />
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-emerald-500" />
+              <span className="text-sm font-medium">Perfiles destacados</span>
             </div>
           </div>
         </div>

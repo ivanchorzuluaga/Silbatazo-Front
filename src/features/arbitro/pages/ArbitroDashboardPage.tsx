@@ -17,6 +17,7 @@ import {
   Activity,
   User,
   Wallet,
+  Search,
 } from "lucide-react";
 import { parseLocalDate, getTodayLocalDate, formatCop } from "@/lib/utils";
 import { COMISION_PLATAFORMA_PARTIDO, ROUTES } from "@/lib/constants";
@@ -165,6 +166,34 @@ export function ArbitroDashboardPage() {
               {partidosAceptados}
             </div>
             <p className="text-xs text-green-500 dark:text-green-400 mt-1">Próximos partidos</p>
+          </CardContent>
+        </Card>
+
+        <Card
+          className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-amber-950 dark:to-yellow-900 cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate(ROUTES.ARBITRO_PARTIDOS_DISPONIBLES)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              navigate(ROUTES.ARBITRO_PARTIDOS_DISPONIBLES);
+            }
+          }}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-amber-700 dark:text-amber-300">
+                Partidos disponibles
+              </CardTitle>
+              <Search className="w-5 h-5 text-amber-500" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-amber-700 dark:text-amber-300">Explorar</div>
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+              Tomar partidos abiertos
+            </p>
           </CardContent>
         </Card>
 

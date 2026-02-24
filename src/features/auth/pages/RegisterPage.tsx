@@ -45,9 +45,12 @@ export function RegisterPage() {
   const [searchParams] = useSearchParams();
   const { login: setAuth } = useAuth();
   const roleParam = searchParams.get("role");
-  const defaultRole = roleParam === "arbitro" ? USER_ROLES.ARBITRO : USER_ROLES.CLIENTE;
+  const defaultRole =
+    roleParam === "arbitro" ? USER_ROLES.ARBITRO : USER_ROLES.CLIENTE;
 
   const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
   const [password, setPassword] = useState("");
@@ -61,6 +64,8 @@ export function RegisterPage() {
 
   const [fieldErrors, setFieldErrors] = useState<{
     username?: string;
+    first_name?: string;
+    last_name?: string;
     email?: string;
     telefono?: string;
     password?: string;
@@ -84,6 +89,14 @@ export function RegisterPage() {
       errors.username = "El usuario debe tener al menos 3 caracteres";
     } else if (!validations.username(username)) {
       errors.username = "Solo letras, números, guiones y guiones bajos";
+    }
+
+    if (!validations.required(firstName)) {
+      errors.first_name = "El nombre es requerido";
+    }
+
+    if (!validations.required(lastName)) {
+      errors.last_name = "El apellido es requerido";
     }
 
     if (!validations.required(email)) {
@@ -131,6 +144,8 @@ export function RegisterPage() {
     try {
       const authResponse = await register({
         username,
+        first_name: firstName,
+        last_name: lastName,
         email,
         telefono,
         password,
@@ -146,10 +161,12 @@ export function RegisterPage() {
         authResponse.user.username,
         authResponse.user.email,
         authResponse.user.id,
-        authResponse.user.email_verificado
+        authResponse.user.email_verificado,
       );
 
-      const dashboardRoute = getDashboardRoute(authResponse.user.role as UserRole);
+      const dashboardRoute = getDashboardRoute(
+        authResponse.user.role as UserRole,
+      );
       navigate(dashboardRoute, { replace: true });
     } catch (err) {
       console.error("Error en registro:", err);
@@ -198,7 +215,11 @@ export function RegisterPage() {
           <div className="relative rounded-3xl border border-border/60 bg-card/70 text-card-foreground shadow-2xl p-6 md:p-8 overflow-hidden">
             {/* Logo de fondo dentro de la card - Solo visible en móvil */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none md:hidden">
-              <img src={logoImage} alt="" className="w-56 h-56 object-contain opacity-10" />
+              <img
+                src={logoImage}
+                alt=""
+                className="w-56 h-56 object-contain opacity-10"
+              />
             </div>
 
             <div className="relative z-10">
@@ -221,12 +242,57 @@ export function RegisterPage() {
                     onChange={(e) => {
                       setUsername(e.target.value);
                       if (fieldErrors.username) {
-                        setFieldErrors((prev) => ({ ...prev, username: undefined }));
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          username: undefined,
+                        }));
                       }
                     }}
                     error={fieldErrors.username}
                     disabled={isLoading}
                     autoComplete="username"
+                    required
+                    leftIcon={<User className="h-4 w-4" />}
+                  />
+
+                  <FormField
+                    label="Nombre"
+                    name="first_name"
+                    placeholder="Tu nombre"
+                    value={firstName}
+                    onChange={(e) => {
+                      setFirstName(e.target.value);
+                      if (fieldErrors.first_name) {
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          first_name: undefined,
+                        }));
+                      }
+                    }}
+                    error={fieldErrors.first_name}
+                    disabled={isLoading}
+                    autoComplete="given-name"
+                    required
+                    leftIcon={<User className="h-4 w-4" />}
+                  />
+
+                  <FormField
+                    label="Apellido"
+                    name="last_name"
+                    placeholder="Tu apellido"
+                    value={lastName}
+                    onChange={(e) => {
+                      setLastName(e.target.value);
+                      if (fieldErrors.last_name) {
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          last_name: undefined,
+                        }));
+                      }
+                    }}
+                    error={fieldErrors.last_name}
+                    disabled={isLoading}
+                    autoComplete="family-name"
                     required
                     leftIcon={<User className="h-4 w-4" />}
                   />
@@ -240,7 +306,10 @@ export function RegisterPage() {
                     onChange={(e) => {
                       setEmail(e.target.value);
                       if (fieldErrors.email) {
-                        setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          email: undefined,
+                        }));
                       }
                     }}
                     error={fieldErrors.email}
@@ -259,7 +328,10 @@ export function RegisterPage() {
                     onChange={(e) => {
                       setTelefono(e.target.value);
                       if (fieldErrors.telefono) {
-                        setFieldErrors((prev) => ({ ...prev, telefono: undefined }));
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          telefono: undefined,
+                        }));
                       }
                     }}
                     error={fieldErrors.telefono}
@@ -278,7 +350,10 @@ export function RegisterPage() {
                     onChange={(e) => {
                       setPassword(e.target.value);
                       if (fieldErrors.password) {
-                        setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          password: undefined,
+                        }));
                       }
                     }}
                     error={fieldErrors.password}
@@ -291,7 +366,11 @@ export function RegisterPage() {
                         type="button"
                         onClick={() => setShowPassword((prev) => !prev)}
                         className="text-muted-foreground hover:text-foreground transition-colors"
-                        aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                        aria-label={
+                          showPassword
+                            ? "Ocultar contraseña"
+                            : "Mostrar contraseña"
+                        }
                       >
                         {showPassword ? (
                           <EyeOff className="h-4 w-4" />
@@ -311,7 +390,10 @@ export function RegisterPage() {
                     onChange={(e) => {
                       setPasswordConfirm(e.target.value);
                       if (fieldErrors.password_confirm) {
-                        setFieldErrors((prev) => ({ ...prev, password_confirm: undefined }));
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          password_confirm: undefined,
+                        }));
                       }
                     }}
                     error={fieldErrors.password_confirm}
@@ -325,7 +407,9 @@ export function RegisterPage() {
                         onClick={() => setShowPasswordConfirm((prev) => !prev)}
                         className="text-muted-foreground hover:text-foreground transition-colors"
                         aria-label={
-                          showPasswordConfirm ? "Ocultar contraseña" : "Mostrar contraseña"
+                          showPasswordConfirm
+                            ? "Ocultar contraseña"
+                            : "Mostrar contraseña"
                         }
                       >
                         {showPasswordConfirm ? (
@@ -497,7 +581,11 @@ export function RegisterPage() {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full h-12" disabled={isLoading}>
+                <Button
+                  type="submit"
+                  className="w-full h-12"
+                  disabled={isLoading}
+                >
                   {isLoading ? "Creando cuenta..." : "Crear cuenta"}
                 </Button>
 
@@ -513,7 +601,10 @@ export function RegisterPage() {
               <div className="text-center mt-6">
                 <p className="text-sm text-muted-foreground">
                   ¿Ya tienes cuenta?{" "}
-                  <Link to={ROUTES.LOGIN} className="text-primary font-semibold hover:underline">
+                  <Link
+                    to={ROUTES.LOGIN}
+                    className="text-primary font-semibold hover:underline"
+                  >
                     Inicia sesión
                   </Link>
                 </p>
@@ -542,7 +633,11 @@ export function RegisterPage() {
             <TerminosModalContent />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setShowTerminos(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowTerminos(false)}
+            >
               Cerrar
             </Button>
           </DialogFooter>
@@ -568,7 +663,11 @@ export function RegisterPage() {
             <PrivacidadModalContent />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setShowPrivacidad(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowPrivacidad(false)}
+            >
               Cerrar
             </Button>
           </DialogFooter>

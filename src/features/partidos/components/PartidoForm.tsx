@@ -17,13 +17,15 @@ import { partidoService } from "../services/partido.service";
 import { ROUTES, CATEGORIAS_PARTIDO } from "@/lib/constants";
 import { getTodayLocalDate, compareDates } from "@/lib/utils";
 import { TipoPartidoCardGrid } from "./TipoPartidoCardGrid";
-import type { TipoPartido } from "../types/partido.types";
+import type { PartidoCreateData, TipoPartido } from "../types/partido.types";
 
 interface PartidoFormProps {
   onSuccess?: () => void;
+  modoAdmin?: boolean;
+  onCreate?: (data: PartidoCreateData) => Promise<void | { id: number; estado: string }>;
 }
 
-export function PartidoForm({ onSuccess }: PartidoFormProps) {
+export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoFormProps) {
   const navigate = useNavigate();
   const { crearPartido, isLoading, error, clearError } = usePartido();
   const { municipios, isLoading: municipiosLoading } = useMunicipios();
@@ -113,7 +115,9 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
         notas_cliente: notasCliente.trim() || undefined,
       };
 
-      const nuevoPartido = await crearPartido(data);
+      const nuevoPartido = onCreate
+        ? ((await onCreate(data)) as { id: number; estado: string })
+        : await crearPartido(data);
 
       // Mostrar mensaje de éxito
       setPartidoCreado({
@@ -167,8 +171,19 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
               ¡Partido creado exitosamente!
             </AlertTitle>
             <AlertDescription className="mt-2">
-              El partido #{partidoCreado.id} ha sido creado y está <strong>buscando árbitro</strong>
-              . Los árbitros podrán postularse y un administrador asignará el árbitro final.
+              {modoAdmin ? (
+                <>
+                  El partido #{partidoCreado.id} ha sido creado y está{" "}
+                  <strong>disponible para árbitros</strong>. El primer árbitro que lo tome quedará
+                  asignado.
+                </>
+              ) : (
+                <>
+                  El partido #{partidoCreado.id} ha sido creado y está{" "}
+                  <strong>buscando árbitro</strong>. Los árbitros podrán postularse y un
+                  administrador asignará el árbitro final.
+                </>
+              )}
             </AlertDescription>
           </Alert>
           {/* Botón Aceptar */}
@@ -188,10 +203,13 @@ export function PartidoForm({ onSuccess }: PartidoFormProps) {
 
           {/* Información */}
           <div className="p-3 rounded-md bg-muted/50 border">
-            <p className="text-sm font-medium mb-1">Crear partido sin árbitro asignado</p>
+            <p className="text-sm font-medium mb-1">
+              {modoAdmin ? "Crear partido abierto" : "Crear partido sin árbitro asignado"}
+            </p>
             <p className="text-xs text-muted-foreground">
-              El partido quedará disponible para que los árbitros se postulen. Un administrador
-              asignará el árbitro final.
+              {modoAdmin
+                ? "El partido quedará publicado para que un árbitro lo tome directamente."
+                : "El partido quedará disponible para que los árbitros se postulen. Un administrador asignará el árbitro final."}
             </p>
           </div>
 

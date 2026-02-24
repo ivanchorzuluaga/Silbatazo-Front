@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FilterTabs } from "@/components/ui/FilterTabs";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,7 @@ const TABS_ESTADO: { value: "" | EstadoPartido; label: string }[] = [
 
 export function GestionPartidosPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const initializedFromQuery = useRef(false);
   const { municipios } = useMunicipios();
   const { categorias } = useCategorias();
@@ -82,6 +83,18 @@ export function GestionPartidosPage() {
       contentClassName="page-surface"
     >
       <div className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">Crear partidos abiertos</h2>
+            <p className="text-sm text-muted-foreground">
+              Publica partidos para que los árbitros los tomen directamente.
+            </p>
+          </div>
+          <Button onClick={() => navigate(ROUTES.ADMIN_PARTIDOS_CREAR)}>
+            Crear partido
+          </Button>
+        </div>
+
         {/* Tabs por estado */}
         <FilterTabs
           label="Estado del partido"

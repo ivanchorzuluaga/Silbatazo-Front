@@ -13,6 +13,83 @@
   }
 }
 
+@keyframes shimmerGlow {
+  0% {
+    transform: translateX(-120%) skewX(-12deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.6;
+  }
+  60% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(120%) skewX(-12deg);
+    opacity: 0;
+  }
+}
+
+@keyframes floatSparkle {
+  0% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-2px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+}
+
+@keyframes slowPulse {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.glow-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.35) 45%,
+    transparent 60%
+  );
+  animation: shimmerGlow 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.sparkle-float {
+  animation: floatSparkle 2.6s ease-in-out infinite;
+}
+
+.slow-pulse {
+  animation: slowPulse 6s ease-in-out infinite;
+}
+
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.08) 1px,
+    transparent 1px
+  );
+  background-size: 3px 3px;
+  mix-blend-mode: overlay;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
 .slide-panel-enter {
   animation: slideDown 0.3s ease-out;
 }
@@ -21,8 +98,15 @@
 
 :root {
   /* Tipografía Poppins */
-  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, sans-serif;
+  font-family:
+    "Poppins",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
   line-height: 1.5;
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -130,14 +214,15 @@ body {
   min-width: 320px;
   min-height: 100vh;
   /* Safe areas para iOS (notch, home indicator) */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
-    env(safe-area-inset-left);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 @theme inline {
   /* Fuente Poppins para todo el proyecto */
-  --font-sans: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, sans-serif;
+  --font-sans:
+    "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 
   --radius-sm: calc(var(--radius) - 8px); /* 8px */
   --radius-md: calc(var(--radius) - 4px); /* 12px */
@@ -254,10 +339,20 @@ body {
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "kern" 1, "liga" 1;
+    font-feature-settings:
+      "kern" 1,
+      "liga" 1;
     background-image:
-      radial-gradient(900px 520px at 12% -10%, color-mix(in oklch, var(--color-emerald) 16%, transparent), transparent 60%),
-      radial-gradient(800px 420px at 90% -15%, color-mix(in oklch, var(--color-indigo) 14%, transparent), transparent 55%);
+      radial-gradient(
+        900px 520px at 12% -10%,
+        color-mix(in oklch, var(--color-emerald) 16%, transparent),
+        transparent 60%
+      ),
+      radial-gradient(
+        800px 420px at 90% -15%,
+        color-mix(in oklch, var(--color-indigo) 14%, transparent),
+        transparent 55%
+      );
     background-repeat: no-repeat;
     background-size: cover, cover;
     background-attachment: scroll;
@@ -265,8 +360,16 @@ body {
 
   .dark body {
     background-image:
-      radial-gradient(900px 520px at 10% -10%, color-mix(in oklch, var(--color-emerald) 18%, transparent), transparent 65%),
-      radial-gradient(800px 420px at 92% -18%, color-mix(in oklch, var(--color-indigo) 16%, transparent), transparent 60%);
+      radial-gradient(
+        900px 520px at 10% -10%,
+        color-mix(in oklch, var(--color-emerald) 18%, transparent),
+        transparent 65%
+      ),
+      radial-gradient(
+        800px 420px at 92% -18%,
+        color-mix(in oklch, var(--color-indigo) 16%, transparent),
+        transparent 60%
+      );
     background-repeat: no-repeat;
     background-size: cover, cover;
   }
@@ -357,7 +460,9 @@ body {
   @apply placeholder:text-muted-foreground/60;
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary;
   @apply disabled:cursor-not-allowed disabled:opacity-50;
-  box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28), 0 2px 4px rgba(2, 6, 23, 0.08),
+  box-shadow:
+    0 10px 18px -14px rgba(2, 6, 23, 0.28),
+    0 2px 4px rgba(2, 6, 23, 0.08),
     0 0 0 1px rgba(2, 6, 23, 0.04);
 }
 
@@ -367,7 +472,9 @@ body {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary;
   @apply disabled:cursor-not-allowed disabled:opacity-50;
   @apply appearance-none cursor-pointer;
-  box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28), 0 2px 4px rgba(2, 6, 23, 0.08),
+  box-shadow:
+    0 10px 18px -14px rgba(2, 6, 23, 0.28),
+    0 2px 4px rgba(2, 6, 23, 0.08),
     0 0 0 1px rgba(2, 6, 23, 0.04);
 }
 
@@ -377,26 +484,34 @@ body {
   @apply placeholder:text-muted-foreground/60;
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-primary;
   @apply disabled:cursor-not-allowed disabled:opacity-50;
-  box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28), 0 2px 4px rgba(2, 6, 23, 0.08),
+  box-shadow:
+    0 10px 18px -14px rgba(2, 6, 23, 0.28),
+    0 2px 4px rgba(2, 6, 23, 0.08),
     0 0 0 1px rgba(2, 6, 23, 0.04);
 }
 
 /* Superficies de UI */
 @utility card-surface {
   @apply rounded-2xl border border-border/60 bg-card/85 text-card-foreground backdrop-blur;
-  box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28), 0 2px 4px rgba(2, 6, 23, 0.08),
+  box-shadow:
+    0 10px 18px -14px rgba(2, 6, 23, 0.28),
+    0 2px 4px rgba(2, 6, 23, 0.08),
     0 0 0 1px rgba(2, 6, 23, 0.04);
 }
 
 @utility card-surface-strong {
   @apply rounded-3xl border border-border/60 bg-card/92 text-card-foreground backdrop-blur-md;
-  box-shadow: 0 18px 28px -18px rgba(2, 6, 23, 0.35), 0 4px 8px rgba(2, 6, 23, 0.12),
+  box-shadow:
+    0 18px 28px -18px rgba(2, 6, 23, 0.35),
+    0 4px 8px rgba(2, 6, 23, 0.12),
     0 0 0 1px rgba(2, 6, 23, 0.04);
 }
 
 @utility modal-surface {
   @apply rounded-2xl border border-border/60 bg-card/90 text-card-foreground backdrop-blur-md;
-  box-shadow: 0 28px 42px -26px rgba(2, 6, 23, 0.45), 0 10px 16px rgba(2, 6, 23, 0.16),
+  box-shadow:
+    0 28px 42px -26px rgba(2, 6, 23, 0.45),
+    0 10px 16px rgba(2, 6, 23, 0.16),
     0 0 0 1px rgba(2, 6, 23, 0.05);
 }
 
@@ -447,23 +562,28 @@ body {
 
   /* Sombras tipo iOS (múltiples capas) */
   .shadow-ios {
-    box-shadow: 0 1px 2px rgba(2, 6, 23, 0.08), 0 1px 1px rgba(2, 6, 23, 0.05);
+    box-shadow:
+      0 1px 2px rgba(2, 6, 23, 0.08),
+      0 1px 1px rgba(2, 6, 23, 0.05);
   }
 
   .shadow-ios-md {
-    box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28),
+    box-shadow:
+      0 10px 18px -14px rgba(2, 6, 23, 0.28),
       0 2px 4px rgba(2, 6, 23, 0.08),
       0 0 0 1px rgba(2, 6, 23, 0.04);
   }
 
   .shadow-ios-lg {
-    box-shadow: 0 18px 28px -18px rgba(2, 6, 23, 0.35),
+    box-shadow:
+      0 18px 28px -18px rgba(2, 6, 23, 0.35),
       0 4px 8px rgba(2, 6, 23, 0.12),
       0 0 0 1px rgba(2, 6, 23, 0.04);
   }
 
   .shadow-ios-xl {
-    box-shadow: 0 28px 42px -26px rgba(2, 6, 23, 0.45),
+    box-shadow:
+      0 28px 42px -26px rgba(2, 6, 23, 0.45),
       0 10px 16px rgba(2, 6, 23, 0.16),
       0 0 0 1px rgba(2, 6, 23, 0.05);
   }
@@ -538,11 +658,19 @@ body {
 
   /* Backgrounds con opacidad */
   .bg-emerald\/10 {
-    background-color: color-mix(in oklch, var(--color-emerald) 10%, transparent);
+    background-color: color-mix(
+      in oklch,
+      var(--color-emerald) 10%,
+      transparent
+    );
   }
 
   .bg-emerald\/20 {
-    background-color: color-mix(in oklch, var(--color-emerald) 20%, transparent);
+    background-color: color-mix(
+      in oklch,
+      var(--color-emerald) 20%,
+      transparent
+    );
   }
 
   .bg-indigo\/10 {
@@ -563,11 +691,19 @@ body {
 
   /* Gradientes de marca */
   .gradient-emerald {
-    background: linear-gradient(135deg, var(--color-emerald) 0%, var(--color-emerald-dark) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--color-emerald) 0%,
+      var(--color-emerald-dark) 100%
+    );
   }
 
   .gradient-brand {
-    background: linear-gradient(135deg, var(--color-emerald) 0%, var(--color-indigo) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--color-emerald) 0%,
+      var(--color-indigo) 100%
+    );
   }
 
   /* Superficies y contenedores globales */
@@ -577,20 +713,23 @@ body {
 
   .section-surface {
     @apply rounded-2xl border border-border/60 bg-card/80 backdrop-blur-md;
-    box-shadow: 0 10px 18px -14px rgba(2, 6, 23, 0.28), 0 2px 4px rgba(2, 6, 23, 0.08),
+    box-shadow:
+      0 10px 18px -14px rgba(2, 6, 23, 0.28),
+      0 2px 4px rgba(2, 6, 23, 0.08),
       0 0 0 1px rgba(2, 6, 23, 0.04);
   }
 
   .section-surface-strong {
     @apply rounded-3xl border border-border/60 bg-card/90 backdrop-blur-lg;
-    box-shadow: 0 18px 28px -18px rgba(2, 6, 23, 0.35), 0 4px 8px rgba(2, 6, 23, 0.12),
+    box-shadow:
+      0 18px 28px -18px rgba(2, 6, 23, 0.35),
+      0 4px 8px rgba(2, 6, 23, 0.12),
       0 0 0 1px rgba(2, 6, 23, 0.04);
   }
 
   .surface-muted {
     @apply rounded-xl border border-border/60 bg-muted/30 backdrop-blur;
   }
-
 }
 
 /* ============================================

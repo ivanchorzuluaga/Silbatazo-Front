@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
 import { getDashboardRoute } from "@/lib/routing";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Menu } from "lucide-react";
+import { Home, Menu } from "lucide-react";
 import { SlidePanel, SlidePanelContent, SlidePanelHeader, SlidePanelTitle } from "@/components/ui/slide-panel";
 import { getVisibleNavSections, getVisibleNavItems } from "./navConfig";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
@@ -116,6 +116,21 @@ export function BottomNav() {
             <SlidePanelTitle>Menú</SlidePanelTitle>
           </SlidePanelHeader>
           <div className="p-4 space-y-6">
+            <div>
+              <h3 className="mb-2 px-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Acceso rápido
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  to={ROUTES.HOME}
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2 rounded-xl border border-border/60 px-3 py-2 text-sm hover:bg-accent/60"
+                >
+                  <Home className="size-4" />
+                  <span className="truncate">Página principal</span>
+                </Link>
+              </div>
+            </div>
             {sections.map((section, sectionIndex) => (
               <div key={sectionIndex}>
                 {section.title && (

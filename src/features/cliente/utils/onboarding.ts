@@ -12,5 +12,6 @@ export function necesitaOnboardingCliente(user: User | null): boolean {
   if (!user) return true;
   const sinNombre = !user.first_name?.trim() || !user.last_name?.trim();
   const sinEmail = !user.email?.trim();
-  return sinNombre || sinEmail;
+  const sinTelefono = !user.telefono?.trim();
+  return sinNombre || sinEmail || sinTelefono;
 }
