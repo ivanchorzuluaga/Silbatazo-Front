@@ -78,11 +78,11 @@ export function Footer() {
                 contacto@{APP_NAME.toLowerCase()}.com
               </a>
               <a
-                href="tel:+573001234567"
+                href="tel:+573159888384"
                 className="flex items-center gap-2 hover:text-foreground transition-colors"
               >
                 <Phone className="w-4 h-4" />
-                +57 300 123-4567
+                +57 315 988-8384
               </a>
               <WhatsAppButton variant="button" size="sm" className="mt-2">
                 WhatsApp
@@ -177,11 +177,11 @@ export function Footer() {
                   contacto@{APP_NAME.toLowerCase()}.com
                 </a>
                 <a
-                  href="tel:+573001234567"
+                  href="tel:+573159888384"
                   className="flex items-center gap-2 hover:text-foreground transition-colors"
                 >
                   <Phone className="w-4 h-4" />
-                  +57 300 123-4567
+                  +57 315 988-8384
                 </a>
                 <WhatsAppButton variant="link" className="mt-1">
                   Escribir por WhatsApp

@@ -7,7 +7,7 @@ export const APP_SLOGAN = "Árbitros de Confianza";
 
 /** Número de WhatsApp para contacto (código país + número sin + ni espacios). Ej: 573001234567 */
 export const CONTACT_WHATSAPP_NUMBER =
-  (import.meta.env.VITE_WHATSAPP_NUMBER as string) || "573001234567";
+  (import.meta.env.VITE_WHATSAPP_NUMBER as string) || "573159888384";
 
 /** Solo estas 4 categorías se muestran en partidos y tarifas */
 export const CATEGORIAS_PARTIDO = ["Libre", "Veteranos", "Juvenil", "Infantil"] as const;
