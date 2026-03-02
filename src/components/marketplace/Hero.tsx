@@ -35,9 +35,9 @@ export function Hero() {
       <div className="absolute top-0 right-0 h-96 w-96 bg-primary/20 rounded-full blur-3xl" />
       <div className="absolute bottom-1/2 left-0 h-96 w-96 bg-primary/10 rounded-full blur-3xl" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-6 lg:py-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-24 sm:pt-6 sm:pb-6 lg:py-8">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          <div className="space-y-6 lg:space-y-8">
+          <div className="space-y-10 sm:space-y-6 lg:space-y-8">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium text-primary backdrop-blur-sm">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
@@ -48,7 +48,7 @@ export function Hero() {
             </div>
 
             {/* Main title */}
-            <div className="space-y-4">
+            <div className="space-y-6 sm:space-y-4">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-tight text-balance">
                 <span className="bg-gradient-to-r from-foreground to-primary/80 bg-clip-text text-transparent">
                   ÁRBITROS PARA PARTIDOS Y TORNEOS
@@ -69,7 +69,7 @@ export function Hero() {
             </div>
 
             {/* Image section - Solo visible en móvil, después de garantías */}
-            <div className="relative lg:hidden">
+            <div className="relative mt-8 lg:hidden lg:mt-0">
               <div className="aspect-[4/3] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
                 <picture>
                   <source media="(min-width: 768px)" srcSet={posterWeb} />
@@ -90,6 +90,16 @@ export function Hero() {
                   />
                 </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+              </div>
+              {/* Letrero flotante: sin recuadro, se sale de la foto, esquina superior izquierda */}
+              <div className="absolute -top-8 -left-2 z-20">
+                <div className="letter-float inline-flex items-start gap-2 text-white font-bold uppercase tracking-wider [text-shadow:0_2px_4px_rgba(0,0,0,0.8),0_4px_12px_rgba(0,0,0,0.5)]">
+                  <Trophy className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 mt-0.5 text-amber-400 [filter:drop-shadow(0_2px_4px_rgba(0,0,0,0.5))]" />
+                  <div className="flex w-min flex-col items-start leading-tight">
+                    <span className="text-4xl sm:text-5xl">Árbitro</span>
+                    <span className="text-sm sm:text-base">Silbatazo del mes</span>
+                  </div>
+                </div>
               </div>
               {/* Floating card móvil */}
               <div className="absolute -bottom-3 right-4 bg-card p-3 rounded-lg shadow-lg border border-border/50 backdrop-blur-sm z-20">
@@ -168,6 +178,7 @@ export function Hero() {
                 <p className="text-sm font-medium text-foreground">Primera hora hoy</p>
               </div>
             </div>
+
           </div>
 
           {/* Image section - Solo visible en desktop */}
@@ -194,6 +205,17 @@ export function Hero() {
               </picture>
               {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            </div>
+
+            {/* Letrero flotante: sin recuadro, se sale de la foto, esquina superior izquierda */}
+            <div className="absolute -top-10 -left-3 z-20">
+              <div className="letter-float inline-flex items-start gap-2 text-white font-bold uppercase tracking-wider [text-shadow:0_2px_4px_rgba(0,0,0,0.8),0_4px_12px_rgba(0,0,0,0.5)]">
+                <Trophy className="h-12 w-12 lg:h-14 lg:w-14 flex-shrink-0 mt-1 text-amber-400 [filter:drop-shadow(0_2px_4px_rgba(0,0,0,0.5))]" />
+                <div className="flex w-min flex-col items-start leading-tight">
+                  <span className="text-4xl lg:text-5xl">Árbitro</span>
+                  <span className="text-base lg:text-lg">Silbatazo del mes</span>
+                </div>
+              </div>
             </div>
 
             {/* Floating cards - solo desktop */}
