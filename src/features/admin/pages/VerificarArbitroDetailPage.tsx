@@ -151,10 +151,19 @@ interface DocumentoItemProps {
   documento: DocumentoArbitro;
   onAprobar: () => void;
   onRechazar: () => void;
+  onEliminar: () => void;
   isRevisando: boolean;
+  isEliminando: boolean;
 }
 
-function DocumentoItem({ documento, onAprobar, onRechazar, isRevisando }: DocumentoItemProps) {
+function DocumentoItem({
+  documento,
+  onAprobar,
+  onRechazar,
+  onEliminar,
+  isRevisando,
+  isEliminando,
+}: DocumentoItemProps) {
   return (
     <div className="rounded-md border p-4 space-y-3">
       <div className="flex items-start justify-between gap-4">
@@ -211,6 +220,15 @@ function DocumentoItem({ documento, onAprobar, onRechazar, isRevisando }: Docume
               </Button>
             </>
           )}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onEliminar}
+            disabled={isEliminando || isRevisando}
+            className="border-destructive/40 text-destructive hover:bg-destructive/10"
+          >
+            {isEliminando ? "Eliminando..." : "Eliminar"}
+          </Button>
         </div>
       </div>
     </div>
@@ -322,6 +340,7 @@ export function VerificarArbitroDetailPage() {
   const [mostrarEdicion, setMostrarEdicion] = useState(false);
   const [isGuardando, setIsGuardando] = useState(false);
   const [errorEdicion, setErrorEdicion] = useState<string | null>(null);
+  const [deletingDocumentoId, setDeletingDocumentoId] = useState<number | null>(null);
 
   // Loading state
   if (isLoading) {
@@ -407,6 +426,24 @@ export function VerificarArbitroDetailPage() {
     }
   };
 
+  const handleEliminarDocumento = async (doc: DocumentoArbitro) => {
+    const confirmacion = confirm(
+      `¿Eliminar el documento "${doc.nombre || doc.tipo_display}"? Esta acción no se puede deshacer.`
+    );
+    if (!confirmacion) return;
+
+    setDeletingDocumentoId(doc.id);
+    try {
+      await arbitroService.eliminarDocumento(doc.id);
+      await recargar();
+    } catch (err) {
+      const mensaje = err instanceof Error ? err.message : "Error al eliminar documento";
+      alert(mensaje);
+    } finally {
+      setDeletingDocumentoId(null);
+    }
+  };
+
   return (
     <PageLayout
       backButton={{ label: "Volver", to: ROUTES.ADMIN_VERIFICACION }}
@@ -469,7 +506,9 @@ export function VerificarArbitroDetailPage() {
                 documento={doc}
                 onAprobar={() => handleAprobarDocumento(doc)}
                 onRechazar={() => handleRechazarDocumento(doc)}
+                onEliminar={() => handleEliminarDocumento(doc)}
                 isRevisando={isRevisandoDocumento}
+                isEliminando={deletingDocumentoId === doc.id}
               />
             ))}
           </div>

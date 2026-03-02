@@ -11,7 +11,6 @@ import type {
   TipoPartidoUpdateData,
 } from "@/features/partidos/types/partido.types";
 import { formatCop } from "@/lib/utils";
-import { getNetAmount } from "@/lib/pricing";
 
 interface TipoPartidoFormProps {
   tipo?: TipoPartidoAdmin;
@@ -42,7 +41,8 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
   const [duracionServicioMin, setDuracionServicioMin] = useState(
     tipo?.duracion_servicio_minutos?.toString() ?? "90"
   );
-  const [monto, setMonto] = useState(tipo?.monto?.toString() ?? "");
+  const [servicioArbitro, setServicioArbitro] = useState(tipo?.servicio_arbitro?.toString() ?? "");
+  const [comisionApp, setComisionApp] = useState(tipo?.comision_app?.toString() ?? "");
   const [activo, setActivo] = useState(tipo?.activo ?? true);
   const [orden, setOrden] = useState(tipo?.orden?.toString() ?? "0");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -50,10 +50,18 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
     () => Math.max(1, parseInt(duracionServicioMin || "0", 10) || 0),
     [duracionServicioMin]
   );
-  const montoNum = useMemo(() => parseInt(monto || "0", 10) || 0, [monto]);
+  const servicioArbitroNum = useMemo(
+    () => parseInt(servicioArbitro || "0", 10) || 0,
+    [servicioArbitro]
+  );
+  const comisionAppNum = useMemo(() => parseInt(comisionApp || "0", 10) || 0, [comisionApp]);
+  const montoTotalNum = useMemo(
+    () => Math.max(servicioArbitroNum + comisionAppNum, 0),
+    [servicioArbitroNum, comisionAppNum]
+  );
   const costoHora = useMemo(
-    () => (duracionMin > 0 ? Math.round((montoNum / duracionMin) * 60) : 0),
-    [duracionMin, montoNum]
+    () => (duracionMin > 0 ? Math.round((montoTotalNum / duracionMin) * 60) : 0),
+    [duracionMin, montoTotalNum]
   );
 
   useEffect(() => {
@@ -62,7 +70,8 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
       setNombre(tipo.nombre);
       setDuracionReferencial(tipo.duracion_referencial || "");
       setDuracionServicioMin(tipo.duracion_servicio_minutos?.toString() ?? "90");
-      setMonto(tipo.monto?.toString() ?? "");
+      setServicioArbitro(tipo.servicio_arbitro?.toString() ?? "");
+      setComisionApp(tipo.comision_app?.toString() ?? "");
       setActivo(tipo.activo);
       setOrden(tipo.orden?.toString() ?? "0");
     }
@@ -90,9 +99,13 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
     if (!nombre.trim()) {
       errors.nombre = "El nombre es requerido";
     }
-    const montoNum = parseInt(monto, 10);
-    if (monto === "" || isNaN(montoNum) || montoNum < 0) {
-      errors.monto = "El monto debe ser un número mayor o igual a 0";
+    const servicioArbitroNum = parseInt(servicioArbitro, 10);
+    if (servicioArbitro === "" || isNaN(servicioArbitroNum) || servicioArbitroNum < 0) {
+      errors.servicio_arbitro = "El valor del servicio árbitro debe ser un número mayor o igual a 0";
+    }
+    const comisionAppNum = parseInt(comisionApp, 10);
+    if (comisionApp === "" || isNaN(comisionAppNum) || comisionAppNum < 0) {
+      errors.comision_app = "La comisión app debe ser un número mayor o igual a 0";
     }
     const ordenNum = parseInt(orden, 10);
     if (orden !== "" && (isNaN(ordenNum) || ordenNum < 0)) {
@@ -119,7 +132,8 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
       nombre: nombre.trim(),
       duracion_referencial: duracionReferencial.trim() || undefined,
       duracion_servicio_minutos: parseInt(duracionServicioMin, 10) || 90,
-      monto: parseInt(monto, 10),
+      servicio_arbitro: parseInt(servicioArbitro, 10),
+      comision_app: parseInt(comisionApp, 10),
       activo,
       orden: parseInt(orden, 10) || 0,
     };
@@ -189,7 +203,7 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
 
           <div className="space-y-1 border-t border-border/60 pt-4">
             <div>
-              <h3 className="text-sm font-semibold">Precio y duración</h3>
+              <h3 className="text-sm font-semibold">Valores y duración</h3>
               <p className="text-xs text-muted-foreground">
                 La duración define la brecha entre partidos del mismo árbitro.
               </p>
@@ -217,21 +231,41 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
               />
 
               <FormField
-                label="Monto (COP) *"
-                name="monto"
+                label="Valor del servicio árbitro (COP) *"
+                name="servicio_arbitro"
                 type="number"
                 min={0}
-                value={monto}
+                value={servicioArbitro}
                 onChange={(e) => {
-                  setMonto(e.target.value);
-                  if (fieldErrors.monto) {
+                  setServicioArbitro(e.target.value);
+                  if (fieldErrors.servicio_arbitro) {
                     setFieldErrors((prev) => {
-                      const { monto: _, ...rest } = prev;
+                      const { servicio_arbitro: _, ...rest } = prev;
                       return rest;
                     });
                   }
                 }}
-                error={fieldErrors.monto}
+                error={fieldErrors.servicio_arbitro}
+                disabled={isLoading}
+                required
+              />
+
+              <FormField
+                label="Comisión app (COP) *"
+                name="comision_app"
+                type="number"
+                min={0}
+                value={comisionApp}
+                onChange={(e) => {
+                  setComisionApp(e.target.value);
+                  if (fieldErrors.comision_app) {
+                    setFieldErrors((prev) => {
+                      const { comision_app: _, ...rest } = prev;
+                      return rest;
+                    });
+                  }
+                }}
+                error={fieldErrors.comision_app}
                 disabled={isLoading}
                 required
               />
@@ -304,12 +338,15 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
               </span>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Precio</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Valor a pagar</p>
               <p className="text-lg font-semibold text-primary">
-                {formatCop(montoNum || 0)}
+                {formatCop(montoTotalNum || 0)}
               </p>
               <p className="text-xs text-muted-foreground">
-                Árbitro: {formatCop(getNetAmount(montoNum || 0))}
+                Valor del servicio árbitro: {formatCop(servicioArbitroNum || 0)}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Comisión app: {formatCop(comisionAppNum || 0)}
               </p>
               <p className="text-xs text-muted-foreground">
                 {formatCop(costoHora)} aprox / hora

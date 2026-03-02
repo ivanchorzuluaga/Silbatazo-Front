@@ -47,7 +47,7 @@ export function AdminDashboardPage() {
       route: ROUTES.ADMIN_GESTION_PARTIDOS,
     },
     {
-      title: "Caja total",
+      title: "Valor a pagar",
       value:
         stats?.total_cobrado != null
           ? formatCop(stats.total_cobrado)
@@ -61,7 +61,7 @@ export function AdminDashboardPage() {
       route: ROUTES.ADMIN_PAGOS_PENDIENTES,
     },
     {
-      title: "Comisión plataforma",
+      title: "Comisión app",
       value:
         stats?.comision_plataforma != null
           ? formatCop(stats.comision_plataforma)
@@ -75,7 +75,7 @@ export function AdminDashboardPage() {
       route: ROUTES.ADMIN_PAGOS_PENDIENTES,
     },
     {
-      title: "Saldo árbitros",
+      title: "Valor servicio árbitros",
       value:
         stats?.saldo_arbitros != null
           ? formatCop(stats.saldo_arbitros)
@@ -242,31 +242,31 @@ export function AdminDashboardPage() {
           <div>
             <h2 className="text-lg font-semibold">Caja y distribución</h2>
             <p className="text-sm text-muted-foreground">
-              Resumen de lo cobrado, comisión de la plataforma y saldo de árbitros.
+              Resumen de valor a pagar, comisión app y valor del servicio árbitro.
             </p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Caja total</p>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Valor a pagar</p>
             <p className="text-2xl font-semibold text-emerald-500">
               {stats?.total_cobrado != null ? formatCop(stats.total_cobrado) : "—"}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">Total cobrado a clientes</p>
+            <p className="text-xs text-muted-foreground mt-1">Total acumulado a pagar por clientes</p>
           </div>
           <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Comisión plataforma</p>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Comisión app</p>
             <p className="text-2xl font-semibold text-orange-500">
               {stats?.comision_plataforma != null ? formatCop(stats.comision_plataforma) : "—"}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">$10.000 por partido completado</p>
+            <p className="text-xs text-muted-foreground mt-1">Según configuración por tipo de partido</p>
           </div>
           <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Saldo árbitros</p>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Valor servicio árbitros</p>
             <p className="text-2xl font-semibold text-slate-500">
               {stats?.saldo_arbitros != null ? formatCop(stats.saldo_arbitros) : "—"}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">Pendiente por retirar</p>
+            <p className="text-xs text-muted-foreground mt-1">Valor neto de servicio</p>
           </div>
         </div>
       </div>

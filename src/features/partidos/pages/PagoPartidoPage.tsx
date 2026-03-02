@@ -188,13 +188,13 @@ export function PagoPartidoPage() {
           {/* Estado del pago */}
           {yaPagado && <PaymentStatusCard estadoPago={estadoPago} notasPago={partido.notas_pago} />}
 
-          {/* Monto a pagar */}
+          {/* Valor a pagar */}
           <div className="bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20 p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-primary/20 rounded-lg">
                 <Banknote className="w-5 h-5 text-primary" />
               </div>
-              <span className="font-semibold text-foreground">Total a Pagar</span>
+              <span className="font-semibold text-foreground">Valor a pagar</span>
             </div>
             <p className="text-4xl font-bold text-primary">{formatCurrency(monto)}</p>
             <p className="text-muted-foreground text-sm mt-2">COP - Pesos Colombianos</p>
@@ -204,7 +204,7 @@ export function PagoPartidoPage() {
         {/* Columna derecha - Pago */}
         <div className="lg:col-span-2">
           {!yaPagado ? (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* Sección de pago con Nequi */}
               <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-6">
                 <div className="flex items-center gap-3 mb-6">
@@ -217,16 +217,21 @@ export function PagoPartidoPage() {
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 gap-6 items-center">
                   {/* QR Code */}
                   <div className="flex flex-col items-center">
-                    <div className="bg-white p-4 rounded-xl border-2 border-[#E61D73]/30 shadow-lg mb-4">
+                    <div className="w-full max-w-xs sm:max-w-sm md:max-w-md aspect-square rounded-2xl border-2 border-[#E61D73]/30 shadow-lg mb-4 flex items-center justify-center overflow-hidden">
                       <img
                         src={nequiConfig.qrUrl}
                         alt="QR Code Nequi"
-                        className="w-48 h-48 sm:w-56 sm:h-56 object-contain"
+                        className="w-full h-full object-contain"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
+                          const img = e.target as HTMLImageElement;
+                          if (img.src.includes("/nequi_qr.jpeg")) {
+                            img.style.display = "none";
+                            return;
+                          }
+                          img.src = "/nequi_qr.jpeg";
                         }}
                       />
                     </div>
@@ -249,12 +254,32 @@ export function PagoPartidoPage() {
                       </p>
                     </div>
                     <CopyField
-                      label="Monto"
+                      label="Valor a pagar"
                       value={formatCurrency(monto)}
                       onCopy={() => handleCopy(formatCurrency(monto))}
                     />
                     <CopyField label="Referencia" value={referencia} onCopy={handleCopy} mono />
                   </div>
+                </div>
+
+                {/* Soporte por WhatsApp para dudas o problemas con el pago */}
+                <div className="mt-6 rounded-xl border border-dashed border-border/70 bg-muted/20 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-foreground">
+                      ¿Tienes dudas para hacer tu pago?
+                    </p>
+                    <p className="text-xs text-muted-foreground max-w-md">
+                      Si el QR no funciona o prefieres coordinar el pago directamente por WhatsApp,
+                      escríbenos y te ayudamos paso a paso.
+                    </p>
+                  </div>
+                  <WhatsAppButton
+                    size="sm"
+                    className="w-full sm:w-auto justify-center"
+                    message={`Hola, tengo dudas para hacer el pago del partido con referencia ${referencia}. ¿Me pueden ayudar?`}
+                  >
+                    Hablar por WhatsApp
+                  </WhatsAppButton>
                 </div>
               </div>
 
@@ -268,7 +293,7 @@ export function PagoPartidoPage() {
                   {[
                     "Abre la app de Nequi en tu celular",
                     'Ve a "Enviar" o "Transferir"',
-                    `Ingresa el monto: ${formatCurrency(monto)}`,
+                    `Ingresa el valor a pagar: ${formatCurrency(monto)}`,
                     `En la referencia, escribe: ${referencia}`,
                     "Confirma y realiza la transferencia",
                     "Toma una captura de pantalla del comprobante",

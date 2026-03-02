@@ -127,10 +127,14 @@ export function PartidoDetail({ partido }: PartidoDetailProps) {
           )}
           <div>
             <p className="text-xs sm:text-sm text-muted-foreground mb-1">Valor a cobrar</p>
-            {partido.monto_total != null || partido.tipo_partido?.monto != null ? (() => {
-              const gross = getGrossAmount(partido.monto_total ?? null, partido.tipo_partido?.monto ?? null);
+            {partido.monto_total != null || partido.tipo_partido?.monto_total != null ? (() => {
+              const gross = getGrossAmount(
+                partido.monto_total ?? null,
+                partido.tipo_partido?.monto_total ?? null
+              );
               const { gross: grossAmount, net, showBoth, showNetOnly } = getRoleAmounts(
                 gross,
+                partido.tipo_partido?.comision_app ?? null,
                 user?.role
               );
               return (
@@ -140,7 +144,12 @@ export function PartidoDetail({ partido }: PartidoDetailProps) {
                   </p>
                   {showBoth && (
                     <p className="text-xs text-muted-foreground">
-                      Árbitro: {formatCop(net)}
+                      Valor del servicio árbitro: {formatCop(net)}
+                    </p>
+                  )}
+                  {showBoth && (
+                    <p className="text-xs text-muted-foreground">
+                      Comisión app: {formatCop(Math.max(grossAmount - net, 0))}
                     </p>
                   )}
                 </div>

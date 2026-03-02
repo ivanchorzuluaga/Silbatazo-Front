@@ -101,13 +101,13 @@ export function TipoPartidoCardGrid({
                 <span className={cn("text-sm", textSecondary)}>{duracion}</span>
               </div>
 
-              {/* Precio: siempre al final, destacado */}
+              {/* Valor a pagar: siempre al final, destacado */}
               <div className="mt-auto pt-4">
                 <span className={cn("text-xs font-medium uppercase tracking-wide", textMuted)}>
-                  Valor
+                  Valor a pagar
                 </span>
                 <p className={cn("mt-0.5 text-xl font-bold tabular-nums", "text-primary")}>
-                  {formatCop(tipo.monto)}
+                  {formatCop(tipo.monto_total)}
                 </p>
               </div>
             </CardContent>

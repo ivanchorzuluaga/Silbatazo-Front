@@ -83,7 +83,9 @@ export interface TipoPartido {
   duracion_referencial: string;
   /** Duración total del servicio en minutos (para brecha 30 min entre partidos) */
   duracion_servicio_minutos?: number;
-  monto: number;
+  servicio_arbitro: number;
+  comision_app: number;
+  monto_total: number;
 }
 
 /** Tipo de partido con campos de admin (activo, orden) */
@@ -96,7 +98,8 @@ export interface TipoPartidoCreateData {
   slug: string;
   nombre: string;
   duracion_referencial?: string;
-  monto: number;
+  servicio_arbitro: number;
+  comision_app: number;
   activo?: boolean;
   orden?: number;
 }
@@ -106,7 +109,8 @@ export interface TipoPartidoUpdateData {
   nombre?: string;
   duracion_referencial?: string;
   duracion_servicio_minutos?: number;
-  monto?: number;
+  servicio_arbitro?: number;
+  comision_app?: number;
   activo?: boolean;
   orden?: number;
 }

@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { usePartidoForm } from "../hooks/usePartidoForm";
 import { DisponibilidadDisplay } from "@/features/arbitro/components/DisponibilidadDisplay";
 import { cn } from "@/lib/utils";
-import { FotoArbitroCard } from "@/components/arbitro/FotoArbitroCard";
 import {
   X,
   Calendar,
@@ -422,6 +421,13 @@ interface ModalHeaderProps {
 }
 
 function ModalHeader({ arbitro, onClose, isLoading }: ModalHeaderProps) {
+  const fotoArbitro =
+    (arbitro.foto_perfil && arbitro.foto_perfil.trim() !== ""
+      ? arbitro.foto_perfil
+      : arbitro.foto_perfil_thumb && arbitro.foto_perfil_thumb.trim() !== ""
+      ? arbitro.foto_perfil_thumb
+      : "/arbitro-anonimo.png");
+
   return (
     <div className="relative p-6 border-b border-border">
       {/* Botón cerrar */}
@@ -436,10 +442,14 @@ function ModalHeader({ arbitro, onClose, isLoading }: ModalHeaderProps) {
       <div className="flex items-center gap-4">
         {/* Foto del árbitro */}
         <div className="relative shrink-0">
-          <FotoArbitroCard
-            arbitro={arbitro}
-            className="w-28 max-w-[140px]"
-          />
+          <div className="h-20 w-20 rounded-2xl border border-border/70 bg-muted/40 overflow-hidden shadow-sm">
+            <img
+              src={fotoArbitro}
+              alt={arbitro.full_name || arbitro.username}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </div>
         </div>
 
         {/* Info */}

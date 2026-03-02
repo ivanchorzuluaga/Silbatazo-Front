@@ -104,8 +104,10 @@ export function ClienteArbitroDetailPage() {
                   className="w-full"
                   backgroundSrc="/Fondo-Limpio-Diseño-2.png"
                   fotoOverrideSrc={arbitro.foto_detalle || undefined}
+                  mostrarCalificacion={false}
+                  nombreOverride="Árbitro Silbatazo"
                   nombreClassName="text-3xl whitespace-nowrap"
-                  nombreWrapperClassName="bottom-24"
+                  nombreWrapperClassName="bottom-12"
                 />
 
                 {/* Botón solicitar */}

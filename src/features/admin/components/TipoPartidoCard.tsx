@@ -23,8 +23,8 @@ export function TipoPartidoCard({
   isLoading,
 }: TipoPartidoCardProps) {
   const duracionMin = tipo.duracion_servicio_minutos ?? 90;
-  const costoHora =
-    duracionMin > 0 ? Math.round((Number(tipo.monto || 0) / duracionMin) * 60) : 0;
+  const montoTotal = Number(tipo.monto_total || 0);
+  const costoHora = duracionMin > 0 ? Math.round((montoTotal / duracionMin) * 60) : 0;
   const handleToggleActivo = () => {
     if (
       confirm(
@@ -65,12 +65,15 @@ export function TipoPartidoCard({
         <div className="grid gap-3">
           <div className="grid grid-cols-3 gap-2">
             <div className="rounded-xl bg-background/70 border border-border/60 px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Precio</p>
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Valor a pagar</p>
               <p className="text-sm font-semibold text-primary tabular-nums">
-                {formatCop(tipo.monto)}
+                {formatCop(montoTotal)}
               </p>
               <p className="text-[10px] text-muted-foreground tabular-nums">
-                Árbitro: {formatCop(getNetAmount(tipo.monto))}
+                Valor del servicio árbitro: {formatCop(getNetAmount(montoTotal, tipo.comision_app))}
+              </p>
+              <p className="text-[10px] text-muted-foreground tabular-nums">
+                App: {formatCop(tipo.comision_app)}
               </p>
             </div>
             <div className="rounded-xl bg-background/70 border border-border/60 px-3 py-2">

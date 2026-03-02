@@ -140,14 +140,14 @@ export function ClienteDashboardPage() {
                           <div className="flex items-center gap-3">
                             {(partido.monto_total != null || "tipo_partido" in partido) &&
                               (partido.monto_total ??
-                                (partido as { tipo_partido?: { monto: number } }).tipo_partido
-                                  ?.monto) != null && (
+                                (partido as { tipo_partido?: { monto_total: number } }).tipo_partido
+                                  ?.monto_total) != null && (
                                 <p className="text-sm font-semibold text-warning tabular-nums">
                                   {formatCop(
                                     getGrossAmount(
                                       partido.monto_total ?? null,
-                                      (partido as { tipo_partido?: { monto: number } }).tipo_partido
-                                        ?.monto ?? null
+                                      (partido as { tipo_partido?: { monto_total: number } }).tipo_partido
+                                        ?.monto_total ?? null
                                     )
                                   )}
                                 </p>
@@ -207,14 +207,14 @@ export function ClienteDashboardPage() {
                           <div className="flex items-center gap-3">
                             {(partido.monto_total != null || "tipo_partido" in partido) &&
                               (partido.monto_total ??
-                                (partido as { tipo_partido?: { monto: number } }).tipo_partido
-                                  ?.monto) != null && (
+                                (partido as { tipo_partido?: { monto_total: number } }).tipo_partido
+                                  ?.monto_total) != null && (
                                 <p className="text-sm font-semibold text-primary tabular-nums">
                                   {formatCop(
                                     getGrossAmount(
                                       partido.monto_total ?? null,
-                                      (partido as { tipo_partido?: { monto: number } }).tipo_partido
-                                        ?.monto ?? null
+                                      (partido as { tipo_partido?: { monto_total: number } }).tipo_partido
+                                        ?.monto_total ?? null
                                     )
                                   )}
                                 </p>
@@ -519,7 +519,7 @@ interface PartidoCardProps {
     categoria: { nombre: string };
     arbitro_info?: { full_name: string } | null;
     monto_total?: number | null;
-    tipo_partido?: { monto: number } | null;
+    tipo_partido?: { monto_total: number } | null;
   };
   onClick: () => void;
   variant?: "upcoming" | "recent";
@@ -579,9 +579,11 @@ function PartidoCard({ partido, onClick }: PartidoCardProps) {
         </div>
 
         <div className="text-right flex flex-col items-end justify-center gap-0.5">
-          {(partido.monto_total != null || partido.tipo_partido?.monto != null) && (
+          {(partido.monto_total != null || partido.tipo_partido?.monto_total != null) && (
             <p className="text-sm font-semibold text-primary tabular-nums">
-              {formatCop(getGrossAmount(partido.monto_total ?? null, partido.tipo_partido?.monto ?? null))}
+              {formatCop(
+                getGrossAmount(partido.monto_total ?? null, partido.tipo_partido?.monto_total ?? null)
+              )}
             </p>
           )}
           <p className="text-xs text-muted-foreground group-hover:text-primary transition-colors">

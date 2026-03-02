@@ -116,17 +116,23 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar, onPreview }: P
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground text-xs sm:text-sm mb-1">Monto</p>
-            {partido.monto_total != null || partido.tipo_partido?.monto != null ? (() => {
-              const gross = getGrossAmount(partido.monto_total ?? null, partido.tipo_partido?.monto ?? null);
-              const net = getNetAmount(gross);
+            <p className="text-muted-foreground text-xs sm:text-sm mb-1">Valor a pagar</p>
+            {partido.monto_total != null || partido.tipo_partido?.monto_total != null ? (() => {
+              const gross = getGrossAmount(
+                partido.monto_total ?? null,
+                partido.tipo_partido?.monto_total ?? null
+              );
+              const net = getNetAmount(gross, partido.tipo_partido?.comision_app ?? null);
               return (
                 <div>
                   <p className="font-medium text-primary text-base sm:text-lg tabular-nums">
                     {formatCop(gross)}
                   </p>
                   <p className="text-[11px] text-muted-foreground tabular-nums">
-                    Árbitro: {formatCop(net)}
+                    Valor del servicio árbitro: {formatCop(net)}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground tabular-nums">
+                    Comisión app: {formatCop(Math.max(gross - net, 0))}
                   </p>
                 </div>
               );

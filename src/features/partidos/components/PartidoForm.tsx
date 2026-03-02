@@ -51,7 +51,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
   const [errorTipos, setErrorTipos] = useState<string | null>(null);
 
   const selectedTipo = tiposPartido.find((t) => t.id === parseInt(tipoPartidoId));
-  const montoTotal = selectedTipo ? selectedTipo.monto : null;
+  const montoTotal = selectedTipo ? selectedTipo.monto_total : null;
 
   const defaultCategoriaId = categoriasPartido[0]?.id;
   const faltanCategorias = categoriasPartido.length === 0;

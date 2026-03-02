@@ -23,9 +23,12 @@ export function PartidoDisponibleCard({ partido, onTomar }: PartidoDisponibleCar
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const monto = partido.monto_total ?? partido.tipo_partido?.monto ?? null;
-  const grossAmount = getGrossAmount(partido.monto_total, partido.tipo_partido?.monto ?? null);
-  const { net } = getRoleAmounts(grossAmount, user?.role);
+  const monto = partido.monto_total ?? partido.tipo_partido?.monto_total ?? null;
+  const grossAmount = getGrossAmount(
+    partido.monto_total,
+    partido.tipo_partido?.monto_total ?? null
+  );
+  const { net } = getRoleAmounts(grossAmount, partido.tipo_partido?.comision_app ?? null, user?.role);
   const tieneConflicto = Boolean(partido.tiene_conflicto_horario);
 
   const handleTomar = async () => {

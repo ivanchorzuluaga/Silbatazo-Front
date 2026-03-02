@@ -1,6 +1,7 @@
+import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle, Shield, Sparkles, Star } from "lucide-react";
+import { ArrowRight, CheckCircle, Shield, Sparkles, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/lib/constants";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 import { RefereeCard } from "./RefereeCard";
@@ -12,6 +13,18 @@ interface RefereesPreviewProps {
 export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
   // Mostrar solo los primeros 5 árbitros
   const arbitrosPreview = arbitros.slice(0, 5);
+
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  const handleScroll = (direction: "left" | "right") => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const amount = container.clientWidth * 0.8;
+    const delta = direction === "left" ? -amount : amount;
+
+    container.scrollBy({ left: delta, behavior: "smooth" });
+  };
 
   return (
     <section
@@ -48,15 +61,37 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
         </div>
 
         {/* Referee Cards - Scroll horizontal en todas las resoluciones */}
-        <div className="flex gap-6 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
-          {arbitrosPreview.map((arbitro) => (
-            <div
-              key={arbitro.id}
-              className="shrink-0 w-[360px] max-w-full snap-center"
+        <div className="relative mt-2">
+          {/* Flechas de navegación: juntas arriba a la derecha (mobile y desktop) */}
+          <div className="absolute -top-10 right-2 flex items-center gap-2 z-20">
+            <button
+              type="button"
+              onClick={() => handleScroll("left")}
+              className="inline-flex items-center justify-center rounded-full bg-black/70 text-white shadow-lg hover:bg-black/90 transition-ios size-8"
+              aria-label="Ver árbitros anteriores"
             >
-              <RefereeCard arbitro={arbitro} />
-            </div>
-          ))}
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => handleScroll("right")}
+              className="inline-flex items-center justify-center rounded-full bg-black/70 text-white shadow-lg hover:bg-black/90 transition-ios size-8"
+              aria-label="Ver más árbitros destacados"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div
+            ref={scrollRef}
+            className="flex gap-6 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide"
+          >
+            {arbitrosPreview.map((arbitro) => (
+              <div key={arbitro.id} className="shrink-0 w-[360px] max-w-full snap-center">
+                <RefereeCard arbitro={arbitro} />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Trust indicators */}

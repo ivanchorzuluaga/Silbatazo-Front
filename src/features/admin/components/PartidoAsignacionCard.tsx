@@ -180,19 +180,26 @@ export function PartidoAsignacionCard({
                 {partido.municipio.departamento && `, ${partido.municipio.departamento}`}
               </span>
             </div>
-            {(partido.monto_total != null || partido.tipo_partido?.monto != null) && (() => {
-              const gross = getGrossAmount(partido.monto_total ?? null, partido.tipo_partido?.monto ?? null);
-              const net = getNetAmount(gross);
+            {(partido.monto_total != null || partido.tipo_partido?.monto_total != null) &&
+              (() => {
+                const gross = getGrossAmount(
+                  partido.monto_total ?? null,
+                  partido.tipo_partido?.monto_total ?? null
+                );
+                const net = getNetAmount(gross, partido.tipo_partido?.comision_app ?? null);
               return (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="font-medium">Valor a cobrar:</span>
+                  <span className="font-medium">Valor a pagar:</span>
                   <span className="font-semibold text-primary tabular-nums">{formatCop(gross)}</span>
                   <span className="text-xs text-muted-foreground tabular-nums">
-                    Árbitro: {formatCop(net)}
+                    Valor del servicio árbitro: {formatCop(net)}
+                  </span>
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    Comisión app: {formatCop(Math.max(gross - net, 0))}
                   </span>
                 </div>
               );
-            })()}
+              })()}
           </div>
 
           {/* Postulaciones */}

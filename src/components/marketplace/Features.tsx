@@ -157,9 +157,24 @@ export function Features() {
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 p-4 sm:p-6 bg-card border border-border/50 rounded-xl shadow-sm">
             <div className="flex items-center gap-2">
               <div className="flex -space-x-2">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary/20 rounded-full border-2 border-background" />
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-secondary/20 rounded-full border-2 border-background" />
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-accent/20 rounded-full border-2 border-background" />
+                <img
+                  src="/arbitro-anonimo.png"
+                  alt=""
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-background object-cover"
+                  loading="lazy"
+                />
+                <img
+                  src="/arbitro-anonimo.png"
+                  alt=""
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-background object-cover opacity-90"
+                  loading="lazy"
+                />
+                <img
+                  src="/arbitro-anonimo.png"
+                  alt=""
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-background object-cover opacity-80"
+                  loading="lazy"
+                />
               </div>
               <span className="text-xs sm:text-sm font-medium text-foreground tabular-nums">
                 {stats && stats.arbitros_total > 0

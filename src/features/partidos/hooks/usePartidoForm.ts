@@ -120,7 +120,7 @@ export function usePartidoForm(
   const tipoPartidoSeleccionado = tiposPartido.find(
     (t) => t.id === parseInt(formState.tipoPartidoId)
   );
-  const montoTotal = tipoPartidoSeleccionado ? tipoPartidoSeleccionado.monto : null;
+  const montoTotal = tipoPartidoSeleccionado ? tipoPartidoSeleccionado.monto_total : null;
 
   // Cargar tipos de partido al montar (cuando se abre el modal)
   useEffect(() => {
@@ -306,7 +306,7 @@ export function usePartidoForm(
           lugar: lugar.trim(),
           direccion: direccion.trim() || undefined,
           tipo_partido_id: tipoPartidoId ? parseInt(tipoPartidoId) : undefined,
-          monto_total: tipoPartidoSeleccionado?.monto ?? undefined,
+          monto_total: tipoPartidoSeleccionado?.monto_total ?? undefined,
           notas_cliente: notasCliente.trim() || undefined,
         };
 

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Search, Calendar, CreditCard, Trophy, ArrowRight } from "lucide-react";
 import { ROUTES } from "@/lib/constants";
 import { useLandingStats } from "@/features/marketplace/hooks/useLandingStats";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 
 export function HowItWorks() {
   const { stats } = useLandingStats();
@@ -18,15 +19,22 @@ export function HowItWorks() {
         "Explora nuestro catálogo de árbitros certificados y filtra por deporte, experiencia y ubicación.",
       icon: Search,
       action: "Explorar árbitros",
+      to: ROUTES.ARBITROS,
       details: [arbitrosLabel, "Filtros avanzados", "Perfiles verificados"],
     },
     {
       number: "02",
       title: "Configura tu Partido",
-      description: "Define fecha, hora, lugar y categoría. Revisa disponibilidad en tiempo real.",
+      description:
+        "Desde tu cuenta de cliente puedes crear partidos, definir fecha, hora, lugar y categoría.",
       icon: Calendar,
-      action: "Ver disponibilidad",
-      details: ["Calendario interactivo", "Confirmación instantánea", "Notificaciones automáticas"],
+      action: "Iniciar sesión o registrarse",
+      to: ROUTES.LOGIN,
+      details: [
+        "Requiere iniciar sesión",
+        "Creación de partidos desde tu panel",
+        "Confirmación y notificaciones",
+      ],
     },
     {
       number: "03",
@@ -35,14 +43,17 @@ export function HowItWorks() {
         "Realiza el pago a través de nuestra plataforma segura con múltiples métodos de pago.",
       icon: CreditCard,
       action: "Métodos de pago",
-      details: ["Pago seguro", "Nequi disponible", "Facturación automática"],
+      to: "/#metodos-de-pago",
+      details: ["Bancolombia", "Otros bancos", "Nequi + QR"],
     },
     {
       number: "04",
       title: "¡Juega y Califica!",
-      description: "El árbitro llegará puntual. Disfruta del partido y califica el servicio.",
+      description:
+        "Después del partido, desde tu cuenta podrás calificar al árbitro y ver tus calificaciones.",
       icon: Trophy,
-      action: "Ver testimonios",
+      action: "Disponible después del partido",
+      disabled: true,
       details: ["Árbitro puntual", "Calificación post-partido", "Garantía de calidad"],
     },
   ];
@@ -112,14 +123,64 @@ export function HowItWorks() {
                   ))}
                 </div>
 
-                {/* Action button */}
-                <button className="w-full py-2 px-3 bg-black/10 hover:bg-black/20 rounded-lg text-xs font-medium text-black transition-colors flex items-center justify-center gap-1 cursor-pointer">
-                  {step.action}
-                  <ArrowRight className="w-3 h-3" />
-                </button>
+                {/* Action button / hint */}
+                {step.to && !step.disabled ? (
+                  <Link
+                    to={step.to}
+                    className="w-full py-2 px-3 bg-black/10 hover:bg-black/20 rounded-lg text-xs font-medium text-black transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    {step.action}
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+                ) : (
+                  <div className="w-full py-2 px-3 bg-black/5 rounded-lg text-[11px] font-medium text-black/55 flex items-center justify-center gap-1 cursor-default">
+                    {step.action}
+                  </div>
+                )}
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Métodos de pago */}
+        <div
+          id="metodos-de-pago"
+          className="scroll-mt-24 rounded-3xl border border-white/35 bg-white/25 backdrop-blur-md p-6 sm:p-8 shadow-lg mb-10 sm:mb-14"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+            <div className="space-y-1">
+              <h3 className="text-2xl sm:text-3xl font-bold text-black">Métodos de pago</h3>
+              <p className="text-black/70">
+                Elige el método que más te sirva. Si no ves el tuyo, pregúntanos.
+              </p>
+            </div>
+            <WhatsAppButton
+              size="sm"
+              className="w-full sm:w-auto justify-center"
+              message="Hola, ¿qué métodos de pago tienen disponibles para reservar un árbitro?"
+            >
+              Preguntar por WhatsApp
+            </WhatsAppButton>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="rounded-2xl border border-white/35 bg-white/25 backdrop-blur-md px-4 py-4">
+              <p className="text-sm font-semibold text-black">Transferencias Bancolombia</p>
+              <p className="text-xs text-black/70 mt-1">Cuenta y referencia del partido</p>
+            </div>
+            <div className="rounded-2xl border border-white/35 bg-white/25 backdrop-blur-md px-4 py-4">
+              <p className="text-sm font-semibold text-black">Otros bancos</p>
+              <p className="text-xs text-black/70 mt-1">Transferencia interbancaria</p>
+            </div>
+            <div className="rounded-2xl border border-white/35 bg-white/25 backdrop-blur-md px-4 py-4">
+              <p className="text-sm font-semibold text-black">Nequi</p>
+              <p className="text-xs text-black/70 mt-1">Pago rápido y verificación</p>
+            </div>
+            <div className="rounded-2xl border border-white/35 bg-white/25 backdrop-blur-md px-4 py-4">
+              <p className="text-sm font-semibold text-black">QR</p>
+              <p className="text-xs text-black/70 mt-1">Escanea y paga en segundos</p>
+            </div>
+          </div>
         </div>
 
         {/* CTA Section */}

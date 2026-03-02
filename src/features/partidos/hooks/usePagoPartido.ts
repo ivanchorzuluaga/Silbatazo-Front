@@ -13,7 +13,7 @@ import { ROUTES, getPartidoDetailRoute } from "@/lib/constants";
 import { formatCop } from "@/lib/utils";
 
 // Configuración de Nequi
-const NEQUI_QR_URL = import.meta.env.VITE_NEQUI_QR_URL || "/nequi_qr.jpeg";
+const NEQUI_QR_URL = "/nequi_qr.webp";
 const NEQUI_PHONE = import.meta.env.VITE_NEQUI_PHONE || "0091187234";
 const NEQUI_NAME = import.meta.env.VITE_NEQUI_NAME || "Silbatazo";
 
@@ -84,8 +84,8 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
   const monto =
     partido?.monto_total != null
       ? Number(partido.monto_total)
-      : partido?.tipo_partido?.monto != null
-      ? partido.tipo_partido.monto
+      : partido?.tipo_partido?.monto_total != null
+      ? partido.tipo_partido.monto_total
       : 0;
   const referencia = partido?.codigo || `PARTIDO-${partido?.id || ""}`;
   const descripcion = partido

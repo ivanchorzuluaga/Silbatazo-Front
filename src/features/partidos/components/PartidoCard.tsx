@@ -140,10 +140,14 @@ export function PartidoCard({ partido }: PartidoCardProps) {
                 {partido.municipio.nombre}
               </Badge>
             </div>
-            {(partido.monto_total != null || partido.tipo_partido?.monto != null) && (() => {
-              const gross = getGrossAmount(partido.monto_total, partido.tipo_partido?.monto ?? null);
+            {(partido.monto_total != null || partido.tipo_partido?.monto_total != null) && (() => {
+              const gross = getGrossAmount(
+                partido.monto_total,
+                partido.tipo_partido?.monto_total ?? null
+              );
               const { gross: grossAmount, net, showBoth, showNetOnly } = getRoleAmounts(
                 gross,
+                partido.tipo_partido?.comision_app ?? null,
                 user?.role
               );
               return (
@@ -153,7 +157,12 @@ export function PartidoCard({ partido }: PartidoCardProps) {
                   </p>
                   {showBoth && (
                     <p className="text-[11px] text-muted-foreground tabular-nums">
-                      Árbitro: {formatCop(net)}
+                      Valor del servicio árbitro: {formatCop(net)}
+                    </p>
+                  )}
+                  {showBoth && (
+                    <p className="text-[11px] text-muted-foreground tabular-nums">
+                      Comisión app: {formatCop(Math.max(grossAmount - net, 0))}
                     </p>
                   )}
                 </div>

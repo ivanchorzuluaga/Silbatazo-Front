@@ -20,7 +20,8 @@ import {
   Search,
 } from "lucide-react";
 import { parseLocalDate, getTodayLocalDate, formatCop } from "@/lib/utils";
-import { COMISION_PLATAFORMA_PARTIDO, ROUTES } from "@/lib/constants";
+import { ROUTES } from "@/lib/constants";
+import { getGrossAmount, getNetAmount } from "@/lib/pricing";
 
 export function ArbitroDashboardPage() {
   const { user } = useAuth();
@@ -39,8 +40,8 @@ export function ArbitroDashboardPage() {
   const gananciasTotal = partidos
     .filter((p) => p.estado === "completado")
     .reduce((total, partido) => {
-      const monto = partido.monto_total ?? partido.tipo_partido?.monto ?? 0;
-      const neto = Math.max(monto - COMISION_PLATAFORMA_PARTIDO, 0);
+      const monto = getGrossAmount(partido.monto_total ?? null, partido.tipo_partido?.monto_total ?? null);
+      const neto = getNetAmount(monto, partido.tipo_partido?.comision_app ?? null);
       return total + neto;
     }, 0);
 
@@ -384,15 +385,17 @@ export function ArbitroDashboardPage() {
                     <span className="text-sm text-muted-foreground">Lugar</span>
                     <span className="font-medium">{partido.lugar}</span>
                   </div>
-                  {(partido.monto_total != null || partido.tipo_partido?.monto != null) && (
+                  {(partido.monto_total != null || partido.tipo_partido?.monto_total != null) && (
                     <div className="flex items-center justify-between pt-2 border-t">
                       <span className="text-sm text-muted-foreground">Valor</span>
                       <span className="font-semibold text-primary tabular-nums">
                         {formatCop(
-                          Math.max(
-                            (partido.monto_total ?? partido.tipo_partido?.monto ?? 0) -
-                              COMISION_PLATAFORMA_PARTIDO,
-                            0
+                          getNetAmount(
+                            getGrossAmount(
+                              partido.monto_total ?? null,
+                              partido.tipo_partido?.monto_total ?? null
+                            ),
+                            partido.tipo_partido?.comision_app ?? null
                           )
                         )}
                       </span>
