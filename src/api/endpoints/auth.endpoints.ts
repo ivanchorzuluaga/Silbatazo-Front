@@ -87,6 +87,20 @@ export const authEndpoints = {
   },
 
   /**
+   * Actualizar perfil de un usuario por ID (solo admin)
+   */
+  async updateUserById(
+    accessToken: string,
+    userId: number,
+    data: UserUpdateData
+  ): Promise<User> {
+    return authenticatedApiClient<User>(`/api/users/me/${userId}/`, accessToken, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
    * Solicitar recuperación de contraseña
    */
   async requestPasswordReset(email: string): Promise<{ message: string }> {

@@ -96,12 +96,70 @@ export const arbitroEndpoints = {
   },
 
   /**
+   * Actualizar perfil de árbitro por ID (solo admin)
+   */
+  async actualizarArbitroAdmin(
+    token: string,
+    id: number,
+    data: ArbitroUpdateData & {
+      first_name?: string;
+      last_name?: string;
+      email?: string;
+    }
+  ): Promise<Arbitro> {
+    return authenticatedApiClient<Arbitro>(`/api/arbitros/${id}/`, token, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
    * Subir foto de perfil del árbitro (multipart/form-data con campo 'foto_perfil')
    */
   async subirFotoPerfil(token: string, file: File): Promise<Arbitro> {
     const formData = new FormData();
     formData.append("foto_perfil", file);
     return authenticatedApiClient<Arbitro>("/api/arbitros/perfil/foto/", token, {
+      method: "POST",
+      body: formData,
+    });
+  },
+
+  /**
+   * Subir foto de detalle del árbitro autenticado
+   */
+  async subirFotoDetallePerfil(token: string, file: File): Promise<Arbitro> {
+    const formData = new FormData();
+    formData.append("foto_detalle", file);
+    return authenticatedApiClient<Arbitro>("/api/arbitros/perfil/foto-detalle/", token, {
+      method: "POST",
+      body: formData,
+    });
+  },
+
+  /**
+   * Subir foto de perfil de árbitro por ID (solo admin)
+   */
+  async subirFotoArbitroAdmin(token: string, id: number, file: File): Promise<Arbitro> {
+    const formData = new FormData();
+    formData.append("foto_perfil", file);
+    return authenticatedApiClient<Arbitro>(`/api/arbitros/${id}/foto/`, token, {
+      method: "POST",
+      body: formData,
+    });
+  },
+
+  /**
+   * Subir foto de detalle de árbitro por ID (solo admin)
+   */
+  async subirFotoDetalleArbitroAdmin(
+    token: string,
+    id: number,
+    file: File
+  ): Promise<Arbitro> {
+    const formData = new FormData();
+    formData.append("foto_detalle", file);
+    return authenticatedApiClient<Arbitro>(`/api/arbitros/${id}/foto-detalle/`, token, {
       method: "POST",
       body: formData,
     });

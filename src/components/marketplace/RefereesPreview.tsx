@@ -10,8 +10,8 @@ interface RefereesPreviewProps {
 }
 
 export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
-  // Mostrar solo los primeros 4 árbitros
-  const arbitrosPreview = arbitros.slice(0, 4);
+  // Mostrar solo los primeros 5 árbitros
+  const arbitrosPreview = arbitros.slice(0, 5);
 
   return (
     <section
@@ -47,10 +47,13 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
           </Button>
         </div>
 
-        {/* Referee Cards - Slider en móvil, Grid en desktop */}
-        <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible pb-4 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory sm:snap-none scrollbar-hide">
+        {/* Referee Cards - Scroll horizontal en todas las resoluciones */}
+        <div className="flex gap-6 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
           {arbitrosPreview.map((arbitro) => (
-            <div key={arbitro.id} className="shrink-0 w-[280px] sm:w-auto snap-center sm:snap-none">
+            <div
+              key={arbitro.id}
+              className="shrink-0 w-[360px] max-w-full snap-center"
+            >
               <RefereeCard arbitro={arbitro} />
             </div>
           ))}

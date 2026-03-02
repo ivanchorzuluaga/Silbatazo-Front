@@ -175,6 +175,30 @@ export const arbitroService = {
   },
 
   /**
+   * Actualizar perfil de árbitro por ID (solo admin)
+   */
+  async actualizarArbitroAdmin(
+    id: number,
+    data: ArbitroUpdateData & {
+      first_name?: string;
+      last_name?: string;
+      email?: string;
+    }
+  ): Promise<Arbitro> {
+    const token = this.getToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await arbitroEndpoints.actualizarArbitroAdmin(token, id, data);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al actualizar árbitro");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
    * Subir foto de perfil del árbitro (invalida caché de perfil)
    */
   async subirFotoPerfil(file: File): Promise<Arbitro> {
@@ -186,6 +210,59 @@ export const arbitroService = {
       const result = await arbitroEndpoints.subirFotoPerfil(token, file);
       perfilCache = { data: result, ts: Date.now() };
       return result;
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al subir la foto");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
+   * Subir foto de detalle del árbitro autenticado
+   */
+  async subirFotoDetallePerfil(file: File): Promise<Arbitro> {
+    const token = this.getToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      const result = await arbitroEndpoints.subirFotoDetallePerfil(token, file);
+      perfilCache = { data: result, ts: Date.now() };
+      return result;
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al subir la foto");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
+   * Subir foto de perfil de árbitro por ID (solo admin)
+   */
+  async subirFotoArbitroAdmin(id: number, file: File): Promise<Arbitro> {
+    const token = this.getToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await arbitroEndpoints.subirFotoArbitroAdmin(token, id, file);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al subir la foto");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
+   * Subir foto de detalle de árbitro por ID (solo admin)
+   */
+  async subirFotoDetalleArbitroAdmin(id: number, file: File): Promise<Arbitro> {
+    const token = this.getToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await arbitroEndpoints.subirFotoDetalleArbitroAdmin(token, id, file);
     } catch (error) {
       if (error instanceof ApiException) {
         throw new Error(extractErrorMessage(error.data) || "Error al subir la foto");

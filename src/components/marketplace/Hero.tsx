@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Star, Clock, Users, Trophy } from "lucide-react";
-import arbitroImage1200 from "@/assets/arbitro-1200.jpg";
-import arbitroImage800 from "@/assets/arbitro-800.jpg";
-import arbitroImage600 from "@/assets/arbitro-600.jpg";
+import posterWeb from "@/assets/Poster-1-Web.png";
+import posterMovil from "@/assets/Poster-1-movil.png";
 import { useLandingStats } from "@/features/marketplace/hooks/useLandingStats";
 
 /** Formatea "HH:MM" a "H:MM" o "HH:MM" para mostrar (ej. "08:00" → "8:00") */
@@ -72,23 +71,24 @@ export function Hero() {
             {/* Image section - Solo visible en móvil, después de garantías */}
             <div className="relative lg:hidden">
               <div className="aspect-[4/3] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
-                <img
-                  src={arbitroImage1200}
-                  srcSet={`${arbitroImage600} 600w, ${arbitroImage800} 800w, ${arbitroImage1200} 1200w`}
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  alt="Árbitro en partido deportivo"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading="eager"
-                  decoding="async"
-                  fetchPriority="high"
-                  width={1200}
-                  height={900}
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src =
-                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro certificado%3C/text%3E%3C/svg%3E";
-                  }}
-                />
+                <picture>
+                  <source media="(min-width: 768px)" srcSet={posterWeb} />
+                  <img
+                    src={posterMovil}
+                    alt="Árbitro profesional"
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
+                    width={1080}
+                    height={1350}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src =
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro certificado%3C/text%3E%3C/svg%3E";
+                    }}
+                  />
+                </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               </div>
               {/* Floating card móvil */}
@@ -174,23 +174,24 @@ export function Hero() {
           <div className="relative hidden lg:block">
             {/* Main image container */}
             <div className="aspect-[4/5] relative rounded-2xl overflow-hidden shadow-2xl border border-primary/10">
-              <img
-                src={arbitroImage1200}
-                srcSet={`${arbitroImage600} 600w, ${arbitroImage800} 800w, ${arbitroImage1200} 1200w`}
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                alt="Árbitro en partido deportivo"
-                className="absolute inset-0 w-full h-full object-cover"
-                loading="eager"
-                decoding="async"
-                fetchPriority="high"
-                width={1200}
-                height={1500}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src =
-                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro certificado%3C/text%3E%3C/svg%3E";
-                }}
-              />
+              <picture>
+                <source media="(min-width: 1024px)" srcSet={posterWeb} />
+                <img
+                  src={posterMovil}
+                  alt="Árbitro profesional"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
+                  width={1080}
+                  height={1350}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src =
+                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro certificado%3C/text%3E%3C/svg%3E";
+                  }}
+                />
+              </picture>
               {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>

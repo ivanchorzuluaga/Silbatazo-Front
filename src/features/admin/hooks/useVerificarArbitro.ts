@@ -48,6 +48,7 @@ interface UseVerificarArbitroReturn {
   
   // Helpers
   clearError: () => void;
+  recargar: () => Promise<void>;
 }
 
 export function useVerificarArbitro(id: string | undefined): UseVerificarArbitroReturn {
@@ -238,5 +239,6 @@ export function useVerificarArbitro(id: string | undefined): UseVerificarArbitro
     cerrarModalDocumento,
     
     clearError,
+    recargar: cargarDatos,
   };
 }

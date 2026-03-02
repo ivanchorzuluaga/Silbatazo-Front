@@ -1,7 +1,7 @@
 import { Star, MapPin, Award, Calendar, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
-import { getRefereeImage } from "@/lib/referee-images";
+import { FotoArbitroCard } from "@/components/arbitro/FotoArbitroCard";
 
 interface RefereeDetailProps {
   arbitro: Arbitro;
@@ -14,13 +14,6 @@ export function RefereeDetail({ arbitro }: RefereeDetailProps) {
   const especialidad =
     arbitro.categorias.length > 0 ? arbitro.categorias.map((c) => c.nombre).join(", ") : "Árbitro";
   const partidos = arbitro.total_partidos || 0;
-  const imagen = getRefereeImage(
-    arbitro.foto_perfil,
-    arbitro.id,
-    arbitro.experiencia_anos,
-    nombre,
-    arbitro.foto_perfil_thumb
-  );
   const municipio =
     arbitro.municipios.length > 0
       ? arbitro.municipios.map((m) => m.nombre).join(", ")
@@ -38,25 +31,14 @@ export function RefereeDetail({ arbitro }: RefereeDetailProps) {
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row gap-6">
-        <div className="w-full sm:w-64 aspect-[3/4] bg-secondary rounded-lg overflow-hidden shrink-0 shadow-lg">
-          <img
-            src={imagen}
-            alt={nombre}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              // Si falla la imagen asignada, intentar con otra del pool
-              const fallbackImages = [
-                "/professional-soccer-referee-in-black-uniform-blowi.jpg",
-                "/male-referee-in-black-uniform-portrait.jpg",
-                "/placeholder.jpg",
-              ];
-              const currentSrc = target.src.split("/").pop() || "";
-              const nextImage =
-                fallbackImages.find((img) => !currentSrc.includes(img.split("/").pop() || "")) ||
-                "/placeholder.jpg";
-              target.src = nextImage;
-            }}
+        <div className="w-full sm:w-72 shrink-0">
+          <FotoArbitroCard
+            arbitro={arbitro}
+            className="w-full"
+            backgroundSrc="/Fondo-Limpio-Diseño-2.png"
+            fotoOverrideSrc={arbitro.foto_detalle || undefined}
+            nombreClassName="text-3xl whitespace-nowrap"
+            nombreWrapperClassName="bottom-24"
           />
         </div>
 

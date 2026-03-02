@@ -3,11 +3,14 @@
  * Permite ver documentos, información y aprobar/rechazar
  */
 
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/layout";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useVerificarArbitro } from "../hooks/useVerificarArbitro";
+import { PerfilArbitroForm } from "@/features/arbitro/components/PerfilArbitroForm";
+import { arbitroService } from "@/features/arbitro/services/arbitro.service";
 import { ROUTES } from "@/lib/constants";
 import type { DocumentoArbitro } from "@/features/arbitro/types/arbitro.types";
 
@@ -313,7 +316,12 @@ export function VerificarArbitroDetailPage() {
     confirmarAprobarDocumento,
     confirmarRechazarDocumento,
     cerrarModalDocumento,
+    recargar,
   } = useVerificarArbitro(id);
+
+  const [mostrarEdicion, setMostrarEdicion] = useState(false);
+  const [isGuardando, setIsGuardando] = useState(false);
+  const [errorEdicion, setErrorEdicion] = useState<string | null>(null);
 
   // Loading state
   if (isLoading) {
@@ -350,6 +358,55 @@ export function VerificarArbitroDetailPage() {
     return null;
   }
 
+  const handleGuardarPerfil = async (payload: {
+    userData: {
+      email?: string;
+      first_name?: string;
+      last_name?: string;
+      telefono?: string;
+    };
+    perfilData: {
+      telefono: string;
+      fecha_nacimiento?: string;
+      documento_identidad?: string;
+      biografia?: string;
+      nombre_publico?: string;
+      experiencia_anos: number;
+      municipios_ids: number[];
+      categorias_ids: number[];
+      roles_ids: number[];
+    };
+    fotoFile: File | null;
+    fotoDetalleFile: File | null;
+  }) => {
+    setIsGuardando(true);
+    setErrorEdicion(null);
+    try {
+      await arbitroService.actualizarArbitroAdmin(arbitro.id, {
+        ...payload.perfilData,
+        ...payload.userData,
+      });
+      if (payload.fotoFile) {
+        await arbitroService.subirFotoArbitroAdmin(arbitro.id, payload.fotoFile);
+      }
+      if (payload.fotoDetalleFile) {
+        await arbitroService.subirFotoDetalleArbitroAdmin(
+          arbitro.id,
+          payload.fotoDetalleFile,
+        );
+      }
+      await recargar();
+      setMostrarEdicion(false);
+    } catch (err) {
+      const mensaje =
+        err instanceof Error ? err.message : "Error al guardar perfil";
+      setErrorEdicion(mensaje);
+      throw err;
+    } finally {
+      setIsGuardando(false);
+    }
+  };
+
   return (
     <PageLayout
       backButton={{ label: "Volver", to: ROUTES.ADMIN_VERIFICACION }}
@@ -370,6 +427,34 @@ export function VerificarArbitroDetailPage() {
         onAprobar={handleAprobar}
         onRechazar={handleRechazar}
       />
+
+      {/* Edición del perfil (admin) */}
+      <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm mt-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-lg font-semibold">Editar perfil</h2>
+            <p className="text-sm text-muted-foreground">
+              Ajusta datos y sube la foto profesional antes de verificar.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setMostrarEdicion((prev) => !prev)}
+          >
+            {mostrarEdicion ? "Ocultar edición" : "Editar perfil"}
+          </Button>
+        </div>
+
+        {mostrarEdicion && (
+          <PerfilArbitroForm
+            arbitro={arbitro}
+            onGuardarPerfil={handleGuardarPerfil}
+            isLoadingOverride={isGuardando}
+            errorOverride={errorEdicion}
+          />
+        )}
+      </div>
 
       {/* Documentos */}
       <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm mt-6">

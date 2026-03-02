@@ -185,6 +185,23 @@ export const authService = {
   },
 
   /**
+   * Actualizar perfil de un usuario por ID (solo admin)
+   */
+  async updateUserById(userId: number, data: UserUpdateData): Promise<User> {
+    const token = this.getAccessToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await authEndpoints.updateUserById(token, userId, data);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al actualizar usuario");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
    * Desactivar cuenta (anonimiza datos sensibles)
    */
   async deactivateAccount(): Promise<{ message: string }> {

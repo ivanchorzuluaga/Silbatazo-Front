@@ -5,12 +5,10 @@
 import { Link } from "react-router-dom";
 import { DisponibilidadDisplay } from "@/features/arbitro/components/DisponibilidadDisplay";
 import { getArbitroDetailRoute } from "@/lib/constants";
-import { getRefereeImage } from "@/lib/referee-images";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Star } from "lucide-react";
+import { FotoArbitroCard } from "@/components/arbitro/FotoArbitroCard";
 
 interface ArbitroCardProps {
   arbitro: Arbitro;
@@ -34,52 +32,19 @@ function calcularEdad(fechaNacimiento?: string): number | null {
 }
 
 export function ArbitroCard({ arbitro }: ArbitroCardProps) {
-  const ratingPromedio = arbitro.calificacion_promedio || 0;
-  const totalCalificaciones = arbitro.total_calificaciones || 0;
-  const nombre =
-    arbitro.nombre_publico || arbitro.full_name || arbitro.username;
-  const imagenArbitro = getRefereeImage(
-    arbitro.foto_perfil,
-    arbitro.id,
-    arbitro.experiencia_anos,
-    nombre,
-    arbitro.foto_perfil_thumb,
-  );
   const edad = arbitro.edad ?? calcularEdad(arbitro.fecha_nacimiento);
 
   return (
-    <Link to={getArbitroDetailRoute(arbitro.id)} className="block h-full">
+    <Link
+      to={getArbitroDetailRoute(arbitro.id)}
+      className="block h-full w-[360px] max-w-full"
+    >
       <Card
         variant="elevated"
         className="h-full hover:shadow-ios-lg transition-ios cursor-pointer"
       >
         <CardHeader>
-          <div className="flex items-start gap-4">
-            <Avatar
-              size="lg"
-              src={imagenArbitro}
-              alt={nombre}
-              fallback={nombre?.charAt(0).toUpperCase() || "A"}
-            />
-            <div className="flex-1 min-w-0">
-              <h3 className="text-xl font-semibold text-foreground truncate">
-                {arbitro.full_name || arbitro.username}
-              </h3>
-              {ratingPromedio > 0 && (
-                <div className="flex items-center gap-1.5 mt-1">
-                  <Star className="size-4 fill-accent text-accent" />
-                  <span className="text-sm font-medium">
-                    {ratingPromedio.toFixed(1)}
-                  </span>
-                  {totalCalificaciones > 0 && (
-                    <span className="text-xs text-muted-foreground">
-                      ({totalCalificaciones})
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+          <FotoArbitroCard arbitro={arbitro} className="w-full" />
         </CardHeader>
 
         <CardContent className="space-y-4">

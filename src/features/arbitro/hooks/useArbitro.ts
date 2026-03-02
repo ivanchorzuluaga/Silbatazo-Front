@@ -14,6 +14,7 @@ interface UseArbitroReturn {
   crearPerfil: (data: ArbitroCreateData) => Promise<void>;
   actualizarPerfil: (data: ArbitroUpdateData) => Promise<void>;
   subirFotoPerfil: (file: File) => Promise<void>;
+  subirFotoDetallePerfil: (file: File) => Promise<void>;
   clearError: () => void;
 }
 
@@ -86,6 +87,22 @@ export function useArbitro(): UseArbitroReturn {
     }
   }, []);
 
+  const subirFotoDetallePerfil = useCallback(async (file: File) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const perfilActualizado = await arbitroService.subirFotoDetallePerfil(file);
+      setArbitro(perfilActualizado);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Error al subir la foto";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -98,6 +115,7 @@ export function useArbitro(): UseArbitroReturn {
     crearPerfil,
     actualizarPerfil,
     subirFotoPerfil,
+    subirFotoDetallePerfil,
     clearError,
   };
 }

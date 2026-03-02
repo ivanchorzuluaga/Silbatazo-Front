@@ -12,8 +12,8 @@ import { ROUTES, getArbitroDetailRoute } from "@/lib/constants";
 import { DisponibilidadDisplay } from "@/features/arbitro/components/DisponibilidadDisplay";
 import { PartidoFormModal } from "@/features/partidos/components/PartidoFormModal";
 import { useCalificaciones } from "@/features/partidos/hooks/useCalificaciones";
-import { getRefereeImage } from "@/lib/referee-images";
 import logoImage from "@/assets/Logo.png";
+import { FotoArbitroCard } from "@/components/arbitro/FotoArbitroCard";
 import {
   ArrowLeft,
   Star,
@@ -140,13 +140,6 @@ export function ArbitroDetailPage() {
   }
 
   const nombre = arbitro.full_name || arbitro.username;
-  const imagen = getRefereeImage(
-    arbitro.foto_perfil,
-    arbitro.id,
-    arbitro.experiencia_anos,
-    nombre,
-    arbitro.foto_perfil_thumb
-  );
   const rating = promedio?.promedio || arbitro.calificacion_promedio || 0;
   const totalCalificaciones = promedio?.total_calificaciones || 0;
 
@@ -206,31 +199,17 @@ export function ArbitroDetailPage() {
           <div className="lg:col-span-1">
             <div className="sticky top-24">
               {/* Imagen */}
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-6 border border-border">
-                <img
-                  src={imagen}
-                  alt={nombre}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/placeholder.jpg";
-                  }}
+              <div className="mb-6">
+                <FotoArbitroCard
+                  arbitro={arbitro}
+                  className="w-full"
+                  backgroundSrc="/Fondo-Limpio-Diseño-2.png"
+                  fotoOverrideSrc={arbitro.foto_detalle || undefined}
+                  mostrarCalificacion={false}
+                  nombreOverride="Árbitro Silbatazo"
+                  nombreClassName="text-3xl whitespace-nowrap"
+                  nombreWrapperClassName="bottom-12"
                 />
-                {/* Gradiente inferior */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent dark:from-black/80" />
-
-                {/* Rating badge */}
-                {totalCalificaciones > 0 && rating > 0 ? (
-                  <div className="absolute top-4 right-4 bg-card/85 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1 border border-border/60 shadow-ios">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-foreground font-semibold">{rating.toFixed(1)}</span>
-                    {totalCalificaciones > 0 && (
-                      <span className="text-muted-foreground text-xs ml-1">
-                        ({totalCalificaciones})
-                      </span>
-                    )}
-                  </div>
-                ) : null}
               </div>
 
               {/* Botón de solicitar - Desktop */}

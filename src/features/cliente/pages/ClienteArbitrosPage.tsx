@@ -10,8 +10,8 @@ import { FiltrosArbitros } from "@/features/marketplace/components/FiltrosArbitr
 import { useArbitrosSearch } from "../hooks/useArbitrosSearch";
 import { PageLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
+import { FotoArbitroCard } from "@/components/arbitro/FotoArbitroCard";
 import logoImage from "@/assets/Logo.png";
-import { getRefereeImage } from "@/lib/referee-images";
 import {
   getClienteArbitroDetailRoute,
   CATEGORIAS_PARTIDO,
@@ -21,7 +21,6 @@ import {
   RefreshCw,
   SearchX,
   Loader2,
-  Star,
   Trophy,
   ArrowRight,
 } from "lucide-react";
@@ -216,7 +215,7 @@ function ArbitrosList({ arbitros }: ArbitrosListProps) {
       </div>
 
       {/* Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid gap-6 justify-items-center sm:grid-cols-2 lg:grid-cols-2">
         {arbitros.map((arbitro) => (
           <ArbitroCard key={arbitro.id} arbitro={arbitro} />
         ))}
@@ -229,90 +228,19 @@ interface ArbitroCardProps {
   arbitro: Arbitro;
 }
 
-function calcularEdad(fechaNacimiento?: string): number | null {
-  if (!fechaNacimiento) return null;
-  const [year, month, day] = fechaNacimiento.split("-").map(Number);
-  if (!year || !month || !day) return null;
-
-  const hoy = new Date();
-  let edad = hoy.getFullYear() - year;
-  const mesActual = hoy.getMonth() + 1;
-  const diaActual = hoy.getDate();
-
-  if (mesActual < month || (mesActual === month && diaActual < day)) {
-    edad -= 1;
-  }
-
-  return edad >= 0 ? edad : null;
-}
-
 function ArbitroCard({ arbitro }: ArbitroCardProps) {
-  const nombre =
-    arbitro.nombre_publico || arbitro.full_name || arbitro.username;
-  const imagen = getRefereeImage(
-    arbitro.foto_perfil,
-    arbitro.id,
-    arbitro.experiencia_anos,
-    nombre,
-    arbitro.foto_perfil_thumb,
-  );
-  const rating = arbitro.calificacion_promedio || 0;
-  const estrellasLlenas = Math.round(Math.max(0, Math.min(5, rating)));
-  const edad = arbitro.edad ?? calcularEdad(arbitro.fecha_nacimiento);
-  const experiencia = `${arbitro.experiencia_anos || 0} años exp.`;
-
   return (
     <Link
       to={getClienteArbitroDetailRoute(arbitro.id)}
-      className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-      style={{ contentVisibility: "auto", containIntrinsicSize: "300px 460px" }}
+      className="block h-full w-[360px] max-w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "360px 450px" }}
     >
       <article className="relative h-full min-h-[360px]">
         <div className="absolute -inset-2 rounded-3xl bg-primary/15 blur-2xl opacity-30" />
 
         {/* Imagen */}
-        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/15">
-          <div className="grain-overlay" />
-          <img
-            src={imagen}
-            alt={nombre}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
-
-          <div className="absolute inset-x-0 top-2 flex justify-center">
-            <div className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/45 px-3 py-1 backdrop-blur">
-              {[1, 2, 3, 4, 5].map((estrella) => (
-                <Star
-                  key={estrella}
-                  className={`h-4 w-4 ${
-                    estrella <= estrellasLlenas
-                      ? "h-5 w-5 fill-amber-300 text-amber-300 drop-shadow-[0_0_14px_rgba(251,191,36,0.95)]"
-                      : "text-white/40"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="absolute inset-x-4 bottom-3 flex flex-col gap-2">
-            <div className="relative glow-shimmer mx-auto w-full overflow-hidden rounded-xl">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500/90 via-emerald-400/90 to-emerald-600/90 shadow-[0_10px_30px_rgba(16,185,129,0.35)]" />
-              <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.25),transparent_60%)] opacity-70" />
-              <h3 className="relative truncate rounded-xl px-3 py-1.5 text-center font-sans text-xs font-black uppercase tracking-[0.2em] text-black drop-shadow-[0_3px_10px_rgba(0,0,0,0.6)] sm:text-sm">
-                {nombre}
-              </h3>
-            </div>
-            <div className="flex items-center justify-between rounded-xl border border-white/25 bg-black/60 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.08em] backdrop-blur sm:text-sm">
-              <span className="font-sans text-white/95 drop-shadow-[0_3px_10px_rgba(0,0,0,0.85)]">
-                {edad ? `${edad} años` : "Edad no disponible"}
-              </span>
-              <span className="mx-2 h-4 w-px bg-white/45" />
-              <span className="font-sans text-amber-200 drop-shadow-[0_3px_10px_rgba(0,0,0,0.85)]">
-                {experiencia}
-              </span>
-            </div>
-          </div>
+        <div className="relative">
+          <FotoArbitroCard arbitro={arbitro} className="w-full" />
         </div>
 
         {/* Contenido */}

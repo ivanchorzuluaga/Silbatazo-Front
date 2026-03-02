@@ -12,8 +12,8 @@ import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { usePartidoForm } from "../hooks/usePartidoForm";
 import { DisponibilidadDisplay } from "@/features/arbitro/components/DisponibilidadDisplay";
-import { getRefereeImage } from "@/lib/referee-images";
 import { cn } from "@/lib/utils";
+import { FotoArbitroCard } from "@/components/arbitro/FotoArbitroCard";
 import {
   X,
   Calendar,
@@ -24,7 +24,6 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  Star,
   User,
 } from "lucide-react";
 import { TipoPartidoCardGrid } from "./TipoPartidoCardGrid";
@@ -71,18 +70,6 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
   const [calendarPos, setCalendarPos] = useState({ top: 0, left: 0 });
   const dateButtonRef = useRef<HTMLButtonElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
-
-  // Imagen del árbitro
-  const imagenArbitro = getRefereeImage(
-    arbitro.foto_perfil,
-    arbitro.id,
-    arbitro.experiencia_anos,
-    arbitro.full_name || arbitro.username,
-    arbitro.foto_perfil_thumb
-  );
-
-  // Rating del árbitro
-  const rating = arbitro.calificacion_promedio || 0;
 
   // Calcular posición del calendario
   const updateCalendarPosition = useCallback(() => {
@@ -215,8 +202,6 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
             {/* Header con info del árbitro */}
             <ModalHeader
               arbitro={arbitro}
-              imagenArbitro={imagenArbitro}
-              rating={rating}
               onClose={handleClose}
               isLoading={isLoading}
             />
@@ -432,13 +417,11 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
 
 interface ModalHeaderProps {
   arbitro: Arbitro;
-  imagenArbitro: string;
-  rating: number;
   onClose: () => void;
   isLoading: boolean;
 }
 
-function ModalHeader({ arbitro, imagenArbitro, rating, onClose, isLoading }: ModalHeaderProps) {
+function ModalHeader({ arbitro, onClose, isLoading }: ModalHeaderProps) {
   return (
     <div className="relative p-6 border-b border-border">
       {/* Botón cerrar */}
@@ -453,17 +436,10 @@ function ModalHeader({ arbitro, imagenArbitro, rating, onClose, isLoading }: Mod
       <div className="flex items-center gap-4">
         {/* Foto del árbitro */}
         <div className="relative shrink-0">
-          <img
-            src={imagenArbitro}
-            alt={arbitro.full_name || arbitro.username}
-            className="w-20 h-20 rounded-xl object-cover border-2 border-primary/30"
+          <FotoArbitroCard
+            arbitro={arbitro}
+            className="w-28 max-w-[140px]"
           />
-          {rating > 0 && (
-            <div className="absolute -bottom-2 -right-2 bg-card/80 backdrop-blur-sm px-2 py-0.5 rounded-full flex items-center gap-1 border border-border/60 shadow-ios">
-              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-              <span className="text-foreground text-xs font-semibold">{rating.toFixed(1)}</span>
-            </div>
-          )}
         </div>
 
         {/* Info */}

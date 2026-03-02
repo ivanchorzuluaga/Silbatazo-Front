@@ -26,12 +26,38 @@ interface PerfilArbitroFormProps {
   arbitro?: Arbitro | null;
   onSuccess?: () => void;
   focusSection?: "personal" | "experiencia" | null;
+  onGuardarPerfil?: (payload: {
+    userData: {
+      email?: string;
+      first_name?: string;
+      last_name?: string;
+      telefono?: string;
+    };
+    perfilData: {
+      telefono: string;
+      fecha_nacimiento?: string;
+      documento_identidad?: string;
+      biografia?: string;
+      nombre_publico?: string;
+      experiencia_anos: number;
+      municipios_ids: number[];
+      categorias_ids: number[];
+      roles_ids: number[];
+    };
+    fotoFile: File | null;
+    fotoDetalleFile: File | null;
+  }) => Promise<void>;
+  isLoadingOverride?: boolean;
+  errorOverride?: string | null;
 }
 
 export function PerfilArbitroForm({
   arbitro,
   onSuccess,
   focusSection,
+  onGuardarPerfil,
+  isLoadingOverride,
+  errorOverride,
 }: PerfilArbitroFormProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -39,6 +65,7 @@ export function PerfilArbitroForm({
     crearPerfil,
     actualizarPerfil,
     subirFotoPerfil,
+    subirFotoDetallePerfil,
     isLoading,
     error,
     clearError,
@@ -124,7 +151,13 @@ export function PerfilArbitroForm({
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [fotoError, setFotoError] = useState<string | null>(null);
+  const [fotoDetalleFile, setFotoDetalleFile] = useState<File | null>(null);
+  const [previewDetalleUrl, setPreviewDetalleUrl] = useState<string | null>(null);
+  const [fotoDetalleError, setFotoDetalleError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileDetalleInputRef = useRef<HTMLInputElement>(null);
   const personalRef = useRef<HTMLDivElement | null>(null);
   const experienciaRef = useRef<HTMLDivElement | null>(null);
   const nombrePublicoRef = useRef<HTMLDivElement | null>(null);
@@ -209,8 +242,11 @@ export function PerfilArbitroForm({
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
+      if (previewDetalleUrl) {
+        URL.revokeObjectURL(previewDetalleUrl);
+      }
     };
-  }, [previewUrl]);
+  }, [previewUrl, previewDetalleUrl]);
 
   const validateForm = (): boolean => {
     const errors: typeof fieldErrors = {};
@@ -270,6 +306,7 @@ export function PerfilArbitroForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
+    setLocalError(null);
 
     if (!validateForm()) {
       return;
@@ -296,7 +333,7 @@ export function PerfilArbitroForm({
         userData.telefono = telefono.trim();
       }
 
-      if (Object.keys(userData).length > 0) {
+      if (!onGuardarPerfil && Object.keys(userData).length > 0) {
         try {
           await authService.updateProfile(userData);
         } catch (err) {
@@ -344,11 +381,48 @@ export function PerfilArbitroForm({
         roles_ids: rolesSeleccionados,
       };
 
+      if (onGuardarPerfil) {
+        setIsSaving(true);
+        await onGuardarPerfil({
+          userData,
+          perfilData: data,
+          fotoFile,
+          fotoDetalleFile,
+        });
+        setIsSaving(false);
+        if (fotoFile) {
+          setFotoFile(null);
+          setPreviewUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return null;
+          });
+        }
+        if (fotoDetalleFile) {
+          setFotoDetalleFile(null);
+          setPreviewDetalleUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return null;
+          });
+        }
+        if (onSuccess) {
+          onSuccess();
+        }
+        return;
+      }
+
       if (isEditMode) {
         if (fotoFile) {
           await subirFotoPerfil(fotoFile);
           setFotoFile(null);
           setPreviewUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return null;
+          });
+        }
+        if (fotoDetalleFile) {
+          await subirFotoDetallePerfil(fotoDetalleFile);
+          setFotoDetalleFile(null);
+          setPreviewDetalleUrl((prev) => {
             if (prev) URL.revokeObjectURL(prev);
             return null;
           });
@@ -364,6 +438,14 @@ export function PerfilArbitroForm({
             return null;
           });
         }
+        if (fotoDetalleFile) {
+          await subirFotoDetallePerfil(fotoDetalleFile);
+          setFotoDetalleFile(null);
+          setPreviewDetalleUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return null;
+          });
+        }
       }
 
       if (onSuccess) {
@@ -374,6 +456,10 @@ export function PerfilArbitroForm({
     } catch (err) {
       // El error ya está manejado por el hook
       console.error("Error al guardar perfil:", err);
+      if (onGuardarPerfil) {
+        setLocalError(err instanceof Error ? err.message : "Error al guardar perfil");
+        setIsSaving(false);
+      }
     }
   };
 
@@ -418,12 +504,19 @@ export function PerfilArbitroForm({
       nombreCompleto,
       arbitro?.foto_perfil_thumb,
     );
+  const imagenDetalle =
+    previewDetalleUrl ||
+    arbitro?.foto_detalle ||
+    arbitro?.foto_perfil ||
+    imagenPerfil;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
+      {(errorOverride ?? localError ?? error) && (
         <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
-          <p className="text-sm text-destructive">{error}</p>
+          <p className="text-sm text-destructive">
+            {errorOverride ?? localError ?? error}
+          </p>
         </div>
       )}
 
@@ -477,7 +570,7 @@ export function PerfilArbitroForm({
                   variant="outline"
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={isLoading}
+                  disabled={isLoadingOverride ?? isSaving ?? isLoading}
                 >
                   <Camera className="mr-2 size-4" />
                   {arbitro?.foto_perfil || fotoFile
@@ -493,6 +586,74 @@ export function PerfilArbitroForm({
                 )}
                 {fotoError && (
                   <p className="text-xs text-destructive">{fotoError}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Foto de detalle */}
+          <div className="space-y-4">
+            <div className="border-b pb-2">
+              <h3 className="text-lg font-semibold">Foto para detalle</h3>
+              <p className="text-sm text-muted-foreground">
+                Se usará en la vista de detalle. Sube una imagen recortada sin fondo.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <div className="rounded-2xl overflow-hidden border-2 border-border bg-muted w-24 h-32 sm:w-28 sm:h-36 shrink-0">
+                <img
+                  src={imagenDetalle}
+                  alt="Vista previa de detalle"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <input
+                  ref={fileDetalleInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const maxBytes = MAX_FOTO_PERFIL_MB * 1024 * 1024;
+                      if (file.size > maxBytes) {
+                        setFotoDetalleError(
+                          `La imagen supera el tamaño máximo de ${MAX_FOTO_PERFIL_MB} MB.`,
+                        );
+                        e.currentTarget.value = "";
+                        return;
+                      }
+                      setFotoDetalleError(null);
+                      setPreviewDetalleUrl((prev) => {
+                        if (prev) URL.revokeObjectURL(prev);
+                        return URL.createObjectURL(file);
+                      });
+                      setFotoDetalleFile(file);
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileDetalleInputRef.current?.click()}
+                  disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                >
+                  <Camera className="mr-2 size-4" />
+                  {arbitro?.foto_detalle || fotoDetalleFile
+                    ? "Cambiar foto de detalle"
+                    : "Subir foto de detalle"}
+                </Button>
+                {(fotoDetalleFile || arbitro?.foto_detalle) && (
+                  <p className="text-xs text-muted-foreground">
+                    {fotoDetalleFile
+                      ? `Nueva imagen: ${fotoDetalleFile.name}. Se guardará al enviar el formulario.`
+                      : "La foto se muestra en la vista de detalle."}
+                  </p>
+                )}
+                {fotoDetalleError && (
+                  <p className="text-xs text-destructive">{fotoDetalleError}</p>
                 )}
               </div>
             </div>
@@ -522,7 +683,7 @@ export function PerfilArbitroForm({
                   }
                 }}
                 error={fieldErrors.first_name}
-                disabled={isLoading}
+                disabled={isLoadingOverride ?? isSaving ?? isLoading}
                 placeholder="Juan"
               />
 
@@ -540,7 +701,7 @@ export function PerfilArbitroForm({
                   }
                 }}
                 error={fieldErrors.last_name}
-                disabled={isLoading}
+                disabled={isLoadingOverride ?? isSaving ?? isLoading}
                 placeholder="Pérez"
               />
             </div>
@@ -564,7 +725,7 @@ export function PerfilArbitroForm({
                 }
               }}
               error={fieldErrors.email}
-              disabled={isLoading}
+              disabled={isLoadingOverride ?? isSaving ?? isLoading}
               placeholder="juan.perez@example.com"
               autoComplete="email"
             />
@@ -585,7 +746,7 @@ export function PerfilArbitroForm({
                   }
                 }}
                 error={fieldErrors.nombre_publico}
-                disabled={isLoading}
+                disabled={isLoadingOverride ?? isSaving ?? isLoading}
                 placeholder="Ej: Árbitro Sibatzo"
                 maxLength={maxNombrePublico}
                 helperText={`Máximo ${maxNombrePublico} caracteres. Este nombre se mostrará en tu tarjeta pública.`}
@@ -617,7 +778,7 @@ export function PerfilArbitroForm({
                   }
                 }}
                 error={fieldErrors.telefono}
-                disabled={isLoading}
+                disabled={isLoadingOverride ?? isSaving ?? isLoading}
                 placeholder="+57 300 123 4567"
                 required
               />
@@ -636,7 +797,7 @@ export function PerfilArbitroForm({
                   }
                 }}
                 error={fieldErrors.fecha_nacimiento}
-                disabled={isLoading}
+                disabled={isLoadingOverride ?? isSaving ?? isLoading}
                 minDate={minFechaNacimiento}
                 maxDate={maxFechaNacimiento}
               />
@@ -656,7 +817,7 @@ export function PerfilArbitroForm({
                 }
               }}
               error={fieldErrors.documento_identidad}
-              disabled={isLoading}
+              disabled={isLoadingOverride ?? isSaving ?? isLoading}
               placeholder="1234567890"
             />
 
@@ -680,7 +841,7 @@ export function PerfilArbitroForm({
                     }));
                   }
                 }}
-                disabled={isLoading}
+                disabled={isLoadingOverride ?? isSaving ?? isLoading}
                 rows={4}
                 className="field-textarea"
                 placeholder="Describe tu experiencia y formación como árbitro..."
@@ -733,7 +894,7 @@ export function PerfilArbitroForm({
                 }
               }}
               error={fieldErrors.experiencia_anos}
-              disabled={isLoading}
+              disabled={isLoadingOverride ?? isSaving ?? isLoading}
               min="0"
               max="100"
               required
@@ -784,7 +945,7 @@ export function PerfilArbitroForm({
                             municipio.id,
                           )}
                           onChange={() => toggleMunicipio(municipio.id)}
-                          disabled={isLoading}
+                          disabled={isLoadingOverride ?? isSaving ?? isLoading}
                           className="peer sr-only"
                         />
                         <span className="flex h-5 w-5 items-center justify-center rounded-md border border-border/80 bg-background text-transparent transition-all peer-checked:border-primary peer-checked:bg-primary/15 peer-checked:text-primary">
@@ -858,7 +1019,7 @@ export function PerfilArbitroForm({
                             categoria.id,
                           )}
                           onChange={() => toggleCategoria(categoria.id)}
-                          disabled={isLoading}
+                          disabled={isLoadingOverride ?? isSaving ?? isLoading}
                           className="peer sr-only"
                         />
                         <span className="flex h-5 w-5 items-center justify-center rounded-md border border-border/80 bg-background text-transparent transition-all peer-checked:border-primary peer-checked:bg-primary/15 peer-checked:text-primary">
@@ -929,7 +1090,7 @@ export function PerfilArbitroForm({
                           type="checkbox"
                           checked={rolesSeleccionados.includes(rol.id)}
                           onChange={() => toggleRol(rol.id)}
-                          disabled={isLoading}
+                          disabled={isLoadingOverride ?? isSaving ?? isLoading}
                           className="peer sr-only"
                         />
                         <span className="flex h-5 w-5 items-center justify-center rounded-md border border-border/80 bg-background text-transparent transition-all peer-checked:border-primary peer-checked:bg-primary/15 peer-checked:text-primary">
@@ -991,7 +1152,7 @@ export function PerfilArbitroForm({
             type="button"
             variant="outline"
             onClick={() => navigate(ROUTES.ARBITRO_DASHBOARD)}
-            disabled={isLoading}
+            disabled={isLoadingOverride ?? isSaving ?? isLoading}
           >
             Cancelar
           </Button>
