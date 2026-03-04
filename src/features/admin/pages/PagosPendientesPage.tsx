@@ -122,7 +122,10 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar, onPreview }: P
                 partido.monto_total ?? null,
                 partido.tipo_partido?.monto_total ?? null
               );
-              const net = getNetAmount(gross, partido.tipo_partido?.comision_app ?? null);
+              const net = getNetAmount(
+                gross,
+                partido.comision_app ?? partido.tipo_partido?.comision_app ?? null
+              );
               return (
                 <div>
                   <p className="font-medium text-primary text-base sm:text-lg tabular-nums">

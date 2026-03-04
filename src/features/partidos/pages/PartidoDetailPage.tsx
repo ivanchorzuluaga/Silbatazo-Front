@@ -11,8 +11,9 @@ import { PartidoEditForm } from "../components/PartidoEditForm";
 import { CalificacionForm } from "../components/CalificacionForm";
 import { CalificacionesSection } from "../components/CalificacionesSection";
 import { usePartidoDetail } from "../hooks/usePartidoDetail";
+import { partidoService } from "../services/partido.service";
 import { ROUTES } from "@/lib/constants";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 // Botón de editar reutilizable
 interface EditarBotonProps {
@@ -43,6 +44,7 @@ export function PartidoDetailPage() {
     refetchCalificaciones,
     isCliente,
     isArbitro,
+    isAdmin,
     puedeEditar,
     puedeCalificar,
     showEditModal,
@@ -66,6 +68,23 @@ export function PartidoDetailPage() {
     refetchPartido();
     refetchCalificaciones();
     setShowCalificarModal(false);
+  };
+
+  const handleEliminarPartido = async () => {
+    if (!partido) return;
+    const confirmar = confirm(
+      `¿Seguro que quieres eliminar el partido #${partido.id}? Esta acción no se puede deshacer.`
+    );
+    if (!confirmar) return;
+
+    try {
+      await partidoService.eliminarPartido(partido.id);
+      navigate(ROUTES.ADMIN_GESTION_PARTIDOS, {
+        state: { refreshList: true, deletedPartidoId: partido.id, at: Date.now() },
+      });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "No se pudo eliminar el partido");
+    }
   };
 
   // Loading state
@@ -139,6 +158,25 @@ export function PartidoDetailPage() {
               isCliente={isCliente}
               isArbitro={isArbitro}
             />
+          </div>
+        )}
+
+        {/* Acciones admin */}
+        {isAdmin && (
+          <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
+            <h2 className="text-lg font-semibold mb-4">Acciones de administrador</h2>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                onClick={() => navigate(ROUTES.ADMIN_ASIGNACION_PARTIDOS)}
+              >
+                Reasignar árbitro
+              </Button>
+              <Button variant="destructive" onClick={handleEliminarPartido}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Eliminar partido
+              </Button>
+            </div>
           </div>
         )}
       </div>

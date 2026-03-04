@@ -35,6 +35,8 @@ export function PartidoEditForm({ partido, open, onClose, onSuccess }: PartidoEd
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
   const [lugar, setLugar] = useState("");
+  const [barrio, setBarrio] = useState("");
+  const [ubicacionMapsUrl, setUbicacionMapsUrl] = useState("");
   const [direccion, setDireccion] = useState("");
   const [notasCliente, setNotasCliente] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -47,7 +49,9 @@ export function PartidoEditForm({ partido, open, onClose, onSuccess }: PartidoEd
       const fechaNormalizada = normalizeDateForInput(partido.fecha_str || partido.fecha);
       setFecha(fechaNormalizada);
       setHora(partido.hora_str || partido.hora || "");
-      setLugar(partido.lugar || "");
+      setLugar(partido.cancha_nombre || partido.lugar || "");
+      setBarrio(partido.barrio || "");
+      setUbicacionMapsUrl(partido.ubicacion_maps_url || "");
       setDireccion(partido.direccion || "");
       setNotasCliente(partido.notas_cliente || "");
       setFieldErrors({});
@@ -65,7 +69,9 @@ export function PartidoEditForm({ partido, open, onClose, onSuccess }: PartidoEd
     const errors: Record<string, string> = {};
     if (!fecha) errors.fecha = "La fecha es requerida";
     if (!hora) errors.hora = "La hora es requerida";
-    if (!lugar.trim()) errors.lugar = "El lugar es requerido";
+    if (!lugar.trim()) errors.lugar = "El nombre de la cancha es requerido";
+    if (!barrio.trim()) errors.barrio = "El barrio es requerido";
+    if (!direccion.trim()) errors.direccion = "La dirección es requerida";
 
     // Validar fecha futura (comparar strings YYYY-MM-DD para evitar problemas de zona horaria)
     if (fecha) {
@@ -85,6 +91,9 @@ export function PartidoEditForm({ partido, open, onClose, onSuccess }: PartidoEd
         fecha,
         hora: hora.length === 5 ? hora : hora.substring(0, 5), // Asegurar formato HH:MM
         lugar: lugar.trim(),
+        cancha_nombre: lugar.trim(),
+        barrio: barrio.trim(),
+        ubicacion_maps_url: ubicacionMapsUrl.trim() || undefined,
         direccion: direccion.trim() || undefined,
         notas_cliente: notasCliente.trim() || undefined,
       };
@@ -193,9 +202,9 @@ export function PartidoEditForm({ partido, open, onClose, onSuccess }: PartidoEd
             </div>
           </div>
 
-          {/* Lugar y Dirección */}
+          {/* Cancha, barrio y dirección */}
           <FormField
-            label="Lugar"
+            label="Nombre de la cancha"
             name="lugar"
             value={lugar}
             onChange={(e) => {
@@ -211,22 +220,60 @@ export function PartidoEditForm({ partido, open, onClose, onSuccess }: PartidoEd
           />
 
           <FormField
-            label="Dirección (Opcional)"
+            label="Barrio"
+            name="barrio"
+            value={barrio}
+            onChange={(e) => {
+              setBarrio(e.target.value);
+              if (fieldErrors.barrio) {
+                setFieldErrors((prev) => ({ ...prev, barrio: undefined }));
+              }
+            }}
+            error={fieldErrors.barrio}
+            disabled={isLoading || showSuccess}
+            placeholder="Ej: Belén Rosales"
+            required
+          />
+
+          <FormField
+            label="Dirección"
             name="direccion"
             value={direccion}
-            onChange={(e) => setDireccion(e.target.value)}
+            onChange={(e) => {
+              setDireccion(e.target.value);
+              if (fieldErrors.direccion) {
+                setFieldErrors((prev) => ({ ...prev, direccion: undefined }));
+              }
+            }}
+            error={fieldErrors.direccion}
             disabled={isLoading || showSuccess}
             placeholder="Calle 123 #45-67"
+            required
+          />
+
+          <FormField
+            label="Enlace Google Maps (Opcional)"
+            name="ubicacion_maps_url"
+            value={ubicacionMapsUrl}
+            onChange={(e) => {
+              setUbicacionMapsUrl(e.target.value);
+              if (fieldErrors.ubicacion_maps_url) {
+                setFieldErrors((prev) => ({ ...prev, ubicacion_maps_url: undefined }));
+              }
+            }}
+            error={fieldErrors.ubicacion_maps_url}
+            disabled={isLoading || showSuccess}
+            placeholder="Pega aquí el enlace de Google Maps"
           />
 
           {/* Notas */}
           <FormField
-            label="Notas Adicionales (Opcional)"
+            label="Detalles del partido (Opcional)"
             name="notas_cliente"
             value={notasCliente}
             onChange={(e) => setNotasCliente(e.target.value)}
             disabled={isLoading || showSuccess}
-            placeholder="Información adicional sobre el partido..."
+            placeholder="Detalles detallados del partido: duración de los tiempos, categoría, horario..."
             multiline
             rows={4}
           />

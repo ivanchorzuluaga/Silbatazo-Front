@@ -23,6 +23,7 @@ export interface ArbitroInfo {
 export interface Partido {
   id: number;
   codigo: string;
+  grupo_pago_codigo?: string;
   cliente: number;
   cliente_username: string;
   cliente_email: string;
@@ -36,9 +37,15 @@ export interface Partido {
   municipio: Municipio;
   categoria: Categoria;
   lugar: string;
+  cancha_nombre?: string;
+  barrio?: string;
   direccion?: string;
+  ubicacion_maps_url?: string;
   tipo_partido?: TipoPartido | null;
   monto_total?: number | null;
+  servicio_arbitro?: number | null;
+  comision_app?: number | null;
+  es_valor_personalizado?: boolean;
   estado: EstadoPartido;
   estado_display: string;
   estado_pago: EstadoPago;
@@ -122,9 +129,15 @@ export interface PartidoCreateData {
   municipio_id: number;
   categoria_id: number;
   lugar: string;
+  cancha_nombre?: string;
+  barrio?: string;
   direccion?: string;
+  ubicacion_maps_url?: string;
   tipo_partido_id?: number | null;
   monto_total?: number | null;
+  servicio_arbitro?: number | null;
+  comision_app?: number | null;
+  grupo_pago_codigo?: string;
   notas_cliente?: string;
 }
 
@@ -132,7 +145,10 @@ export interface PartidoUpdateData {
   fecha?: string; // YYYY-MM-DD
   hora?: string; // HH:MM
   lugar?: string;
+  cancha_nombre?: string;
+  barrio?: string;
   direccion?: string;
+  ubicacion_maps_url?: string;
   notas_cliente?: string;
 }
 
@@ -153,6 +169,7 @@ export interface PartidoCompletarData {
 }
 
 export interface PartidosListParams {
+  vista?: "mis" | "plataforma";
   estado?: EstadoPartido;
   estado_pago?: EstadoPago; // Solo admin
   fecha_desde?: string; // YYYY-MM-DD

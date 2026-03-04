@@ -41,7 +41,10 @@ export function ArbitroDashboardPage() {
     .filter((p) => p.estado === "completado")
     .reduce((total, partido) => {
       const monto = getGrossAmount(partido.monto_total ?? null, partido.tipo_partido?.monto_total ?? null);
-      const neto = getNetAmount(monto, partido.tipo_partido?.comision_app ?? null);
+      const neto = getNetAmount(
+        monto,
+        partido.comision_app ?? partido.tipo_partido?.comision_app ?? null
+      );
       return total + neto;
     }, 0);
 
@@ -357,7 +360,10 @@ export function ArbitroDashboardPage() {
             </div>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {proximosPartidos.map((partido) => (
+            {proximosPartidos.map((partido) => {
+              const cancha = partido.cancha_nombre || partido.lugar;
+              const ubicacion = partido.barrio ? `${cancha} · ${partido.barrio}` : cancha;
+              return (
               <Card
                 key={partido.id}
                 className="group hover:shadow-xl transition-all duration-300 cursor-pointer"
@@ -366,7 +372,7 @@ export function ArbitroDashboardPage() {
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-primary" />
-                    Partido en {partido.municipio?.nombre ?? partido.lugar}
+                    Partido en {partido.municipio?.nombre ?? cancha}
                   </CardTitle>
                   <CardDescription>
                     {parseLocalDate(partido.fecha).toLocaleDateString("es-CO", {
@@ -383,7 +389,7 @@ export function ArbitroDashboardPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Lugar</span>
-                    <span className="font-medium">{partido.lugar}</span>
+                    <span className="font-medium">{ubicacion}</span>
                   </div>
                   {(partido.monto_total != null || partido.tipo_partido?.monto_total != null) && (
                     <div className="flex items-center justify-between pt-2 border-t">
@@ -395,7 +401,7 @@ export function ArbitroDashboardPage() {
                               partido.monto_total ?? null,
                               partido.tipo_partido?.monto_total ?? null
                             ),
-                            partido.tipo_partido?.comision_app ?? null
+                            partido.comision_app ?? partido.tipo_partido?.comision_app ?? null
                           )
                         )}
                       </span>
@@ -403,7 +409,8 @@ export function ArbitroDashboardPage() {
                   )}
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

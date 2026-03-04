@@ -24,11 +24,17 @@ export function PartidoDisponibleCard({ partido, onTomar }: PartidoDisponibleCar
   const [error, setError] = useState<string | null>(null);
 
   const monto = partido.monto_total ?? partido.tipo_partido?.monto_total ?? null;
+  const cancha = partido.cancha_nombre || partido.lugar;
+  const ubicacion = partido.barrio ? `${cancha} · ${partido.barrio}` : cancha;
   const grossAmount = getGrossAmount(
     partido.monto_total,
     partido.tipo_partido?.monto_total ?? null
   );
-  const { net } = getRoleAmounts(grossAmount, partido.tipo_partido?.comision_app ?? null, user?.role);
+  const { net } = getRoleAmounts(
+    grossAmount,
+    partido.comision_app ?? partido.tipo_partido?.comision_app ?? null,
+    user?.role
+  );
   const tieneConflicto = Boolean(partido.tiene_conflicto_horario);
 
   const handleTomar = async () => {
@@ -85,7 +91,7 @@ export function PartidoDisponibleCard({ partido, onTomar }: PartidoDisponibleCar
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-primary" />
               <span>
-                {partido.lugar}
+                {ubicacion}
                 {partido.direccion ? ` · ${partido.direccion}` : ""}
               </span>
             </div>
@@ -111,7 +117,7 @@ export function PartidoDisponibleCard({ partido, onTomar }: PartidoDisponibleCar
               onClick={() => (tieneConflicto ? setIsConfirmOpen(true) : handleTomar())}
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Asignando..." : "Tomar partido"}
+              {isSubmitting ? "Reservando..." : "Tomar para revisar"}
             </Button>
           </div>
 
@@ -122,21 +128,23 @@ export function PartidoDisponibleCard({ partido, onTomar }: PartidoDisponibleCar
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirmar asignación</DialogTitle>
+            <DialogTitle>Confirmar reserva</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 text-sm text-muted-foreground">
             <p>
               Este partido se cruza con otro en tu agenda. Si el lugar es cercano puedes continuar,
               pero debes asegurarte de cumplir ambos compromisos.
             </p>
-            <p className="text-foreground font-medium">¿Deseas tomar este partido de todas formas?</p>
+            <p className="text-foreground font-medium">
+              ¿Deseas reservar este partido y luego decidir aceptarlo o rechazarlo?
+            </p>
           </div>
           <div className="flex gap-2 pt-4">
             <Button variant="outline" className="flex-1" onClick={() => setIsConfirmOpen(false)}>
               Cancelar
             </Button>
             <Button className="flex-1" onClick={handleTomar} disabled={isSubmitting}>
-              {isSubmitting ? "Asignando..." : "Sí, tomar partido"}
+              {isSubmitting ? "Reservando..." : "Sí, reservar"}
             </Button>
           </div>
         </DialogContent>

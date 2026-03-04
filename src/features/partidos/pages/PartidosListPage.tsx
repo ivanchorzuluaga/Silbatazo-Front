@@ -27,8 +27,12 @@ const TABS: { value: "" | EstadoPartido; label: string }[] = [
 export function PartidosListPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [vistaArbitro, setVistaArbitro] = useState<"mis" | "plataforma">("mis");
   const [tabEstado, setTabEstado] = useState<"" | EstadoPartido>("");
-  const filtros: PartidosListParams = tabEstado ? { estado: tabEstado } : {};
+  const filtros: PartidosListParams = {
+    ...(tabEstado ? { estado: tabEstado } : {}),
+    ...(user?.role === "arbitro" ? { vista: vistaArbitro } : {}),
+  };
   const { partidos, isLoading, error } = usePartidos(filtros);
 
   return (
@@ -45,16 +49,22 @@ export function PartidosListPage() {
               <div className="h-7 w-7 rounded-lg bg-primary/15 flex items-center justify-center">
                 <Calendar className="h-4 w-4 text-primary" />
               </div>
-              <h1 className="text-sm sm:text-2xl font-semibold">Mis Partidos</h1>
+              <h1 className="text-sm sm:text-2xl font-semibold">
+                {user?.role === "arbitro" && vistaArbitro === "plataforma"
+                  ? "Partidos de la plataforma"
+                  : "Mis Partidos"}
+              </h1>
             </div>
-            <p className="text-[11px] sm:text-base text-muted-foreground">
-              {user?.role === "cliente"
-                ? "Gestiona tus solicitudes de partidos"
-                : user?.role === "arbitro"
-                ? "Gestiona tus partidos asignados"
-                : "Todos los partidos del sistema"}
-            </p>
-          </div>
+              <p className="text-[11px] sm:text-base text-muted-foreground">
+                {user?.role === "cliente"
+                  ? "Gestiona tus solicitudes de partidos"
+                  : user?.role === "arbitro"
+                  ? vistaArbitro === "plataforma"
+                    ? "Movimientos de la plataforma: aceptados, rechazados, pendientes y más"
+                    : "Gestiona tus partidos asignados"
+                  : "Todos los partidos del sistema"}
+              </p>
+            </div>
           {user?.role === "cliente" && (
             <Button
               onClick={() => navigate(ROUTES.PARTIDOS_CREAR)}
@@ -67,6 +77,29 @@ export function PartidosListPage() {
           )}
         </div>
       </div>
+
+      {user?.role === "arbitro" && (
+        <div className="mb-4 flex gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant={vistaArbitro === "mis" ? "default" : "outline"}
+            onClick={() => setVistaArbitro("mis")}
+            className="h-8 text-xs"
+          >
+            Mis partidos
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={vistaArbitro === "plataforma" ? "default" : "outline"}
+            onClick={() => setVistaArbitro("plataforma")}
+            className="h-8 text-xs"
+          >
+            Partidos de la plataforma
+          </Button>
+        </div>
+      )}
 
       {/* Tabs compactos */}
       <FilterTabs
@@ -110,6 +143,8 @@ export function PartidosListPage() {
                       ? `No hay partidos en "${TABS.find((t) => t.value === tabEstado)?.label}"`
                       : user?.role === "cliente"
                       ? "Aún no tienes partidos"
+                      : user?.role === "arbitro" && vistaArbitro === "plataforma"
+                      ? "No hay movimientos de plataforma"
                       : "No hay partidos asignados"}
                   </h3>
                   <p className="text-[10px] sm:text-base text-muted-foreground">
@@ -117,6 +152,8 @@ export function PartidosListPage() {
                       ? "Prueba con otro estado o vuelve a Todos."
                       : user?.role === "cliente"
                       ? "Crea tu primer partido y conecta con árbitros."
+                      : user?.role === "arbitro" && vistaArbitro === "plataforma"
+                      ? "Cuando haya partidos en la app, verás aquí toda la actividad."
                       : "Espera a que te asignen nuevos partidos."}
                   </p>
                 </div>

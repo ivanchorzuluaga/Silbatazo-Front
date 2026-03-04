@@ -49,6 +49,9 @@ export function PagoPartidoPage() {
     comprobanteError,
     monto,
     referencia,
+    esPagoGrupal,
+    referenciasGrupo,
+    partidosPendientesGrupo,
     nequiConfig,
     tienePermiso,
     handleMarcarComoPagado,
@@ -181,6 +184,12 @@ export function PagoPartidoPage() {
                   <span className="text-muted-foreground text-sm">Código:</span>
                   <code className="text-primary font-mono text-sm">{referencia}</code>
                 </div>
+                {esPagoGrupal && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Pago único de {partidosPendientesGrupo} partidos:{" "}
+                    {referenciasGrupo.join(", ")}
+                  </p>
+                )}
               </div>
             </div>
           </InfoCard>
@@ -246,13 +255,12 @@ export function PagoPartidoPage() {
                       <p className="text-xs uppercase tracking-wide text-muted-foreground">
                         Número Nequi
                       </p>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Oculto en modo prueba
-                      </p>
+                      <p className="text-sm font-semibold text-foreground">{nequiConfig.phone}</p>
                       <p className="text-[11px] text-muted-foreground">
                         Nombre: {nequiConfig.name}
                       </p>
                     </div>
+                    <CopyField label="Número Nequi" value={nequiConfig.phone} onCopy={handleCopy} />
                     <CopyField
                       label="Valor a pagar"
                       value={formatCurrency(monto)}
@@ -295,6 +303,9 @@ export function PagoPartidoPage() {
                     'Ve a "Enviar" o "Transferir"',
                     `Ingresa el valor a pagar: ${formatCurrency(monto)}`,
                     `En la referencia, escribe: ${referencia}`,
+                    esPagoGrupal
+                      ? `Este pago cubre ${partidosPendientesGrupo} partidos (${referenciasGrupo.join(", ")})`
+                      : "Este pago cubre 1 partido",
                     "Confirma y realiza la transferencia",
                     "Toma una captura de pantalla del comprobante",
                     "Sube la captura y confirma tu pago",

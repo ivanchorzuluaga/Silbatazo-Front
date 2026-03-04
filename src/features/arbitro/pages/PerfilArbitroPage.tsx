@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { PageLayout } from "@/components/layout";
 import { ROUTES } from "@/lib/constants";
 import { getRefereeImage } from "@/lib/referee-images";
+import { parseLocalDate } from "@/lib/utils";
 import { authService } from "@/features/auth/services/auth.service";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -241,9 +242,9 @@ export function PerfilArbitroPage() {
                         Fecha de Nacimiento
                       </p>
                       <p className="text-base">
-                        {new Date(arbitro.fecha_nacimiento).toLocaleDateString(
-                          "es-CO",
-                        )}
+                        {parseLocalDate(
+                          arbitro.fecha_nacimiento.split("T")[0],
+                        ).toLocaleDateString("es-CO")}
                       </p>
                     </div>
                   )}

@@ -39,7 +39,7 @@ export function ArbitroPartidosDisponiblesPage() {
         <div>
           <h2 className="text-lg font-semibold">Elige el partido que mejor te quede</h2>
           <p className="text-sm text-muted-foreground">
-            El primero en confirmar se queda con el partido.
+            Al tomarlo quedará pendiente para que confirmes aceptar o rechazar desde la app.
           </p>
         </div>
         <button

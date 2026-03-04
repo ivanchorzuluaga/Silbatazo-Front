@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePartido } from "./usePartido";
 import { partidoEndpoints } from "@/api/endpoints/partido.endpoints";
+import { notifyPartidosChanged } from "../utils/partidos-sync";
 import { authService } from "@/features/auth/services/auth.service";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES, getPartidoDetailRoute } from "@/lib/constants";
@@ -37,6 +38,9 @@ export interface UsePagoPartidoReturn {
   monto: number;
   referencia: string;
   descripcion: string;
+  esPagoGrupal: boolean;
+  referenciasGrupo: string[];
+  partidosPendientesGrupo: number;
   nequiConfig: {
     qrUrl: string;
     phone: string;
@@ -62,6 +66,15 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
   const { partido, isLoading, error, obtenerPartido, refresh } = usePartido();
 
   const [isMarkingAsPaid, setIsMarkingAsPaid] = useState(false);
+  const [partidosGrupo, setPartidosGrupo] = useState<
+    Array<{
+      id: number;
+      codigo?: string;
+      estado_pago: string;
+      monto_total?: number | null;
+      tipo_partido?: { monto_total: number } | null;
+    }>
+  >([]);
   const [comprobante, setComprobante] = useState<File | null>(null);
   const [comprobantePreview, setComprobantePreview] = useState<string | null>(null);
   const [comprobanteError, setComprobanteError] = useState<string | null>(null);
@@ -73,30 +86,86 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
     }
   }, [partidoId, obtenerPartido]);
 
+  useEffect(() => {
+    const cargarGrupo = async () => {
+      if (!partido?.grupo_pago_codigo || !user) {
+        setPartidosGrupo([]);
+        return;
+      }
+      const token = authService.getAccessToken();
+      if (!token) return;
+      try {
+        const partidos = await partidoEndpoints.listarPartidos(token, { cliente_id: user.id });
+        const delGrupo = partidos.filter((p) => p.grupo_pago_codigo === partido.grupo_pago_codigo);
+        setPartidosGrupo(
+          delGrupo.map((p) => ({
+            id: p.id,
+            codigo: p.codigo,
+            estado_pago: p.estado_pago,
+            monto_total: p.monto_total,
+            tipo_partido: p.tipo_partido,
+          }))
+        );
+      } catch {
+        setPartidosGrupo([]);
+      }
+    };
+    cargarGrupo();
+  }, [partido?.grupo_pago_codigo, user?.id]);
+
   // Verificar permisos
   const tienePermiso = user?.id === partido?.cliente;
 
   // Estado del pago
   const estadoPago = partido?.estado_pago || "pendiente";
-  const yaPagado = estadoPago !== "pendiente";
+  const yaPagado =
+    partido?.grupo_pago_codigo && partidosGrupo.length > 0
+      ? partidosGrupo.every((p) => p.estado_pago !== "pendiente")
+      : estadoPago !== "pendiente";
 
   // Información de pago: monto del partido (tipo_partido o monto_total)
-  const monto =
+  const montoPartido =
     partido?.monto_total != null
       ? Number(partido.monto_total)
       : partido?.tipo_partido?.monto_total != null
       ? partido.tipo_partido.monto_total
       : 0;
-  const referencia = partido?.codigo || `PARTIDO-${partido?.id || ""}`;
+  const montoGrupo = partidosGrupo
+    .filter((p) => p.estado_pago === "pendiente")
+    .reduce((acc, p) => {
+      const monto =
+        p.monto_total != null
+          ? Number(p.monto_total)
+          : p.tipo_partido?.monto_total != null
+          ? p.tipo_partido.monto_total
+          : 0;
+      return acc + monto;
+    }, 0);
+  const monto = montoGrupo > 0 ? montoGrupo : montoPartido;
+  const referencia = partido?.grupo_pago_codigo || partido?.codigo || `PARTIDO-${partido?.id || ""}`;
   const descripcion = partido
     ? [
-        `Partido ${referencia}`,
+        partido.grupo_pago_codigo
+          ? `Grupo ${referencia} (${Math.max(partidosGrupo.length, 1)} partidos)`
+          : `Partido ${referencia}`,
         partido.tipo_partido?.nombre ?? partido.categoria?.nombre,
         partido.municipio?.nombre,
       ]
         .filter(Boolean)
         .join(" - ")
     : "";
+  const esPagoGrupal = Boolean(partido?.grupo_pago_codigo && partidosGrupo.length > 1);
+  const referenciasGrupo =
+    partido?.grupo_pago_codigo && partidosGrupo.length > 0
+      ? partidosGrupo
+          .filter((p) => p.estado_pago === "pendiente")
+          .map((p) => p.codigo || `PARTIDO-${p.id}`)
+          .filter(Boolean)
+      : [];
+  const partidosPendientesGrupo =
+    partido?.grupo_pago_codigo && partidosGrupo.length > 0
+      ? partidosGrupo.filter((p) => p.estado_pago === "pendiente").length
+      : 1;
 
   // Configuración de Nequi
   const nequiConfig = {
@@ -156,7 +225,15 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
 
     setIsMarkingAsPaid(true);
     try {
-      await partidoEndpoints.marcarPartidoPagado(token, partido.id, comprobante);
+      const partidosPendientesGrupo =
+        partido.grupo_pago_codigo && partidosGrupo.length > 0
+          ? partidosGrupo.filter((p) => p.estado_pago === "pendiente")
+          : [{ id: partido.id, estado_pago: partido.estado_pago }];
+
+      for (const p of partidosPendientesGrupo) {
+        await partidoEndpoints.marcarPartidoPagado(token, p.id, comprobante);
+      }
+      notifyPartidosChanged();
       refresh();
     } catch {
       setComprobanteError("Error al enviar el comprobante. Intenta nuevamente.");
@@ -194,6 +271,9 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
     monto,
     referencia,
     descripcion,
+    esPagoGrupal,
+    referenciasGrupo,
+    partidosPendientesGrupo,
     nequiConfig,
     tienePermiso,
     user,

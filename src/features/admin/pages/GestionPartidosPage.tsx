@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FilterTabs } from "@/components/ui/FilterTabs";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,7 @@ const TABS_ESTADO: { value: "" | EstadoPartido; label: string }[] = [
 export function GestionPartidosPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const initializedFromQuery = useRef(false);
   const { municipios } = useMunicipios();
   const { categorias } = useCategorias();
@@ -53,7 +54,7 @@ export function GestionPartidosPage() {
   if (clienteId) filtros.cliente_id = parseInt(clienteId);
   if (arbitroId) filtros.arbitro_id = parseInt(arbitroId);
 
-  const { partidos, isLoading, error } = usePartidos(filtros);
+  const { partidos, isLoading, error, refetch } = usePartidos(filtros);
 
   useEffect(() => {
     if (initializedFromQuery.current) return;
@@ -65,6 +66,14 @@ export function GestionPartidosPage() {
       initializedFromQuery.current = true;
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const state = location.state as { refreshList?: boolean } | null;
+    if (state?.refreshList) {
+      refetch();
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, location.pathname, navigate, refetch]);
 
   const handleLimpiarFiltros = () => {
     setTabEstado("");

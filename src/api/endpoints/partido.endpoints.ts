@@ -41,6 +41,7 @@ export const partidoEndpoints = {
    */
   async listarPartidos(token: string, params?: PartidosListParams): Promise<Partido[]> {
     const queryParams = new URLSearchParams();
+    if (params?.vista) queryParams.append("vista", params.vista);
     if (params?.estado) queryParams.append("estado", params.estado);
     if (params?.estado_pago) queryParams.append("estado_pago", params.estado_pago);
     if (params?.fecha_desde) queryParams.append("fecha_desde", params.fecha_desde);
@@ -150,6 +151,15 @@ export const partidoEndpoints = {
     return authenticatedApiClient<PartidoDetail>(`/api/partidos/${id}/`, token, {
       method: "PATCH",
       body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Eliminar un partido (solo admin)
+   */
+  async eliminarPartido(token: string, id: number): Promise<void> {
+    await authenticatedApiClient(`/api/partidos/${id}/`, token, {
+      method: "DELETE",
     });
   },
 

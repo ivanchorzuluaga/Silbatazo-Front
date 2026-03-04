@@ -57,6 +57,8 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
     setHora,
     setMunicipioId,
     setLugar,
+    setBarrio,
+    setUbicacionMapsUrl,
     setDireccion,
     setNotasCliente,
     handleSubmit,
@@ -277,6 +279,9 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                     </option>
                   ))}
                 </Select>
+                <p className="text-xs text-muted-foreground">
+                  Debes elegir el municipio del partido para validar cobertura del servicio.
+                </p>
                 {fieldErrors.municipio_id && (
                   <p className="text-xs text-destructive">{fieldErrors.municipio_id}</p>
                 )}
@@ -307,11 +312,11 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                 )}
               </div>
 
-              {/* Lugar */}
+              {/* Cancha */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-primary" />
-                  Lugar del Partido
+                  Nombre de la cancha
                   <span className="text-destructive">*</span>
                 </label>
                 <FormField
@@ -325,19 +330,56 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                 />
               </div>
 
+              {/* Barrio */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  Barrio
+                  <span className="text-destructive">*</span>
+                </label>
+                <FormField
+                  label=""
+                  name="barrio"
+                  value={formState.barrio}
+                  onChange={(e) => setBarrio(e.target.value)}
+                  error={fieldErrors.barrio}
+                  disabled={isLoading}
+                  placeholder="Ej: Belén Rosales"
+                />
+              </div>
+
               {/* Dirección */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <label className="text-sm font-medium text-foreground flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
-                  Dirección (Opcional)
+                  Dirección
+                  <span className="text-destructive">*</span>
                 </label>
                 <FormField
                   label=""
                   name="direccion"
                   value={formState.direccion}
                   onChange={(e) => setDireccion(e.target.value)}
+                  error={fieldErrors.direccion}
                   disabled={isLoading}
                   placeholder="Calle 123 #45-67"
+                />
+              </div>
+
+              {/* Google Maps */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  Enlace Google Maps (Opcional)
+                </label>
+                <FormField
+                  label=""
+                  name="ubicacion_maps_url"
+                  value={formState.ubicacionMapsUrl}
+                  onChange={(e) => setUbicacionMapsUrl(e.target.value)}
+                  error={fieldErrors.ubicacion_maps_url}
+                  disabled={isLoading}
+                  placeholder="Pega aquí el enlace de Google Maps"
                 />
               </div>
 
@@ -345,7 +387,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <FileText className="w-4 h-4" />
-                  Notas Adicionales (Opcional)
+                  Detalles del partido (Opcional)
                 </label>
                 <FormField
                   label=""
@@ -353,7 +395,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                   value={formState.notasCliente}
                   onChange={(e) => setNotasCliente(e.target.value)}
                   disabled={isLoading}
-                  placeholder="Información adicional sobre el partido..."
+                  placeholder="Detalles detallados del partido: duración de los tiempos, categoría, horario..."
                   multiline
                   rows={3}
                 />

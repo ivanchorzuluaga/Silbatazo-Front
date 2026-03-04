@@ -7,6 +7,7 @@ import { partidoEndpoints } from "@/api/endpoints";
 import { authService } from "@/features/auth/services/auth.service";
 import { ApiException } from "@/api/client";
 import { extractErrorMessage } from "@/lib/error-utils";
+import { notifyPartidosChanged } from "../utils/partidos-sync";
 import type {
   Partido,
   PartidoDetail,
@@ -34,6 +35,10 @@ export const partidoService = {
    */
   getToken(): string | null {
     return authService.getAccessToken();
+  },
+
+  onPartidosMutated() {
+    notifyPartidosChanged();
   },
 
   /**
@@ -88,7 +93,9 @@ export const partidoService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return (await partidoEndpoints.crearPartido(token, data)) as PartidoDetail;
+      const created = (await partidoEndpoints.crearPartido(token, data)) as PartidoDetail;
+      this.onPartidosMutated();
+      return created;
     } catch (error) {
       if (error instanceof ApiException) {
         if (error.status === 403) {
@@ -108,7 +115,9 @@ export const partidoService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await partidoEndpoints.crearPartidoAdmin(token, data);
+      const created = await partidoEndpoints.crearPartidoAdmin(token, data);
+      this.onPartidosMutated();
+      return created;
     } catch (error) {
       if (error instanceof ApiException) {
         if (error.status === 403) {
@@ -144,7 +153,9 @@ export const partidoService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await partidoEndpoints.actualizarPartido(token, id, data);
+      const updated = await partidoEndpoints.actualizarPartido(token, id, data);
+      this.onPartidosMutated();
+      return updated;
     } catch (error) {
       if (error instanceof ApiException) {
         if (error.status === 403) {
@@ -160,6 +171,27 @@ export const partidoService = {
   },
 
   /**
+   * Eliminar partido (solo admin)
+   */
+  async eliminarPartido(id: number): Promise<void> {
+    const token = this.getToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      await partidoEndpoints.eliminarPartido(token, id);
+      this.onPartidosMutated();
+    } catch (error) {
+      if (error instanceof ApiException) {
+        if (error.status === 403) {
+          throw new Error("Solo administradores pueden eliminar partidos");
+        }
+        throw new Error(extractErrorMessage(error.data) || "Error al eliminar partido");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
    * Aceptar un partido (solo árbitro)
    */
   async aceptarPartido(id: number, data?: PartidoAceptarData): Promise<PartidoDetail> {
@@ -167,7 +199,9 @@ export const partidoService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await partidoEndpoints.aceptarPartido(token, id, data);
+      const updated = await partidoEndpoints.aceptarPartido(token, id, data);
+      this.onPartidosMutated();
+      return updated;
     } catch (error) {
       if (error instanceof ApiException) {
         if (error.status === 403) {
@@ -190,7 +224,9 @@ export const partidoService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await partidoEndpoints.rechazarPartido(token, id, data);
+      const updated = await partidoEndpoints.rechazarPartido(token, id, data);
+      this.onPartidosMutated();
+      return updated;
     } catch (error) {
       if (error instanceof ApiException) {
         if (error.status === 403) {
@@ -213,7 +249,9 @@ export const partidoService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await partidoEndpoints.cancelarPartido(token, id, data);
+      const updated = await partidoEndpoints.cancelarPartido(token, id, data);
+      this.onPartidosMutated();
+      return updated;
     } catch (error) {
       if (error instanceof ApiException) {
         if (error.status === 403) {
@@ -236,7 +274,9 @@ export const partidoService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await partidoEndpoints.completarPartido(token, id, data);
+      const updated = await partidoEndpoints.completarPartido(token, id, data);
+      this.onPartidosMutated();
+      return updated;
     } catch (error) {
       if (error instanceof ApiException) {
         if (error.status === 403) {
@@ -281,7 +321,9 @@ export const partidoService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await partidoEndpoints.tomarPartidoDisponible(token, id);
+      const updated = await partidoEndpoints.tomarPartidoDisponible(token, id);
+      this.onPartidosMutated();
+      return updated;
     } catch (error) {
       if (error instanceof ApiException) {
         if (error.status === 400) {
@@ -344,7 +386,9 @@ export const partidoService = {
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      return await partidoEndpoints.asignarArbitro(token, id, data);
+      const updated = await partidoEndpoints.asignarArbitro(token, id, data);
+      this.onPartidosMutated();
+      return updated;
     } catch (error) {
       if (error instanceof ApiException) {
         if (error.status === 403) {

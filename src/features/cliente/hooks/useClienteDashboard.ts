@@ -18,6 +18,17 @@ export interface DashboardStats {
   pagosPendientes: number;
 }
 
+export interface PagoGrupoCliente {
+  grupoCodigo: string;
+  partidoPrincipalId: number;
+  referencias: string[];
+  totalPartidos: number;
+  montoTotal: number;
+  fecha: string;
+  municipioNombre?: string;
+  estadoPago: "pendiente" | "en_revision";
+}
+
 export interface UseClienteDashboardReturn {
   // Usuario
   user: ReturnType<typeof useAuth>["user"];
@@ -34,8 +45,8 @@ export interface UseClienteDashboardReturn {
   // Partidos
   proximosPartidos: ReturnType<typeof usePartidos>["partidos"];
   partidosRecientes: ReturnType<typeof usePartidos>["partidos"];
-  partidosPagosPendientes: ReturnType<typeof usePartidos>["partidos"];
-  partidosPagosEnRevision: ReturnType<typeof usePartidos>["partidos"];
+  partidosPagosPendientes: PagoGrupoCliente[];
+  partidosPagosEnRevision: PagoGrupoCliente[];
 
   // Navegación
   navigateToCrearPartido: () => void;
@@ -53,6 +64,48 @@ export function useClienteDashboard(): UseClienteDashboardReturn {
   // Nombre del usuario
   const username = user?.username || "Cliente";
 
+  const agruparPagos = (
+    estadoPago: "pendiente" | "en_revision"
+  ): PagoGrupoCliente[] => {
+    const filtrados = partidos.filter((p) => p.estado_pago === estadoPago && p.estado !== "cancelado");
+    const grupos = new Map<string, typeof filtrados>();
+
+    filtrados.forEach((p) => {
+      const key = p.grupo_pago_codigo?.trim() || `PARTIDO-${p.id}`;
+      const current = grupos.get(key) || [];
+      current.push(p);
+      grupos.set(key, current);
+    });
+
+    return Array.from(grupos.entries())
+      .map(([grupoCodigo, items]) => {
+        const ordenados = [...items].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        const principal = ordenados[0];
+        const montoTotal = ordenados.reduce((acc, p) => {
+          const monto =
+            p.monto_total != null
+              ? Number(p.monto_total)
+              : p.tipo_partido?.monto_total != null
+              ? p.tipo_partido.monto_total
+              : 0;
+          return acc + monto;
+        }, 0);
+
+        return {
+          grupoCodigo,
+          partidoPrincipalId: principal.id,
+          referencias: ordenados.map((p) => p.codigo || `PARTIDO-${p.id}`),
+          totalPartidos: ordenados.length,
+          montoTotal,
+          fecha: principal.fecha,
+          municipioNombre: principal.municipio?.nombre,
+          estadoPago,
+        };
+      })
+      .sort((a, b) => parseLocalDate(a.fecha).getTime() - parseLocalDate(b.fecha).getTime())
+      .slice(0, 3);
+  };
+
   // Calcular estadísticas
   const stats = useMemo<DashboardStats>(() => {
     const total = partidos.length;
@@ -61,7 +114,12 @@ export function useClienteDashboard(): UseClienteDashboardReturn {
     ).length;
     const aceptados = partidos.filter((p) => p.estado === "aceptado").length;
     const completados = partidos.filter((p) => p.estado === "completado").length;
-    const pagosPendientes = partidos.filter((p) => p.estado_pago === "pendiente").length;
+    const gruposPendientes = new Set(
+      partidos
+        .filter((p) => p.estado_pago === "pendiente" && p.estado !== "cancelado")
+        .map((p) => p.grupo_pago_codigo?.trim() || `PARTIDO-${p.id}`)
+    );
+    const pagosPendientes = gruposPendientes.size;
 
     return { total, pendientes, aceptados, completados, pagosPendientes };
   }, [partidos]);
@@ -89,16 +147,12 @@ export function useClienteDashboard(): UseClienteDashboardReturn {
 
   // Partidos con pago pendiente
   const partidosPagosPendientes = useMemo(() => {
-    return partidos
-      .filter((p) => p.estado_pago === "pendiente" && p.estado !== "cancelado")
-      .slice(0, 3);
+    return agruparPagos("pendiente");
   }, [partidos]);
 
   // Partidos con pago en revisión
   const partidosPagosEnRevision = useMemo(() => {
-    return partidos
-      .filter((p) => p.estado_pago === "en_revision" && p.estado !== "cancelado")
-      .slice(0, 3);
+    return agruparPagos("en_revision");
   }, [partidos]);
 
   // Funciones de navegación

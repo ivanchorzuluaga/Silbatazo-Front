@@ -34,9 +34,10 @@ export function PartidoDetail({ partido }: PartidoDetailProps) {
   const { promedio, obtenerPromedio, isLoading: isLoadingPromedio } = useCalificaciones();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const cancha = partido.cancha_nombre || partido.lugar;
   const titulo = isAdmin
     ? `Partido #${partido.id}`
-    : `Partido en ${partido.municipio?.nombre ?? partido.lugar}`;
+    : `Partido en ${partido.municipio?.nombre ?? cancha}`;
 
   // Cargar promedio de calificaciones del árbitro si hay árbitro asignado
   useEffect(() => {
@@ -98,13 +99,32 @@ export function PartidoDetail({ partido }: PartidoDetailProps) {
             <p className="font-medium text-sm sm:text-base">{partido.hora_str}</p>
           </div>
           <div>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-1">Lugar</p>
-            <p className="font-medium text-sm sm:text-base break-words">{partido.lugar}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-1">Cancha</p>
+            <p className="font-medium text-sm sm:text-base break-words">{cancha}</p>
           </div>
+          {partido.barrio && (
+            <div>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Barrio</p>
+              <p className="font-medium text-sm sm:text-base break-words">{partido.barrio}</p>
+            </div>
+          )}
           {partido.direccion && (
             <div>
               <p className="text-xs sm:text-sm text-muted-foreground mb-1">Dirección</p>
               <p className="font-medium text-sm sm:text-base break-words">{partido.direccion}</p>
+            </div>
+          )}
+          {partido.ubicacion_maps_url && (
+            <div>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Ubicación Maps</p>
+              <a
+                href={partido.ubicacion_maps_url}
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-sm sm:text-base text-primary underline break-all"
+              >
+                Abrir en Google Maps
+              </a>
             </div>
           )}
           <div>
@@ -134,7 +154,7 @@ export function PartidoDetail({ partido }: PartidoDetailProps) {
               );
               const { gross: grossAmount, net, showBoth, showNetOnly } = getRoleAmounts(
                 gross,
-                partido.tipo_partido?.comision_app ?? null,
+                partido.comision_app ?? partido.tipo_partido?.comision_app ?? null,
                 user?.role
               );
               return (

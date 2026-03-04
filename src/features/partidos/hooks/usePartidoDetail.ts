@@ -24,6 +24,7 @@ interface UsePartidoDetailReturn {
   // Permisos
   isCliente: boolean;
   isArbitro: boolean;
+  isAdmin: boolean;
   puedeEditar: boolean;
   puedeCalificar: boolean;
   
@@ -83,9 +84,12 @@ export function usePartidoDetail(partidoId: number | undefined): UsePartidoDetai
     );
   }, [user?.role, user?.username, partido?.arbitro_info]);
 
+  const isAdmin = useMemo(() => user?.role === "admin", [user?.role]);
+
   const puedeEditar = useMemo(() => {
+    if (isAdmin) return true;
     return isCliente && (partido?.estado === "buscando_arbitro" || partido?.estado === "pendiente");
-  }, [isCliente, partido?.estado]);
+  }, [isAdmin, isCliente, partido?.estado]);
 
   const puedeCalificar = useMemo(() => {
     return (
@@ -118,6 +122,7 @@ export function usePartidoDetail(partidoId: number | undefined): UsePartidoDetai
     
     isCliente,
     isArbitro,
+    isAdmin,
     puedeEditar,
     puedeCalificar,
     

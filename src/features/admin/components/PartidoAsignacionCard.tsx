@@ -74,6 +74,8 @@ export function PartidoAsignacionCard({
     partido.estado === "buscando_arbitro"
       ? "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20"
       : "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20";
+  const cancha = partido.cancha_nombre || partido.lugar;
+  const ubicacion = partido.barrio ? `${cancha} · ${partido.barrio}` : cancha;
 
   // Parsear fecha correctamente sin problemas de zona horaria
   const fechaPartido = parseLocalDate(partido.fecha);
@@ -165,7 +167,7 @@ export function PartidoAsignacionCard({
                 />
               </svg>
               <span>
-                {partido.lugar}
+                {ubicacion}
                 {partido.direccion && ` - ${partido.direccion}`}
               </span>
             </div>
@@ -186,7 +188,10 @@ export function PartidoAsignacionCard({
                   partido.monto_total ?? null,
                   partido.tipo_partido?.monto_total ?? null
                 );
-                const net = getNetAmount(gross, partido.tipo_partido?.comision_app ?? null);
+                const net = getNetAmount(
+                  gross,
+                  partido.comision_app ?? partido.tipo_partido?.comision_app ?? null
+                );
               return (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <span className="font-medium">Valor a pagar:</span>

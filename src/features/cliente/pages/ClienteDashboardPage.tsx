@@ -26,6 +26,17 @@ import {
 import { parseLocalDate, cn, formatCop } from "@/lib/utils";
 import { getGrossAmount } from "@/lib/pricing";
 
+type PartidoUbicacion = {
+  lugar: string;
+  cancha_nombre?: string;
+  barrio?: string;
+};
+
+function getUbicacionPartido(partido: PartidoUbicacion): string {
+  const cancha = partido.cancha_nombre || partido.lugar;
+  return partido.barrio ? `${cancha} · ${partido.barrio}` : cancha;
+}
+
 export function ClienteDashboardPage() {
   const navigate = useNavigate();
   const {
@@ -115,8 +126,8 @@ export function ClienteDashboardPage() {
                     <div className="space-y-2">
                       {partidosPagosPendientes.map((partido) => (
                         <button
-                          key={partido.id}
-                          onClick={() => navigateToPago(partido.id)}
+                          key={partido.grupoCodigo}
+                          onClick={() => navigateToPago(partido.partidoPrincipalId)}
                           className="w-full flex items-center justify-between p-3 bg-muted/50 hover:bg-muted rounded-xl border border-border transition-colors group"
                         >
                           <div className="flex items-center gap-3">
@@ -131,27 +142,23 @@ export function ClienteDashboardPage() {
                               </p>
                             </div>
                             <div className="text-left">
-                              <p className="text-foreground font-medium">Partido en {partido.lugar}</p>
+                              <p className="text-foreground font-medium">
+                                {partido.totalPartidos > 1
+                                  ? `${partido.totalPartidos} partidos pendientes`
+                                  : "Partido pendiente"}
+                              </p>
                               <p className="text-muted-foreground text-sm">
-                                {partido.municipio?.nombre ?? "Ubicación pendiente"}
+                                {partido.municipioNombre ?? "Ubicación pendiente"}
+                              </p>
+                              <p className="text-muted-foreground text-xs truncate max-w-[320px]">
+                                Ref: {partido.referencias.join(", ")}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            {(partido.monto_total != null || "tipo_partido" in partido) &&
-                              (partido.monto_total ??
-                                (partido as { tipo_partido?: { monto_total: number } }).tipo_partido
-                                  ?.monto_total) != null && (
-                                <p className="text-sm font-semibold text-warning tabular-nums">
-                                  {formatCop(
-                                    getGrossAmount(
-                                      partido.monto_total ?? null,
-                                      (partido as { tipo_partido?: { monto_total: number } }).tipo_partido
-                                        ?.monto_total ?? null
-                                    )
-                                  )}
-                                </p>
-                              )}
+                            <p className="text-sm font-semibold text-warning tabular-nums">
+                              {formatCop(partido.montoTotal)}
+                            </p>
                             <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-warning group-hover:translate-x-1 transition-all" />
                           </div>
                         </button>
@@ -182,8 +189,8 @@ export function ClienteDashboardPage() {
                     <div className="space-y-2">
                       {partidosPagosEnRevision.map((partido) => (
                         <button
-                          key={partido.id}
-                          onClick={() => navigateToPago(partido.id)}
+                          key={partido.grupoCodigo}
+                          onClick={() => navigateToPago(partido.partidoPrincipalId)}
                           className="w-full flex items-center justify-between p-3 bg-muted/50 hover:bg-muted rounded-xl border border-border transition-colors group"
                         >
                           <div className="flex items-center gap-3">
@@ -198,27 +205,23 @@ export function ClienteDashboardPage() {
                               </p>
                             </div>
                             <div className="text-left">
-                              <p className="text-foreground font-medium">Partido en {partido.lugar}</p>
+                              <p className="text-foreground font-medium">
+                                {partido.totalPartidos > 1
+                                  ? `${partido.totalPartidos} partidos en revisión`
+                                  : "Partido en revisión"}
+                              </p>
                               <p className="text-muted-foreground text-sm">
-                                {partido.municipio?.nombre ?? "Ubicación pendiente"}
+                                {partido.municipioNombre ?? "Ubicación pendiente"}
+                              </p>
+                              <p className="text-muted-foreground text-xs truncate max-w-[320px]">
+                                Ref: {partido.referencias.join(", ")}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            {(partido.monto_total != null || "tipo_partido" in partido) &&
-                              (partido.monto_total ??
-                                (partido as { tipo_partido?: { monto_total: number } }).tipo_partido
-                                  ?.monto_total) != null && (
-                                <p className="text-sm font-semibold text-primary tabular-nums">
-                                  {formatCop(
-                                    getGrossAmount(
-                                      partido.monto_total ?? null,
-                                      (partido as { tipo_partido?: { monto_total: number } }).tipo_partido
-                                        ?.monto_total ?? null
-                                    )
-                                  )}
-                                </p>
-                              )}
+                            <p className="text-sm font-semibold text-primary tabular-nums">
+                              {formatCop(partido.montoTotal)}
+                            </p>
                             <span className="text-xs text-primary/80 border border-primary/30 px-2 py-1 rounded-full">
                               En revisión
                             </span>
@@ -514,6 +517,8 @@ interface PartidoCardProps {
     fecha: string;
     hora: string;
     lugar: string;
+    cancha_nombre?: string;
+    barrio?: string;
     estado: string;
     estado_display: string;
     categoria: { nombre: string };
@@ -563,7 +568,7 @@ function PartidoCard({ partido, onClick }: PartidoCardProps) {
 
           <div className="flex items-center gap-2 text-sm mb-1">
             <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
-            <span className="text-foreground truncate">{partido.lugar}</span>
+            <span className="text-foreground truncate">{getUbicacionPartido(partido)}</span>
           </div>
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -602,6 +607,8 @@ interface ActivityItemProps {
     estado: string;
     estado_display: string;
     lugar: string;
+    cancha_nombre?: string;
+    barrio?: string;
     created_at: string;
   };
   onClick: () => void;
@@ -638,7 +645,9 @@ function ActivityItem({ partido, onClick }: ActivityItemProps) {
       </div>
 
       <div className="flex-1 min-w-0 text-left">
-        <p className="text-foreground font-medium truncate">Partido en {partido.lugar}</p>
+        <p className="text-foreground font-medium truncate">
+          Partido en {getUbicacionPartido(partido)}
+        </p>
         <p className="text-muted-foreground text-sm">
           {fecha.toLocaleDateString("es-CO", {
             day: "numeric",

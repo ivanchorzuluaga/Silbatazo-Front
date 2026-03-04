@@ -39,10 +39,20 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
   const [hora, setHora] = useState("");
   const [municipioId, setMunicipioId] = useState("");
   const [lugar, setLugar] = useState("");
+  const [barrio, setBarrio] = useState("");
+  const [ubicacionMapsUrl, setUbicacionMapsUrl] = useState("");
   const [direccion, setDireccion] = useState("");
   const [notasCliente, setNotasCliente] = useState("");
+  const [usarValoresPersonalizados, setUsarValoresPersonalizados] = useState(false);
+  const [servicioArbitro, setServicioArbitro] = useState("");
+  const [comisionApp, setComisionApp] = useState("");
+  const [cantidadPartidos, setCantidadPartidos] = useState("1");
+  const [partidosIguales, setPartidosIguales] = useState(true);
+  const [tiposPorPartido, setTiposPorPartido] = useState<string[]>([""]);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [partidoCreado, setPartidoCreado] = useState<{ id: number; estado: string } | null>(null);
+  const [partidosCreados, setPartidosCreados] = useState<Array<{ id: number; estado: string }>>(
+    []
+  );
 
   // Tipo de partido (selector único con precio fijo)
   const [tiposPartido, setTiposPartido] = useState<TipoPartido[]>([]);
@@ -56,7 +66,10 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
   const defaultCategoriaId = categoriasPartido[0]?.id;
   const faltanCategorias = categoriasPartido.length === 0;
   const faltanTipos = !loadingTipos && (tiposPartido.length === 0 || errorTipos != null);
-  const puedeEnviar = !faltanCategorias && !faltanTipos && defaultCategoriaId != null;
+  const puedeEnviar =
+    !faltanCategorias &&
+    defaultCategoriaId != null &&
+    (usarValoresPersonalizados ? modoAdmin : !faltanTipos);
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
 
@@ -72,6 +85,18 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
       .finally(() => setLoadingTipos(false));
   }, []);
 
+  useEffect(() => {
+    const total = parseInt(cantidadPartidos, 10) || 1;
+    setTiposPorPartido((prev) => Array.from({ length: total }, (_, i) => prev[i] ?? ""));
+  }, [cantidadPartidos]);
+
+  const generarCodigoGrupoPago = (): string => {
+    // Código corto para referencia de pago grupal (ej: GP-8F2KQ7)
+    const base = Date.now().toString(36).slice(-4).toUpperCase();
+    const rnd = Math.random().toString(36).slice(2, 4).toUpperCase();
+    return `GP-${base}${rnd}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
@@ -79,12 +104,32 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
 
     // Validaciones básicas
     const errors: Record<string, string> = {};
+    const totalPartidos = parseInt(cantidadPartidos, 10) || 1;
     if (!fecha) errors.fecha = "La fecha es requerida";
     if (!hora) errors.hora = "La hora es requerida";
     if (!municipioId) errors.municipio_id = "Debes seleccionar un municipio";
-    if (!tipoPartidoId)
+    if (!usarValoresPersonalizados && (partidosIguales || totalPartidos === 1) && !tipoPartidoId)
       errors.tipo_partido_id = "Selecciona el tipo de partido que se acomoda a tu partido";
-    if (!lugar.trim()) errors.lugar = "El lugar es requerido";
+    if (!lugar.trim()) errors.lugar = "El nombre de la cancha es requerido";
+    if (!barrio.trim()) errors.barrio = "El barrio es requerido";
+    if (!direccion.trim()) errors.direccion = "La dirección es requerida";
+    if (!partidosIguales && !usarValoresPersonalizados) {
+      for (let i = 0; i < totalPartidos; i += 1) {
+        if (!tiposPorPartido[i]) {
+          errors[`tipo_partido_${i}`] = `Selecciona el tipo del partido ${i + 1}`;
+        }
+      }
+    }
+    if (modoAdmin && usarValoresPersonalizados) {
+      const servicio = Number(servicioArbitro);
+      const comision = Number(comisionApp);
+      if (!servicioArbitro.trim() || Number.isNaN(servicio) || servicio < 0) {
+        errors.servicio_arbitro = "Ingresa un valor válido para servicio árbitro";
+      }
+      if (!comisionApp.trim() || Number.isNaN(comision) || comision < 0) {
+        errors.comision_app = "Ingresa un valor válido para comisión app";
+      }
+    }
     if (!defaultCategoriaId)
       errors.categoria_id = "No hay categoría disponible. Intenta más tarde.";
 
@@ -102,28 +147,72 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
     }
 
     try {
-      const data = {
+      const timeToMinutes = (hhmm: string): number => {
+        const [h, m] = hhmm.split(":").map(Number);
+        return h * 60 + m;
+      };
+      const minutesToTime = (mins: number): string =>
+        `${String(Math.floor(mins / 60)).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`;
+      const horaBase = hora.length === 5 ? hora : hora.substring(0, 5);
+      const inicioMinutos = timeToMinutes(horaBase);
+      const tiposSeleccionados = Array.from({ length: totalPartidos }, (_, i) => {
+        if (usarValoresPersonalizados) return undefined;
+        const tipoId = partidosIguales ? tipoPartidoId : tiposPorPartido[i];
+        return tiposPartido.find((t) => t.id === parseInt(tipoId || "0"));
+      });
+      const duraciones = tiposSeleccionados.map((tipo) => tipo?.duracion_servicio_minutos ?? 90);
+      const totalMinutos = duraciones.reduce((acc, cur) => acc + cur, 0);
+      const finUltimo = inicioMinutos + Math.max(totalMinutos - (duraciones[duraciones.length - 1] ?? 90), 0);
+      if (finUltimo >= 24 * 60) {
+        setFieldErrors({
+          hora: "Con la cantidad de partidos seleccionada, el horario supera las 23:59.",
+        });
+        return;
+      }
+
+      const grupoPagoCodigo = totalPartidos > 1 ? generarCodigoGrupoPago() : undefined;
+
+      const dataBase = {
         arbitro_id: null,
         fecha,
-        hora: hora.length === 5 ? hora : hora.substring(0, 5),
         municipio_id: parseInt(municipioId),
         categoria_id: defaultCategoriaId ?? 0,
         lugar: lugar.trim(),
+        cancha_nombre: lugar.trim(),
+        barrio: barrio.trim(),
+        ubicacion_maps_url: ubicacionMapsUrl.trim() || undefined,
         direccion: direccion.trim() || undefined,
-        tipo_partido_id: tipoPartidoId ? parseInt(tipoPartidoId) : undefined,
-        monto_total: montoTotal ?? undefined,
+        grupo_pago_codigo: grupoPagoCodigo,
+        servicio_arbitro:
+          modoAdmin && usarValoresPersonalizados ? Number(servicioArbitro || 0) : undefined,
+        comision_app: modoAdmin && usarValoresPersonalizados ? Number(comisionApp || 0) : undefined,
         notas_cliente: notasCliente.trim() || undefined,
       };
 
-      const nuevoPartido = onCreate
-        ? ((await onCreate(data)) as { id: number; estado: string })
-        : await crearPartido(data);
+      const creados: Array<{ id: number; estado: string }> = [];
+      let horaActual = inicioMinutos;
+      for (let i = 0; i < totalPartidos; i += 1) {
+        const tipoActual = tiposSeleccionados[i];
+        const tipoPartidoIdActual = tipoActual?.id;
+        const montoActual = tipoActual?.monto_total ?? montoTotal ?? undefined;
+        const payload = {
+          ...dataBase,
+          hora: minutesToTime(horaActual),
+          tipo_partido_id: usarValoresPersonalizados ? undefined : tipoPartidoIdActual,
+          monto_total:
+            modoAdmin && usarValoresPersonalizados
+              ? Number(servicioArbitro || 0) + Number(comisionApp || 0)
+              : montoActual,
+        };
+        const nuevoPartido = onCreate
+          ? ((await onCreate(payload)) as { id: number; estado: string })
+          : await crearPartido(payload);
+        creados.push({ id: nuevoPartido.id, estado: nuevoPartido.estado });
+        horaActual += duraciones[i] ?? 90;
+      }
 
       // Mostrar mensaje de éxito
-      setPartidoCreado({
-        id: nuevoPartido.id,
-        estado: nuevoPartido.estado,
-      });
+      setPartidosCreados(creados);
       setShowSuccess(true);
       setTipoPartidoId("");
 
@@ -132,20 +221,28 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
       setHora("");
       setMunicipioId("");
       setLugar("");
+      setBarrio("");
+      setUbicacionMapsUrl("");
       setDireccion("");
+      setUsarValoresPersonalizados(false);
+      setServicioArbitro("");
+      setComisionApp("");
+      setCantidadPartidos("1");
+      setPartidosIguales(true);
+      setTiposPorPartido([""]);
       setNotasCliente("");
       setFieldErrors({});
     } catch (err) {
       // El error ya está manejado por el hook
       console.error("Error al crear partido:", err);
       setShowSuccess(false);
-      setPartidoCreado(null);
+      setPartidosCreados([]);
     }
   };
 
   const handleAceptar = () => {
     setShowSuccess(false);
-    setPartidoCreado(null);
+    setPartidosCreados([]);
     if (onSuccess) {
       onSuccess();
     } else {
@@ -155,7 +252,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {showSuccess && partidoCreado ? (
+      {showSuccess && partidosCreados.length > 0 ? (
         <>
           {/* Mensaje de éxito - Solo se muestra cuando hay éxito */}
           <Alert variant="success" className="mb-4">
@@ -173,13 +270,20 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
             <AlertDescription className="mt-2">
               {modoAdmin ? (
                 <>
-                  El partido #{partidoCreado.id} ha sido creado y está{" "}
-                  <strong>disponible para árbitros</strong>. El primer árbitro que lo tome quedará
-                  asignado.
+                  {partidosCreados.length === 1
+                    ? `El partido #${partidosCreados[0].id} ha sido creado y está `
+                    : `Se crearon ${partidosCreados.length} partidos (${partidosCreados
+                        .map((p) => `#${p.id}`)
+                        .join(", ")}) y están `}
+                  <strong>disponibles para árbitros</strong>.
                 </>
               ) : (
                 <>
-                  El partido #{partidoCreado.id} ha sido creado y está{" "}
+                  {partidosCreados.length === 1
+                    ? `El partido #${partidosCreados[0].id} ha sido creado y está `
+                    : `Se crearon ${partidosCreados.length} partidos (${partidosCreados
+                        .map((p) => `#${p.id}`)
+                        .join(", ")}) y están `}
                   <strong>buscando árbitro</strong>. Los árbitros podrán postularse y un
                   administrador asignará el árbitro final.
                 </>
@@ -214,7 +318,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
           </div>
 
           {/* Aviso cuando faltan datos del sistema */}
-          {(faltanCategorias || faltanTipos) && (
+          {(faltanCategorias || (!usarValoresPersonalizados && faltanTipos)) && (
             <Alert variant="destructive" className="mb-4">
               <AlertTitle>No se puede crear el partido en este momento</AlertTitle>
               <AlertDescription>
@@ -266,6 +370,40 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
             </div>
           </div>
 
+          <div className="space-y-2">
+            <label htmlFor="cantidad_partidos" className="text-sm font-medium">
+              Cantidad de partidos seguidos <span className="text-destructive">*</span>
+            </label>
+            <Select
+              id="cantidad_partidos"
+              value={cantidadPartidos}
+              onChange={(e) => setCantidadPartidos(e.target.value)}
+              disabled={isLoading}
+            >
+              <option value="1">1 partido</option>
+              <option value="2">2 partidos</option>
+              <option value="3">3 partidos</option>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Si eliges 2 o 3, se crearán consecutivos usando la duración del tipo de partido.
+            </p>
+            {parseInt(cantidadPartidos, 10) > 1 && (
+              <label className="flex items-center gap-2 text-sm font-medium pt-1">
+                <input
+                  type="checkbox"
+                  checked={partidosIguales}
+                  onChange={(e) => {
+                    setPartidosIguales(e.target.checked);
+                    setFieldErrors((prev) => ({ ...prev, tipo_partido_id: undefined }));
+                  }}
+                  disabled={isLoading || usarValoresPersonalizados}
+                  className="h-4 w-4"
+                />
+                Todos los partidos son del mismo tipo
+              </label>
+            )}
+          </div>
+
           {/* Municipio */}
           <div className="space-y-2">
             <label htmlFor="municipio_id" className="text-sm font-medium">
@@ -283,7 +421,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
               disabled={isLoading || municipiosLoading}
               className={fieldErrors.municipio_id ? "border-destructive" : ""}
             >
-              <option value="">Selecciona un municipio</option>
+              <option value="">Selecciona el municipio del partido</option>
               {municipios.map((municipio) => (
                 <option key={municipio.id} value={municipio.id}>
                   {municipio.nombre}
@@ -291,6 +429,9 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
                 </option>
               ))}
             </Select>
+            <p className="text-xs text-muted-foreground">
+              Debes elegir el municipio del partido para validar cobertura del servicio.
+            </p>
             {fieldErrors.municipio_id && (
               <p className="text-sm text-destructive">{fieldErrors.municipio_id}</p>
             )}
@@ -298,35 +439,147 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
 
           {/* Tipo de partido: cards seleccionables */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold">¿Qué tipo de partido vas a jugar?</h3>
-            <p className="text-xs text-muted-foreground">
-              Selecciona la opción que se acomoda a tu partido. El precio está incluido.
-            </p>
-            <TipoPartidoCardGrid
-              tipos={tiposPartido}
-              selectedId={tipoPartidoId}
-              onSelect={(id) => {
-                setTipoPartidoId(id);
-                if (fieldErrors.tipo_partido_id) {
-                  setFieldErrors((prev) => ({ ...prev, tipo_partido_id: undefined }));
-                }
-              }}
-              disabled={isLoading}
-              variant="default"
-              loading={loadingTipos}
-              error={errorTipos}
-            />
-            {fieldErrors.tipo_partido_id && (
-              <p className="text-sm text-destructive">{fieldErrors.tipo_partido_id}</p>
+            {modoAdmin && (
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <input
+                  type="checkbox"
+                  checked={usarValoresPersonalizados}
+                  onChange={(e) => {
+                    const activo = e.target.checked;
+                    setUsarValoresPersonalizados(activo);
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      tipo_partido_id: undefined,
+                      servicio_arbitro: undefined,
+                      comision_app: undefined,
+                    }));
+                    if (activo) {
+                      setTipoPartidoId("");
+                    } else {
+                      setServicioArbitro("");
+                      setComisionApp("");
+                    }
+                  }}
+                  disabled={isLoading}
+                  className="h-4 w-4"
+                />
+                Crear partido personalizado (solo admin)
+              </label>
+            )}
+
+            {!usarValoresPersonalizados ? (
+              <>
+                {partidosIguales || parseInt(cantidadPartidos, 10) === 1 ? (
+                  <>
+                    <h3 className="text-sm font-semibold">¿Qué tipo de partido vas a jugar?</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Selecciona la opción que se acomoda a tu partido. El precio está incluido.
+                    </p>
+                    <TipoPartidoCardGrid
+                      tipos={tiposPartido}
+                      selectedId={tipoPartidoId}
+                      onSelect={(id) => {
+                        setTipoPartidoId(id);
+                        if (fieldErrors.tipo_partido_id) {
+                          setFieldErrors((prev) => ({ ...prev, tipo_partido_id: undefined }));
+                        }
+                      }}
+                      disabled={isLoading}
+                      variant="default"
+                      loading={loadingTipos}
+                      error={errorTipos}
+                    />
+                    {fieldErrors.tipo_partido_id && (
+                      <p className="text-sm text-destructive">{fieldErrors.tipo_partido_id}</p>
+                    )}
+                  </>
+                ) : (
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold">Tipos por partido</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Elige el tipo para cada partido (ej: Fútbol 10, 11, 8).
+                    </p>
+                    {Array.from({ length: parseInt(cantidadPartidos, 10) || 1 }).map((_, idx) => (
+                      <div key={idx} className="space-y-1">
+                        <label className="text-sm font-medium">Partido {idx + 1}</label>
+                        <Select
+                          value={tiposPorPartido[idx] || ""}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setTiposPorPartido((prev) => {
+                              const next = [...prev];
+                              next[idx] = value;
+                              return next;
+                            });
+                            if (fieldErrors[`tipo_partido_${idx}`]) {
+                              setFieldErrors((prev) => ({ ...prev, [`tipo_partido_${idx}`]: undefined }));
+                            }
+                          }}
+                          disabled={isLoading || loadingTipos}
+                        >
+                          <option value="">Selecciona tipo</option>
+                          {tiposPartido.map((tipo) => (
+                            <option key={tipo.id} value={tipo.id}>
+                              {tipo.nombre}
+                            </option>
+                          ))}
+                        </Select>
+                        {fieldErrors[`tipo_partido_${idx}`] && (
+                          <p className="text-sm text-destructive">{fieldErrors[`tipo_partido_${idx}`]}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  label="Valor del servicio árbitro"
+                  name="servicio_arbitro"
+                  type="number"
+                  min={0}
+                  step={1000}
+                  value={servicioArbitro}
+                  onChange={(e) => {
+                    setServicioArbitro(e.target.value);
+                    if (fieldErrors.servicio_arbitro) {
+                      setFieldErrors((prev) => ({ ...prev, servicio_arbitro: undefined }));
+                    }
+                  }}
+                  error={fieldErrors.servicio_arbitro}
+                  disabled={isLoading}
+                  placeholder="Ej: 90000"
+                  required
+                />
+                <FormField
+                  label="Comisión app"
+                  name="comision_app"
+                  type="number"
+                  min={0}
+                  step={1000}
+                  value={comisionApp}
+                  onChange={(e) => {
+                    setComisionApp(e.target.value);
+                    if (fieldErrors.comision_app) {
+                      setFieldErrors((prev) => ({ ...prev, comision_app: undefined }));
+                    }
+                  }}
+                  error={fieldErrors.comision_app}
+                  disabled={isLoading}
+                  placeholder="Ej: 15000"
+                  required
+                />
+              </div>
             )}
             {fieldErrors.categoria_id && (
               <p className="text-sm text-destructive">{fieldErrors.categoria_id}</p>
             )}
           </div>
 
-          {/* Lugar y Dirección */}
+          {/* Cancha, barrio y dirección */}
           <FormField
-            label="Lugar"
+            label="Nombre de la cancha"
             name="lugar"
             value={lugar}
             onChange={(e) => {
@@ -342,22 +595,60 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
           />
 
           <FormField
-            label="Dirección (Opcional)"
+            label="Barrio"
+            name="barrio"
+            value={barrio}
+            onChange={(e) => {
+              setBarrio(e.target.value);
+              if (fieldErrors.barrio) {
+                setFieldErrors((prev) => ({ ...prev, barrio: undefined }));
+              }
+            }}
+            error={fieldErrors.barrio}
+            disabled={isLoading}
+            placeholder="Ej: Belén Rosales"
+            required
+          />
+
+          <FormField
+            label="Dirección"
             name="direccion"
             value={direccion}
-            onChange={(e) => setDireccion(e.target.value)}
+            onChange={(e) => {
+              setDireccion(e.target.value);
+              if (fieldErrors.direccion) {
+                setFieldErrors((prev) => ({ ...prev, direccion: undefined }));
+              }
+            }}
+            error={fieldErrors.direccion}
             disabled={isLoading}
             placeholder="Calle 123 #45-67"
+            required
+          />
+
+          <FormField
+            label="Enlace Google Maps (Opcional)"
+            name="ubicacion_maps_url"
+            value={ubicacionMapsUrl}
+            onChange={(e) => {
+              setUbicacionMapsUrl(e.target.value);
+              if (fieldErrors.ubicacion_maps_url) {
+                setFieldErrors((prev) => ({ ...prev, ubicacion_maps_url: undefined }));
+              }
+            }}
+            error={fieldErrors.ubicacion_maps_url}
+            disabled={isLoading}
+            placeholder="Pega aquí el enlace de Google Maps"
           />
 
           {/* Notas */}
           <FormField
-            label="Notas Adicionales (Opcional)"
+            label="Detalles del partido (Opcional)"
             name="notas_cliente"
             value={notasCliente}
             onChange={(e) => setNotasCliente(e.target.value)}
             disabled={isLoading}
-            placeholder="Información adicional sobre el partido..."
+            placeholder="Detalles detallados del partido: duración de los tiempos, categoría, horario..."
             multiline
             rows={4}
           />

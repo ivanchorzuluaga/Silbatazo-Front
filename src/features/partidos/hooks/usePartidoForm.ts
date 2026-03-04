@@ -22,6 +22,8 @@ interface FormState {
   municipioId: string;
   categoriaId: string;
   lugar: string;
+  barrio: string;
+  ubicacionMapsUrl: string;
   direccion: string;
   notasCliente: string;
   tipoPartidoId: string;
@@ -63,6 +65,8 @@ export interface UsePartidoFormReturn {
   setHora: (hora: string) => void;
   setMunicipioId: (id: string) => void;
   setLugar: (lugar: string) => void;
+  setBarrio: (barrio: string) => void;
+  setUbicacionMapsUrl: (url: string) => void;
   setDireccion: (direccion: string) => void;
   setNotasCliente: (notas: string) => void;
 
@@ -90,6 +94,8 @@ export function usePartidoForm(
     municipioId: "",
     categoriaId: "",
     lugar: "",
+    barrio: "",
+    ubicacionMapsUrl: "",
     direccion: "",
     notasCliente: "",
     tipoPartidoId: "",
@@ -164,6 +170,17 @@ export function usePartidoForm(
 
   const setDireccion = useCallback((direccion: string) => {
     setFormState((prev) => ({ ...prev, direccion }));
+    setFieldErrors((prev) => ({ ...prev, direccion: undefined }));
+  }, []);
+
+  const setBarrio = useCallback((barrio: string) => {
+    setFormState((prev) => ({ ...prev, barrio }));
+    setFieldErrors((prev) => ({ ...prev, barrio: undefined }));
+  }, []);
+
+  const setUbicacionMapsUrl = useCallback((ubicacionMapsUrl: string) => {
+    setFormState((prev) => ({ ...prev, ubicacionMapsUrl }));
+    setFieldErrors((prev) => ({ ...prev, ubicacion_maps_url: undefined }));
   }, []);
 
   const setNotasCliente = useCallback((notasCliente: string) => {
@@ -177,6 +194,8 @@ export function usePartidoForm(
       municipioId: "",
       categoriaId: "",
       lugar: "",
+      barrio: "",
+      ubicacionMapsUrl: "",
       direccion: "",
       notasCliente: "",
       tipoPartidoId: "",
@@ -252,6 +271,8 @@ export function usePartidoForm(
         municipioId,
         categoriaId: _categoriaId,
         lugar,
+        barrio,
+        ubicacionMapsUrl,
         direccion,
         notasCliente,
         tipoPartidoId,
@@ -265,6 +286,8 @@ export function usePartidoForm(
       if (!tipoPartidoId)
         errors.tipo_partido_id = "Selecciona el tipo de partido que se acomoda a tu partido";
       if (!lugar.trim()) errors.lugar = "El lugar es requerido";
+      if (!barrio.trim()) errors.barrio = "El barrio es requerido";
+      if (!direccion.trim()) errors.direccion = "La dirección es requerida";
       if (!defaultCategoriaId)
         errors.categoria_id = "No hay categoría disponible. Intenta más tarde.";
 
@@ -304,6 +327,9 @@ export function usePartidoForm(
           municipio_id: parseInt(municipioId),
           categoria_id: categoriaIdToSend ?? 0,
           lugar: lugar.trim(),
+          cancha_nombre: lugar.trim(),
+          barrio: barrio.trim(),
+          ubicacion_maps_url: ubicacionMapsUrl.trim() || undefined,
           direccion: direccion.trim() || undefined,
           tipo_partido_id: tipoPartidoId ? parseInt(tipoPartidoId) : undefined,
           monto_total: tipoPartidoSeleccionado?.monto_total ?? undefined,
@@ -396,6 +422,8 @@ export function usePartidoForm(
     setHora,
     setMunicipioId,
     setLugar,
+    setBarrio,
+    setUbicacionMapsUrl,
     setDireccion,
     setNotasCliente,
 

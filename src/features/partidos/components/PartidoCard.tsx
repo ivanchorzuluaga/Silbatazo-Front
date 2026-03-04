@@ -18,9 +18,11 @@ interface PartidoCardProps {
 export function PartidoCard({ partido }: PartidoCardProps) {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const cancha = partido.cancha_nombre || partido.lugar;
+  const ubicacion = partido.barrio ? `${cancha} · ${partido.barrio}` : cancha;
   const titulo = isAdmin
     ? `Partido #${partido.id}`
-    : `Partido en ${partido.municipio?.nombre ?? partido.lugar}`;
+    : `Partido en ${partido.municipio?.nombre ?? cancha}`;
 
   return (
     <Link
@@ -67,7 +69,7 @@ export function PartidoCard({ partido }: PartidoCardProps) {
 
         <CardContent className="space-y-2">
           <p className="text-xs sm:text-base font-medium text-foreground">
-            {partido.lugar}
+            {ubicacion}
             {partido.direccion && ` - ${partido.direccion}`}
           </p>
 
@@ -147,7 +149,7 @@ export function PartidoCard({ partido }: PartidoCardProps) {
               );
               const { gross: grossAmount, net, showBoth, showNetOnly } = getRoleAmounts(
                 gross,
-                partido.tipo_partido?.comision_app ?? null,
+                partido.comision_app ?? partido.tipo_partido?.comision_app ?? null,
                 user?.role
               );
               return (
