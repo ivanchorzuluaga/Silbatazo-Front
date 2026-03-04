@@ -30,8 +30,9 @@ function obtenerFoto(arbitro: Arbitro): string {
   return FOTO_ANONIMA;
 }
 
-function formatearId(arbitroId: number): string {
-  return `#${String(arbitroId).padStart(3, "0")}`;
+function formatearId(arbitro: Arbitro): string {
+  const idMostrar = arbitro.identificador_publico ?? arbitro.id;
+  return `#${String(idMostrar).padStart(3, "0")}`;
 }
 
 function clampCalificacion(valor: number): number {
@@ -89,7 +90,7 @@ export function FotoArbitroCard({
       />
 
       <div className="absolute left-6 top-6 z-20 text-white">
-        <span className="text-md  tracking-[0.2em]">{formatearId(arbitro.id)}</span>
+        <span className="text-md  tracking-[0.2em]">{formatearId(arbitro)}</span>
       </div>
 
       {(etiquetaSuperior != null || mostrarCalificacion) && (

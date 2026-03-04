@@ -21,14 +21,14 @@ export function VerificacionArbitrosPage() {
       {/* Header Section */}
       <div className="mb-8 space-y-4">
         <p className="text-muted-foreground">
-          Revisa y aprueba los árbitros que están esperando verificación
+          Revisa y aprueba los árbitros en estado pendiente o en revisión
         </p>
       </div>
 
       {/* Loading State */}
       {isLoading && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Cargando árbitros pendientes...</p>
+          <p className="text-muted-foreground">Cargando árbitros por verificar...</p>
         </div>
       )}
 
@@ -46,7 +46,7 @@ export function VerificacionArbitrosPage() {
       {!isLoading && !error && arbitros.length === 0 && (
         <div className="text-center py-12 space-y-4">
           <p className="text-lg text-muted-foreground">
-            No hay árbitros pendientes de verificación
+            No hay árbitros pendientes o en revisión
           </p>
           <p className="text-sm text-muted-foreground">Todos los árbitros han sido revisados</p>
         </div>
@@ -58,8 +58,10 @@ export function VerificacionArbitrosPage() {
           <div className="mb-4">
             <p className="text-sm text-muted-foreground">
               {arbitros.length}{" "}
-              {arbitros.length === 1 ? "árbitro pendiente" : "árbitros pendientes"} de
-              verificación
+              {arbitros.length === 1
+                ? "árbitro pendiente/en revisión"
+                : "árbitros pendientes/en revisión"}{" "}
+              de verificación
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

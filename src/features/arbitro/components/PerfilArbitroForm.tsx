@@ -39,6 +39,7 @@ interface PerfilArbitroFormProps {
       documento_identidad?: string;
       biografia?: string;
       nombre_publico?: string;
+      identificador_publico?: number;
       experiencia_anos: number;
       municipios_ids: number[];
       categorias_ids: number[];
@@ -80,6 +81,7 @@ export function PerfilArbitroForm({
   const isEditMode = !!arbitro;
   const showPersonal = !focusSection || focusSection === "personal";
   const showExperiencia = !focusSection || focusSection === "experiencia";
+  const isAdmin = user?.role === "admin";
   const minFechaNacimiento = useMemo(() => new Date(1900, 0, 1), []);
   const maxFechaNacimiento = useMemo(() => new Date(), []);
 
@@ -95,6 +97,9 @@ export function PerfilArbitroForm({
     arbitro?.nombre_publico || "",
   );
   const [maxNombrePublico, setMaxNombrePublico] = useState(28);
+  const [identificadorPublico, setIdentificadorPublico] = useState(
+    arbitro?.identificador_publico?.toString() || "",
+  );
 
   // Inicializar estados desde el árbitro si existe
   const getInitialValues = () => {
@@ -167,6 +172,7 @@ export function PerfilArbitroForm({
     last_name?: string;
     email?: string;
     nombre_publico?: string;
+    identificador_publico?: string;
     telefono?: string;
     fecha_nacimiento?: string;
     documento_identidad?: string;
@@ -176,6 +182,7 @@ export function PerfilArbitroForm({
     categorias_ids?: string;
     roles_ids?: string;
   }>({});
+  const isFormBusy = Boolean(isLoadingOverride ?? isSaving ?? isLoading);
 
   // Sincronizar cuando cambia la prop arbitro
   useEffect(() => {
@@ -193,6 +200,7 @@ export function PerfilArbitroForm({
       setLastName(arbitro.last_name || "");
       setEmail(arbitro.email || "");
       setNombrePublico(arbitro.nombre_publico || "");
+      setIdentificadorPublico(arbitro.identificador_publico?.toString() || "");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [arbitro?.id]);
@@ -270,6 +278,13 @@ export function PerfilArbitroForm({
       errors.telefono = "El teléfono es requerido";
     }
 
+    if (isAdmin && identificadorPublico.trim()) {
+      const idPublico = parseInt(identificadorPublico, 10);
+      if (Number.isNaN(idPublico) || idPublico <= 0) {
+        errors.identificador_publico = "Debe ser un número entero mayor a 0";
+      }
+    }
+
     if (showExperiencia) {
       // Validar experiencia (requerido)
       const experienciaNum = parseInt(experienciaAnos);
@@ -297,6 +312,7 @@ export function PerfilArbitroForm({
       if (rolesSeleccionados.length === 0) {
         errors.roles_ids = "Debes seleccionar al menos un rol";
       }
+
     }
 
     setFieldErrors(errors);
@@ -375,6 +391,9 @@ export function PerfilArbitroForm({
         documento_identidad: documentoIdentidad || undefined,
         biografia: biografia || undefined,
         nombre_publico: nombrePublico.trim() || undefined,
+        ...(isAdmin && identificadorPublico.trim()
+          ? { identificador_publico: parseInt(identificadorPublico, 10) }
+          : {}),
         experiencia_anos: parseInt(experienciaAnos),
         municipios_ids: municipiosSeleccionados,
         categorias_ids: categoriasSeleccionadas,
@@ -570,7 +589,7 @@ export function PerfilArbitroForm({
                   variant="outline"
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                  disabled={isFormBusy}
                 >
                   <Camera className="mr-2 size-4" />
                   {arbitro?.foto_perfil || fotoFile
@@ -638,7 +657,7 @@ export function PerfilArbitroForm({
                   variant="outline"
                   size="sm"
                   onClick={() => fileDetalleInputRef.current?.click()}
-                  disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                  disabled={isFormBusy}
                 >
                   <Camera className="mr-2 size-4" />
                   {arbitro?.foto_detalle || fotoDetalleFile
@@ -683,7 +702,7 @@ export function PerfilArbitroForm({
                   }
                 }}
                 error={fieldErrors.first_name}
-                disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                disabled={isFormBusy}
                 placeholder="Juan"
               />
 
@@ -701,7 +720,7 @@ export function PerfilArbitroForm({
                   }
                 }}
                 error={fieldErrors.last_name}
-                disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                disabled={isFormBusy}
                 placeholder="Pérez"
               />
             </div>
@@ -725,7 +744,7 @@ export function PerfilArbitroForm({
                 }
               }}
               error={fieldErrors.email}
-              disabled={isLoadingOverride ?? isSaving ?? isLoading}
+              disabled={isFormBusy}
               placeholder="juan.perez@example.com"
               autoComplete="email"
             />
@@ -746,12 +765,36 @@ export function PerfilArbitroForm({
                   }
                 }}
                 error={fieldErrors.nombre_publico}
-                disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                disabled={isFormBusy}
                 placeholder="Ej: Árbitro Sibatzo"
                 maxLength={maxNombrePublico}
                 helperText={`Máximo ${maxNombrePublico} caracteres. Este nombre se mostrará en tu tarjeta pública.`}
               />
             </div>
+
+            {isAdmin && (
+              <FormField
+                label="Identificador público"
+                name="identificador_publico"
+                type="number"
+                value={identificadorPublico}
+                onChange={(e) => {
+                  setIdentificadorPublico(e.target.value);
+                  if (fieldErrors.identificador_publico) {
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      identificador_publico: undefined,
+                    }));
+                  }
+                }}
+                error={fieldErrors.identificador_publico}
+                disabled={isFormBusy}
+                min="1"
+                placeholder="Ej: 36"
+                helperText="Solo administración: número visible en la tarjeta del árbitro."
+              />
+            )}
+
           </div>
 
           <div className="space-y-4">
@@ -778,7 +821,7 @@ export function PerfilArbitroForm({
                   }
                 }}
                 error={fieldErrors.telefono}
-                disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                disabled={isFormBusy}
                 placeholder="+57 300 123 4567"
                 required
               />
@@ -797,7 +840,7 @@ export function PerfilArbitroForm({
                   }
                 }}
                 error={fieldErrors.fecha_nacimiento}
-                disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                disabled={isFormBusy}
                 minDate={minFechaNacimiento}
                 maxDate={maxFechaNacimiento}
               />
@@ -817,7 +860,7 @@ export function PerfilArbitroForm({
                 }
               }}
               error={fieldErrors.documento_identidad}
-              disabled={isLoadingOverride ?? isSaving ?? isLoading}
+              disabled={isFormBusy}
               placeholder="1234567890"
             />
 
@@ -841,7 +884,7 @@ export function PerfilArbitroForm({
                     }));
                   }
                 }}
-                disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                disabled={isFormBusy}
                 rows={4}
                 className="field-textarea"
                 placeholder="Describe tu experiencia y formación como árbitro..."
@@ -894,7 +937,7 @@ export function PerfilArbitroForm({
                 }
               }}
               error={fieldErrors.experiencia_anos}
-              disabled={isLoadingOverride ?? isSaving ?? isLoading}
+              disabled={isFormBusy}
               min="0"
               max="100"
               required
@@ -945,7 +988,7 @@ export function PerfilArbitroForm({
                             municipio.id,
                           )}
                           onChange={() => toggleMunicipio(municipio.id)}
-                          disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                          disabled={isFormBusy}
                           className="peer sr-only"
                         />
                         <span className="flex h-5 w-5 items-center justify-center rounded-md border border-border/80 bg-background text-transparent transition-all peer-checked:border-primary peer-checked:bg-primary/15 peer-checked:text-primary">
@@ -1019,7 +1062,7 @@ export function PerfilArbitroForm({
                             categoria.id,
                           )}
                           onChange={() => toggleCategoria(categoria.id)}
-                          disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                          disabled={isFormBusy}
                           className="peer sr-only"
                         />
                         <span className="flex h-5 w-5 items-center justify-center rounded-md border border-border/80 bg-background text-transparent transition-all peer-checked:border-primary peer-checked:bg-primary/15 peer-checked:text-primary">
@@ -1090,7 +1133,7 @@ export function PerfilArbitroForm({
                           type="checkbox"
                           checked={rolesSeleccionados.includes(rol.id)}
                           onChange={() => toggleRol(rol.id)}
-                          disabled={isLoadingOverride ?? isSaving ?? isLoading}
+                          disabled={isFormBusy}
                           className="peer sr-only"
                         />
                         <span className="flex h-5 w-5 items-center justify-center rounded-md border border-border/80 bg-background text-transparent transition-all peer-checked:border-primary peer-checked:bg-primary/15 peer-checked:text-primary">
@@ -1137,12 +1180,12 @@ export function PerfilArbitroForm({
         <Button
           type="submit"
           disabled={
-            isLoading || municipiosLoading || categoriasLoading || rolesLoading
+            isFormBusy || municipiosLoading || categoriasLoading || rolesLoading
           }
           className="flex-1"
         >
-          {isLoading
-            ? "Guardando..."
+          {isFormBusy
+            ? "Actualizando..."
             : isEditMode
               ? "Actualizar Perfil"
               : "Crear Perfil"}
@@ -1152,7 +1195,7 @@ export function PerfilArbitroForm({
             type="button"
             variant="outline"
             onClick={() => navigate(ROUTES.ARBITRO_DASHBOARD)}
-            disabled={isLoadingOverride ?? isSaving ?? isLoading}
+            disabled={isFormBusy}
           >
             Cancelar
           </Button>

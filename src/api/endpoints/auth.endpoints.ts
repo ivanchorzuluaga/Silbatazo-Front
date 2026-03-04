@@ -3,6 +3,7 @@
  */
 
 import apiClient, { authenticatedApiClient } from "../client";
+import type { PaginatedResponse } from "../utils/pagination";
 import type {
   LoginCredentials,
   RegisterCredentials,
@@ -11,6 +12,12 @@ import type {
   AuthResponse,
 } from "../types";
 import type { User, UserUpdateData } from "@/features/auth/types/auth.types";
+
+export interface AdminUserListItem extends User {
+  total_partidos_solicitados: number;
+  servicios_completados: number;
+  estado_verificacion_arbitro?: string | null;
+}
 
 export const authEndpoints = {
   /**
@@ -98,6 +105,29 @@ export const authEndpoints = {
       method: "PATCH",
       body: JSON.stringify(data),
     });
+  },
+
+  /**
+   * Listado administrativo de usuarios con métricas
+   */
+  async listAdminUsers(
+    accessToken: string,
+    params?: {
+      page?: number;
+      role?: "cliente" | "arbitro" | "admin" | "";
+      search?: string;
+      con_servicios?: boolean;
+    }
+  ): Promise<PaginatedResponse<AdminUserListItem>> {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append("page", String(params.page));
+    if (params?.role) queryParams.append("role", params.role);
+    if (params?.search) queryParams.append("search", params.search);
+    if (params?.con_servicios) queryParams.append("con_servicios", "1");
+
+    const query = queryParams.toString();
+    const endpoint = `/api/users/admin/list/${query ? `?${query}` : ""}`;
+    return authenticatedApiClient<PaginatedResponse<AdminUserListItem>>(endpoint, accessToken);
   },
 
   /**

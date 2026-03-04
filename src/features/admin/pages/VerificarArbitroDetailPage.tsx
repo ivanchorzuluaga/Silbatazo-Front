@@ -390,6 +390,7 @@ export function VerificarArbitroDetailPage() {
       documento_identidad?: string;
       biografia?: string;
       nombre_publico?: string;
+      identificador_publico?: number;
       experiencia_anos: number;
       municipios_ids: number[];
       categorias_ids: number[];
@@ -478,10 +479,17 @@ export function VerificarArbitroDetailPage() {
             type="button"
             variant="outline"
             onClick={() => setMostrarEdicion((prev) => !prev)}
+            disabled={isGuardando}
           >
             {mostrarEdicion ? "Ocultar edición" : "Editar perfil"}
           </Button>
         </div>
+
+        {isGuardando && (
+          <div className="mb-4 rounded-lg border border-primary/20 bg-primary/10 p-3">
+            <p className="text-sm text-primary">Actualizando perfil del árbitro...</p>
+          </div>
+        )}
 
         {mostrarEdicion && (
           <PerfilArbitroForm

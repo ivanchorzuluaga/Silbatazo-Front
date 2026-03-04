@@ -3,7 +3,8 @@
  * Permite ver todos los árbitros, filtrar, suspender, ver documentos, etc.
  */
 
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageLayout } from "@/components/layout";
@@ -99,11 +100,11 @@ interface ArbitroCardProps {
 
 function ArbitroCard({ arbitro, onVerDetalles, onSuspender, onActivar }: ArbitroCardProps) {
   return (
-    <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+    <div className="rounded-lg border bg-card p-4 shadow-sm hover:shadow-md transition-shadow h-full">
+      <div className="flex flex-col gap-4 h-full">
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-lg font-semibold">{arbitro.full_name || arbitro.username}</h3>
+            <h3 className="text-base font-semibold">{arbitro.full_name || arbitro.username}</h3>
             <span
               className={`inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium ${getEstadoBadgeColor(
                 arbitro.estado_verificacion
@@ -122,11 +123,11 @@ function ArbitroCard({ arbitro, onVerDetalles, onSuspender, onActivar }: Arbitro
               </p>
             )}
             {arbitro.municipios.length > 0 && (
-              <p>📍 {arbitro.municipios.map((m) => m.nombre).join(", ")}</p>
+              <p className="line-clamp-2">📍 {arbitro.municipios.map((m) => m.nombre).join(", ")}</p>
             )}
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-start">
+        <div className="flex flex-wrap gap-2 mt-auto">
           <Button variant="outline" size="sm" onClick={() => onVerDetalles(arbitro.id)}>
             Ver Detalles
           </Button>
@@ -234,14 +235,19 @@ function ConfirmacionModal({
 // Componente principal
 export function GestionArbitrosPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const {
     arbitros,
     isLoading,
     error,
     filtros,
+    currentPage,
+    totalPages,
+    totalCount,
     setFiltroEstado,
     setBusqueda,
     setOrdenamiento,
+    setCurrentPage,
     arbitroSeleccionado,
     showSuspenderModal,
     showActivarModal,
@@ -255,6 +261,13 @@ export function GestionArbitrosPage() {
     cerrarModales,
     setComentarios,
   } = useGestionArbitros();
+
+  useEffect(() => {
+    const estadoQuery = searchParams.get("estado") || "";
+    if (estadoQuery !== filtros.estado) {
+      setFiltroEstado(estadoQuery);
+    }
+  }, [searchParams, filtros.estado, setFiltroEstado]);
 
   const handleVerDetalles = (id: number) => {
     navigate(getVerificarArbitroRoute(id));
@@ -317,11 +330,11 @@ export function GestionArbitrosPage() {
         <>
           <div className="mb-4">
             <p className="text-sm text-muted-foreground">
-              {arbitros.length}{" "}
-              {arbitros.length === 1 ? "árbitro encontrado" : "árbitros encontrados"}
+              Mostrando {arbitros.length} de {totalCount} árbitro
+              {totalCount !== 1 ? "s" : ""}
             </p>
           </div>
-          <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {arbitros.map((arbitro) => (
               <ArbitroCard
                 key={arbitro.id}
@@ -331,6 +344,29 @@ export function GestionArbitrosPage() {
                 onActivar={handleActivar}
               />
             ))}
+          </div>
+          <div className="mt-6 flex items-center justify-between rounded-lg border bg-card p-3">
+            <p className="text-sm text-muted-foreground">
+              Página {currentPage} de {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage <= 1 || isLoading}
+              >
+                Anterior
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage >= totalPages || isLoading}
+              >
+                Siguiente
+              </Button>
+            </div>
           </div>
         </>
       )}

@@ -8,7 +8,7 @@ import { arbitroEndpoints } from "@/api/endpoints";
 import { authService } from "@/features/auth/services/auth.service";
 import { ApiException } from "@/api/client";
 import { extractErrorMessage } from "@/lib/error-utils";
-import { unwrapPaginated } from "@/api/utils/pagination";
+import { unwrapPaginated, type PaginatedResponse } from "@/api/utils/pagination";
 import type {
   Arbitro,
   ArbitroCreateData,
@@ -454,13 +454,13 @@ export const arbitroService = {
     categoria?: number;
     search?: string;
     ordering?: string;
-  }): Promise<Arbitro[]> {
+    page?: number;
+  }): Promise<PaginatedResponse<Arbitro>> {
     const token = this.getToken();
     if (!token) throw new Error("No estás autenticado");
 
     try {
-      const data = await arbitroEndpoints.listarTodos(token, params);
-      return unwrapPaginated<Arbitro>(data as Arbitro[]);
+      return await arbitroEndpoints.listarTodos(token, params);
     } catch (error) {
       if (error instanceof ApiException) {
         throw new Error(extractErrorMessage(error.data) || "Error al obtener árbitros");

@@ -76,6 +76,7 @@ export interface Arbitro {
   last_name?: string;
   full_name: string;
   nombre_publico?: string;
+  identificador_publico?: number | null;
   edad?: number | null;
   telefono?: string;
   fecha_nacimiento?: string;

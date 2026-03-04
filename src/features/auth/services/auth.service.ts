@@ -9,6 +9,8 @@ import type { User, UserUpdateData } from "../types/auth.types";
 import { STORAGE_KEYS } from "@/lib/constants";
 import { ApiException } from "@/api/client";
 import { extractErrorMessage } from "@/lib/error-utils";
+import type { PaginatedResponse } from "@/api/utils/pagination";
+import type { AdminUserListItem } from "@/api/endpoints/auth.endpoints";
 
 export const authService = {
   /**
@@ -196,6 +198,24 @@ export const authService = {
     } catch (error) {
       if (error instanceof ApiException) {
         throw new Error(extractErrorMessage(error.data) || "Error al actualizar usuario");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  async listAdminUsers(params?: {
+    page?: number;
+    role?: "cliente" | "arbitro" | "admin" | "";
+    search?: string;
+    con_servicios?: boolean;
+  }): Promise<PaginatedResponse<AdminUserListItem>> {
+    const token = this.getAccessToken();
+    if (!token) throw new Error("No estás autenticado");
+    try {
+      return await authEndpoints.listAdminUsers(token, params);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al obtener usuarios");
       }
       throw new Error("Error de conexión. Intenta nuevamente.");
     }

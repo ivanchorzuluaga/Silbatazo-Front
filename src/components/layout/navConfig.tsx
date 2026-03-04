@@ -105,6 +105,12 @@ export const navSections: NavSection[] = [
         roles: [USER_ROLES.ADMIN],
       },
       {
+        label: "Usuarios",
+        icon: Users,
+        route: ROUTES.ADMIN_USUARIOS,
+        roles: [USER_ROLES.ADMIN],
+      },
+      {
         label: "Verificar Árbitros",
         icon: UserCheck,
         route: ROUTES.ADMIN_VERIFICACION,

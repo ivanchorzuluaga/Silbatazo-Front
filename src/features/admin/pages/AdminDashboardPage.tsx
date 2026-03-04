@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/layout";
 import { useAdminDashboardStats } from "../hooks/useAdminDashboardStats";
 import { getTodayLocalDate } from "@/lib/utils";
@@ -268,6 +269,125 @@ export function AdminDashboardPage() {
             </p>
             <p className="text-xs text-muted-foreground mt-1">Valor neto de servicio</p>
           </div>
+        </div>
+      </div>
+
+      {/* Control de usuarios */}
+      <div className="card-surface-strong p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-lg font-semibold">Control de usuarios</h2>
+            <p className="text-sm text-muted-foreground">
+              Gestión rápida de árbitros por estado.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(ROUTES.ADMIN_GESTION_ARBITROS)}
+          >
+            Abrir gestión completa
+          </Button>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Button
+            variant="outline"
+            className="justify-between"
+            onClick={() => navigate(`${ROUTES.ADMIN_GESTION_ARBITROS}?estado=pendiente`)}
+          >
+            Pendientes
+            <span className="font-semibold">{stats?.arbitros_pendientes ?? 0}</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="justify-between"
+            onClick={() => navigate(`${ROUTES.ADMIN_GESTION_ARBITROS}?estado=en_revision`)}
+          >
+            En revisión
+            <span className="font-semibold">{stats?.arbitros_en_revision ?? 0}</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="justify-between"
+            onClick={() => navigate(`${ROUTES.ADMIN_GESTION_ARBITROS}?estado=suspendido`)}
+          >
+            Suspendidos
+            <span className="font-semibold">{stats?.arbitros_suspendidos ?? 0}</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="justify-between"
+            onClick={() => navigate(ROUTES.ADMIN_VERIFICACION)}
+          >
+            Por verificar
+            <span className="font-semibold">{stats?.verificaciones ?? 0}</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Métricas de clientes */}
+      <div className="card-surface-strong p-5 sm:p-6">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">Métricas de clientes</h2>
+          <p className="text-sm text-muted-foreground">
+            Registro de usuarios y consumo de servicios.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Usuarios registrados
+            </p>
+            <p className="text-2xl font-semibold">{stats?.usuarios_registrados ?? 0}</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Clientes registrados
+            </p>
+            <p className="text-2xl font-semibold">{stats?.clientes_registrados ?? 0}</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Clientes con servicios
+            </p>
+            <p className="text-2xl font-semibold">{stats?.clientes_con_servicios ?? 0}</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Partidos solicitados
+            </p>
+            <p className="text-2xl font-semibold">{stats?.partidos_solicitados_total ?? 0}</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Servicios completados
+            </p>
+            <p className="text-2xl font-semibold">{stats?.servicios_completados_total ?? 0}</p>
+          </div>
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-border/60 bg-background/60 p-4">
+          <p className="text-sm font-medium mb-3">Top clientes por partidos solicitados</p>
+          {stats?.top_clientes && stats.top_clientes.length > 0 ? (
+            <div className="space-y-2">
+              {stats.top_clientes.map((cliente) => (
+                <div
+                  key={cliente.id}
+                  className="flex items-center justify-between rounded-xl border border-border/50 px-3 py-2"
+                >
+                  <p className="text-sm font-medium">{cliente.nombre}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {cliente.total_partidos} solicitados · {cliente.servicios_completados} completados
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Aún no hay clientes con partidos solicitados.
+            </p>
+          )}
         </div>
       </div>
 

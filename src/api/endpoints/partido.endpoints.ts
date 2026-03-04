@@ -470,6 +470,20 @@ export const partidoEndpoints = {
 
 export interface AdminDashboardStats {
   arbitros_activos: number;
+  arbitros_pendientes?: number;
+  arbitros_en_revision?: number;
+  arbitros_suspendidos?: number;
+  usuarios_registrados?: number;
+  clientes_registrados?: number;
+  clientes_con_servicios?: number;
+  partidos_solicitados_total?: number;
+  servicios_completados_total?: number;
+  top_clientes?: {
+    id: number;
+    nombre: string;
+    total_partidos: number;
+    servicios_completados: number;
+  }[];
   partidos_hoy: number;
   pendientes: number;
   pendientes_busqueda?: number;

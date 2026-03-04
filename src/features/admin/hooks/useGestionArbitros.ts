@@ -21,9 +21,13 @@ interface UseGestionArbitrosReturn {
   
   // Filtros
   filtros: FiltrosArbitros;
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
   setFiltroEstado: (estado: string) => void;
   setBusqueda: (busqueda: string) => void;
   setOrdenamiento: (ordenamiento: string) => void;
+  setCurrentPage: (page: number) => void;
   
   // Modal state
   arbitroSeleccionado: Arbitro | null;
@@ -58,6 +62,9 @@ export function useGestionArbitros(): UseGestionArbitrosReturn {
 
   // Estados de filtros
   const [filtros, setFiltros] = useState<FiltrosArbitros>(FILTROS_INICIALES);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const PAGE_SIZE = 10;
 
   // Estados de modales
   const [arbitroSeleccionado, setArbitroSeleccionado] = useState<Arbitro | null>(null);
@@ -76,37 +83,47 @@ export function useGestionArbitros(): UseGestionArbitrosReturn {
         estado?: string;
         search?: string;
         ordering?: string;
+        page?: number;
       } = {};
 
       if (filtros.estado) params.estado = filtros.estado;
       if (filtros.busqueda) params.search = filtros.busqueda;
       if (filtros.ordenamiento) params.ordering = filtros.ordenamiento;
+      params.page = currentPage;
 
       const data = await arbitroService.listarTodos(params);
-      setArbitros(data);
+      setArbitros(data.results);
+      setTotalCount(data.count ?? 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar árbitros");
     } finally {
       setIsLoading(false);
     }
-  }, [filtros.estado, filtros.ordenamiento, filtros.busqueda]);
+  }, [filtros.estado, filtros.ordenamiento, filtros.busqueda, currentPage]);
 
   // Setters de filtros
   const setFiltroEstado = useCallback((estado: string) => {
+    setCurrentPage(1);
     setFiltros(prev => ({ ...prev, estado }));
   }, []);
 
   const setBusqueda = useCallback((busqueda: string) => {
+    setCurrentPage(1);
     setFiltros(prev => ({ ...prev, busqueda }));
   }, []);
 
   const setOrdenamiento = useCallback((ordenamiento: string) => {
+    setCurrentPage(1);
     setFiltros(prev => ({ ...prev, ordenamiento }));
   }, []);
 
   const handleBuscar = useCallback(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+      return;
+    }
     cargarArbitros();
-  }, [cargarArbitros]);
+  }, [cargarArbitros, currentPage]);
 
   // Handlers de modales
   const handleSuspender = useCallback((arbitro: Arbitro) => {
@@ -189,9 +206,13 @@ export function useGestionArbitros(): UseGestionArbitrosReturn {
     
     // Filtros
     filtros,
+    currentPage,
+    totalPages: Math.max(1, Math.ceil(totalCount / PAGE_SIZE)),
+    totalCount,
     setFiltroEstado,
     setBusqueda,
     setOrdenamiento,
+    setCurrentPage,
     
     // Modal state
     arbitroSeleccionado,

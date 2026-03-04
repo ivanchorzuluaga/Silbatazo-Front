@@ -40,6 +40,7 @@ export const ROUTES = {
   ADMIN_VERIFICACION: "/admin/arbitros/verificar",
   ADMIN_VERIFICAR_ARBITRO: "/admin/arbitros/verificar/:id",
   ADMIN_GESTION_ARBITROS: "/admin/arbitros",
+  ADMIN_USUARIOS: "/admin/usuarios",
   ADMIN_GESTION_PARTIDOS: "/admin/partidos",
   ADMIN_PARTIDOS_CREAR: "/admin/partidos/crear",
   ADMIN_CATEGORIAS: "/admin/categorias",

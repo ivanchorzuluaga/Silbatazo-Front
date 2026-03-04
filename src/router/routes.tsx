@@ -130,6 +130,11 @@ const GestionArbitrosPage = lazy(() =>
     default: m.GestionArbitrosPage,
   }))
 );
+const UsuariosPage = lazy(() =>
+  import("@/features/admin/pages/UsuariosPage").then((m) => ({
+    default: m.UsuariosPage,
+  }))
+);
 const GestionPartidosPage = lazy(() =>
   import("@/features/admin/pages/GestionPartidosPage").then((m) => ({
     default: m.GestionPartidosPage,
@@ -418,6 +423,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
             {withSuspense(<GestionArbitrosPage />)}
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: ROUTES.ADMIN_USUARIOS,
+        element: (
+          <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+            {withSuspense(<UsuariosPage />)}
           </ProtectedRoute>
         ),
       },

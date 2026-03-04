@@ -176,26 +176,40 @@ export const arbitroEndpoints = {
       categoria?: number;
       search?: string;
       ordering?: string;
+      page?: number;
     }
-  ): Promise<Arbitro[]> {
+  ): Promise<PaginatedResponse<Arbitro>> {
     const queryParams = new URLSearchParams();
     if (params?.estado) queryParams.append("estado", params.estado);
     if (params?.municipio) queryParams.append("municipio", params.municipio.toString());
     if (params?.categoria) queryParams.append("categoria", params.categoria.toString());
     if (params?.search) queryParams.append("search", params.search);
     if (params?.ordering) queryParams.append("ordering", params.ordering);
+    if (params?.page) queryParams.append("page", params.page.toString());
 
     const query = queryParams.toString();
-    const endpoint = `/api/arbitros/${query ? `?${query}` : ""}`;
+    const endpoint = `/api/arbitros/todos/${query ? `?${query}` : ""}`;
 
-    return authenticatedApiClient<Arbitro[]>(endpoint, token);
+    const data = await authenticatedApiClient<PaginatedResponse<Arbitro> | Arbitro[]>(
+      endpoint,
+      token
+    );
+    if (Array.isArray(data)) {
+      return {
+        count: data.length,
+        next: null,
+        previous: null,
+        results: unwrapPaginated(data),
+      };
+    }
+    return data;
   },
 
   /**
    * Lista de árbitros pendientes (solo admin)
    */
   async listarPendientes(token: string): Promise<Arbitro[]> {
-    return authenticatedApiClient<Arbitro[]>("/api/arbitros/?estado=pendiente", token);
+    return authenticatedApiClient<Arbitro[]>("/api/arbitros/pendientes/", token);
   },
 
   /**
