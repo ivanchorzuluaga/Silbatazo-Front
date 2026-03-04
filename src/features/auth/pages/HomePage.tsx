@@ -109,7 +109,7 @@ export function HomePage() {
       setIsLoadingArbitros(true);
       try {
         const queryParams = new URLSearchParams();
-        queryParams.append("ordering", "-created_at");
+        queryParams.append("ordering", "ranking");
 
         const arbitros = await fetchArbitrosCached({
           query: queryParams.toString(),
