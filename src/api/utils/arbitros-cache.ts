@@ -1,5 +1,6 @@
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 import { unwrapPaginated } from "@/api/utils/pagination";
+import type { PaginatedResponse } from "@/api/utils/pagination";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 const CACHE_TTL_MS = 30_000;
@@ -47,5 +48,58 @@ export async function fetchArbitrosCached(options: {
     });
 
   inflight.set(key, request);
+  return request;
+}
+
+type CachePaginatedEntry = {
+  ts: number;
+  data: PaginatedResponse<Arbitro>;
+};
+
+const cachePaginated = new Map<string, CachePaginatedEntry>();
+const inflightPaginated = new Map<string, Promise<PaginatedResponse<Arbitro>>>();
+
+export async function fetchArbitrosPaginatedCached(options: {
+  query?: string;
+  token?: string | null;
+}): Promise<PaginatedResponse<Arbitro>> {
+  const key = options.query || "__all__";
+  const cached = cachePaginated.get(key);
+  if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
+    return cached.data;
+  }
+
+  const existing = inflightPaginated.get(key);
+  if (existing) return existing;
+
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (options.token) {
+    headers.Authorization = `Bearer ${options.token}`;
+  }
+
+  const url = `${API_URL}/api/arbitros/${options.query ? `?${options.query}` : ""}`;
+
+  const request = fetch(url, { headers })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error("Error al cargar árbitros");
+      }
+      const data = (await response.json()) as PaginatedResponse<Arbitro> | Arbitro[];
+      const paginated: PaginatedResponse<Arbitro> = Array.isArray(data)
+        ? { count: data.length, next: null, previous: null, results: data }
+        : {
+            count: data.count ?? 0,
+            next: data.next ?? null,
+            previous: data.previous ?? null,
+            results: unwrapPaginated<Arbitro>(data),
+          };
+      cachePaginated.set(key, { ts: Date.now(), data: paginated });
+      return paginated;
+    })
+    .finally(() => {
+      inflightPaginated.delete(key);
+    });
+
+  inflightPaginated.set(key, request);
   return request;
 }

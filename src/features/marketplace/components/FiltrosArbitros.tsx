@@ -126,7 +126,7 @@ export function FiltrosArbitros({
   };
 
   const limpiarFiltros = () => {
-    onFiltrosChange({ ordering: "-created_at" });
+    onFiltrosChange({ ordering: "ranking" });
   };
 
   const tieneFiltros =
@@ -135,7 +135,7 @@ export function FiltrosArbitros({
     filtros.search ||
     filtros.fecha ||
     filtros.hora ||
-    (filtros.ordering && filtros.ordering !== "-created_at");
+    (filtros.ordering && filtros.ordering !== "ranking");
 
   const formatDateDisplay = (dateStr: string | undefined) => {
     if (!dateStr) return "";
@@ -261,11 +261,12 @@ export function FiltrosArbitros({
               <ArrowUpDown className="w-4 h-4" />
             </div>
             <select
-              value={filtros.ordering || "-created_at"}
+              value={filtros.ordering || "ranking"}
               onChange={(e) => handleChange("ordering", e.target.value)}
               disabled={isLoading}
               className={selectBaseClass}
             >
+              <option value="ranking">Mejor rendimiento</option>
               <option value="-created_at">Más recientes</option>
               <option value="created_at">Más antiguos</option>
               <option value="-experiencia_anos">Mayor experiencia</option>

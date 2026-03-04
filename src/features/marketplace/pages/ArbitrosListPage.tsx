@@ -17,7 +17,9 @@ import { CATEGORIAS_PARTIDO, ROUTES } from "@/lib/constants";
 import logoImage from "@/assets/Logo.png";
 import { Users, RefreshCw, SearchX, Loader2, CalendarPlus, ArrowRight } from "lucide-react";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
-import { fetchArbitrosCached } from "@/api/utils/arbitros-cache";
+import { fetchArbitrosPaginatedCached } from "@/api/utils/arbitros-cache";
+
+const PAGE_SIZE = 25;
 
 export function ArbitrosListPage() {
   const { municipios } = useMunicipios();
@@ -32,8 +34,10 @@ export function ArbitrosListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filtros, setFiltros] = useState<FiltrosArbitrosType>({
-    ordering: "-created_at",
+    ordering: "ranking",
   });
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [totalArbitros, setTotalArbitros] = useState(0);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitialMount = useRef(true);
 
@@ -54,7 +58,7 @@ export function ArbitrosListPage() {
     if (isInitialMount.current) return;
     cargarArbitros(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filtros.municipio, filtros.categoria, filtros.ordering, filtros.fecha, filtros.hora]);
+  }, [filtros.municipio, filtros.categoria, filtros.ordering, filtros.fecha, filtros.hora, paginaActual]);
 
   // Efecto separado para search con debounce
   useEffect(() => {
@@ -81,6 +85,13 @@ export function ArbitrosListPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtros.search]);
 
+  const totalPaginas = Math.max(1, Math.ceil(totalArbitros / PAGE_SIZE));
+
+  const handleFiltrosChange = (next: FiltrosArbitrosType) => {
+    setPaginaActual(1);
+    setFiltros(next);
+  };
+
   const cargarArbitros = async (showLoading = false) => {
     if (showLoading) {
       setIsLoading(true);
@@ -96,11 +107,13 @@ export function ArbitrosListPage() {
       if (filtros.ordering) queryParams.append("ordering", filtros.ordering);
       if (filtros.fecha) queryParams.append("fecha", filtros.fecha);
       if (filtros.hora) queryParams.append("hora", filtros.hora);
+      queryParams.append("page", paginaActual.toString());
 
-      const arbitrosList = await fetchArbitrosCached({
+      const response = await fetchArbitrosPaginatedCached({
         query: queryParams.toString(),
       });
-      setArbitros(arbitrosList);
+      setArbitros(response.results);
+      setTotalArbitros(response.count);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar árbitros");
     } finally {
@@ -165,7 +178,7 @@ export function ArbitrosListPage() {
               municipios={municipios}
               categorias={categorias}
               filtros={filtros}
-              onFiltrosChange={setFiltros}
+              onFiltrosChange={handleFiltrosChange}
               isLoading={isLoading}
             />
           </div>
@@ -222,7 +235,13 @@ export function ArbitrosListPage() {
                 <p className="text-sm text-muted-foreground mb-6">
                   Intenta ajustar los filtros de búsqueda para encontrar más resultados
                 </p>
-                <Button onClick={() => setFiltros({ ordering: "-created_at" })} variant="outline">
+                <Button
+                  onClick={() => {
+                    setPaginaActual(1);
+                    setFiltros({ ordering: "ranking" });
+                  }}
+                  variant="outline"
+                >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Limpiar filtros
                 </Button>
@@ -235,10 +254,13 @@ export function ArbitrosListPage() {
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
                   <p className="text-sm text-muted-foreground">
-                    <span className="font-semibold text-foreground">{arbitros.length}</span>{" "}
-                    {arbitros.length === 1 ? "árbitro encontrado" : "árbitros encontrados"}
+                    <span className="font-semibold text-foreground">{totalArbitros}</span>{" "}
+                    {totalArbitros === 1 ? "árbitro encontrado" : "árbitros encontrados"}
                   </p>
                 </div>
+                <p className="text-sm text-muted-foreground">
+                  Página {paginaActual} de {totalPaginas}
+                </p>
               </div>
 
               {/* Grid de árbitros */}
@@ -247,6 +269,32 @@ export function ArbitrosListPage() {
                   <RefereeCard key={arbitro.id} arbitro={arbitro} />
                 ))}
               </div>
+
+              {totalPaginas > 1 && (
+                <div className="mt-8 flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                  <p className="text-sm text-muted-foreground">
+                    Mostrando página {paginaActual} de {totalPaginas}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setPaginaActual((prev) => Math.max(1, prev - 1))}
+                      disabled={paginaActual <= 1}
+                    >
+                      Anterior
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        setPaginaActual((prev) => Math.min(totalPaginas, prev + 1))
+                      }
+                      disabled={paginaActual >= totalPaginas}
+                    >
+                      Siguiente
+                    </Button>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
