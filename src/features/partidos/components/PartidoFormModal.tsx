@@ -100,7 +100,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
     const firstKey = order.find((key) => fieldErrors[key]);
     if (!firstKey) return;
 
-    const refsMap: Record<string, React.RefObject<HTMLDivElement>> = {
+    const refsMap: Record<string, React.RefObject<HTMLDivElement | null>> = {
       fecha: fechaRef,
       hora: horaRef,
       municipio_id: municipioRef,
