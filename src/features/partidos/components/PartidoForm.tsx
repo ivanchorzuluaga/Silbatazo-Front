@@ -125,7 +125,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
     const firstKey = order.find((key) => fieldErrors[key]);
     if (!firstKey) return;
 
-    const refsMap: Record<string, React.RefObject<HTMLDivElement>> = {
+    const refsMap: Record<string, React.RefObject<HTMLDivElement | null>> = {
       fecha: fechaRef,
       hora: horaRef,
       cantidad_partidos: cantidadRef,
