@@ -26,12 +26,15 @@ interface UseArbitrosSearchReturn {
   recargar: () => void;
 }
 
-export function useArbitrosSearch(): UseArbitrosSearchReturn {
+export function useArbitrosSearch(
+  initialFilters?: Partial<FiltrosArbitrosType>,
+): UseArbitrosSearchReturn {
   const [arbitros, setArbitros] = useState<Arbitro[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filtros, setFiltros] = useState<FiltrosArbitrosType>({
     ordering: "-created_at",
+    ...initialFilters,
   });
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

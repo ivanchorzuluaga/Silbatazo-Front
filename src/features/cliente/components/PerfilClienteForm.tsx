@@ -69,6 +69,9 @@ export function PerfilClienteForm({
     if (!telefono?.trim()) {
       errors.telefono = "El teléfono es requerido";
     }
+    if (!documentoIdentidad?.trim()) {
+      errors.documento_identidad = "El número de documento es requerido";
+    }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -82,7 +85,7 @@ export function PerfilClienteForm({
       last_name: lastName.trim(),
       email: email.trim(),
       telefono: telefono.trim(),
-      documento_identidad: documentoIdentidad.trim() || undefined,
+      documento_identidad: documentoIdentidad.trim(),
     });
   };
 
@@ -167,6 +170,7 @@ export function PerfilClienteForm({
         placeholder="Cédula o documento de identidad"
         error={fieldErrors.documento_identidad}
         autoComplete="off"
+        required
       />
 
       <div className="pt-2">

@@ -94,6 +94,19 @@ export const authEndpoints = {
   },
 
   /**
+   * Subir foto de perfil del usuario (cliente o árbitro).
+   * multipart/form-data con campo 'foto_perfil'.
+   */
+  async uploadProfilePhoto(accessToken: string, file: File): Promise<User> {
+    const formData = new FormData();
+    formData.append("foto_perfil", file);
+    return authenticatedApiClient<User>("/api/users/profile/foto/", accessToken, {
+      method: "POST",
+      body: formData,
+    });
+  },
+
+  /**
    * Actualizar perfil de un usuario por ID (solo admin)
    */
   async updateUserById(

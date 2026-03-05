@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
+  CreditCard,
   Eye,
   EyeOff,
   Lock,
@@ -53,6 +54,7 @@ export function RegisterPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
+  const [documentoIdentidad, setDocumentoIdentidad] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -68,6 +70,7 @@ export function RegisterPage() {
     last_name?: string;
     email?: string;
     telefono?: string;
+    documento_identidad?: string;
     password?: string;
     password_confirm?: string;
     role?: string;
@@ -109,6 +112,10 @@ export function RegisterPage() {
       errors.telefono = "El teléfono es requerido";
     }
 
+    if (!validations.required(documentoIdentidad)) {
+      errors.documento_identidad = "El número de documento es requerido";
+    }
+
     if (!validations.required(password)) {
       errors.password = "La contraseña es requerida";
     } else if (!validations.passwordStrength(password)) {
@@ -148,6 +155,7 @@ export function RegisterPage() {
         last_name: lastName,
         email,
         telefono,
+        documento_identidad: documentoIdentidad.trim(),
         password,
         password_confirm: passwordConfirm,
         role: userRole as "cliente" | "arbitro",
@@ -339,6 +347,27 @@ export function RegisterPage() {
                     autoComplete="tel"
                     required
                     leftIcon={<Phone className="h-4 w-4" />}
+                  />
+
+                  <FormField
+                    label="Número de documento"
+                    name="documento_identidad"
+                    value={documentoIdentidad}
+                    onChange={(e) => {
+                      setDocumentoIdentidad(e.target.value);
+                      if (fieldErrors.documento_identidad) {
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          documento_identidad: undefined,
+                        }));
+                      }
+                    }}
+                    error={fieldErrors.documento_identidad}
+                    disabled={isLoading}
+                    placeholder="Cédula o documento de identidad"
+                    autoComplete="off"
+                    required
+                    leftIcon={<CreditCard className="h-4 w-4" />}
                   />
 
                   <FormField

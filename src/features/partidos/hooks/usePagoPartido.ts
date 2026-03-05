@@ -225,22 +225,48 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
 
     setIsMarkingAsPaid(true);
     try {
-      const partidosPendientesGrupo =
+      const pendientesGrupo =
         partido.grupo_pago_codigo && partidosGrupo.length > 0
           ? partidosGrupo.filter((p) => p.estado_pago === "pendiente")
           : [{ id: partido.id, estado_pago: partido.estado_pago }];
 
-      for (const p of partidosPendientesGrupo) {
+      for (const p of pendientesGrupo) {
         await partidoEndpoints.marcarPartidoPagado(token, p.id, comprobante);
       }
       notifyPartidosChanged();
-      refresh();
+      await refresh();
+
+      // Volver a cargar el grupo para reflejar estados EN_REVISION y mostrar feedback
+      if (partido.grupo_pago_codigo && user) {
+        try {
+          const tokenReload = authService.getAccessToken();
+          if (tokenReload) {
+            const partidos = await partidoEndpoints.listarPartidos(tokenReload, {
+              cliente_id: user.id,
+            });
+            const delGrupo = partidos.filter(
+              (p) => p.grupo_pago_codigo === partido.grupo_pago_codigo,
+            );
+            setPartidosGrupo(
+              delGrupo.map((p) => ({
+                id: p.id,
+                codigo: p.codigo,
+                estado_pago: p.estado_pago,
+                monto_total: p.monto_total,
+                tipo_partido: p.tipo_partido,
+              })),
+            );
+          }
+        } catch {
+          // Si falla el recálculo del grupo no bloqueamos el flujo
+        }
+      }
     } catch {
       setComprobanteError("Error al enviar el comprobante. Intenta nuevamente.");
     } finally {
       setIsMarkingAsPaid(false);
     }
-  }, [partido, comprobante, refresh]);
+  }, [partido, comprobante, partidosGrupo, refresh, user]);
 
   // Copiar al portapapeles
   const handleCopy = useCallback((text: string) => {

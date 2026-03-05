@@ -9,8 +9,14 @@ export const APP_SLOGAN = "Árbitros de Confianza";
 export const CONTACT_WHATSAPP_NUMBER =
   (import.meta.env.VITE_WHATSAPP_NUMBER as string) || "573159888384";
 
-/** Solo estas 4 categorías se muestran en partidos y tarifas */
-export const CATEGORIAS_PARTIDO = ["Libre", "Veteranos", "Juvenil", "Infantil"] as const;
+/** Categorías base que se usan en partidos y tarifas */
+export const CATEGORIAS_PARTIDO = [
+  "Libre",
+  "Veteranos",
+  "Juvenil",
+  "Infantil",
+  "Femenino",
+] as const;
 
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: "access_token",

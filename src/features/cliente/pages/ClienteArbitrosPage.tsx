@@ -3,7 +3,7 @@
  * Muestra la lista de árbitros dentro del layout del dashboard
  */
 
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useMunicipios } from "@/features/arbitro/hooks/useMunicipios";
 import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
 import { FiltrosArbitros } from "@/features/marketplace/components/FiltrosArbitros";
@@ -27,12 +27,15 @@ import {
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
 export function ClienteArbitrosPage() {
+  const [searchParams] = useSearchParams();
   const { municipios } = useMunicipios();
   const { categorias: todasLasCategorias } = useCategorias();
   // Filtrar solo las categorías de partido (las mismas que se usan en el formulario)
   const categorias = todasLasCategorias.filter((c) =>
     (CATEGORIAS_PARTIDO as readonly string[]).includes(c.nombre),
   );
+  const fechaParam = searchParams.get("fecha") || undefined;
+  const horaParam = searchParams.get("hora") || undefined;
   const {
     arbitros,
     isLoading,
@@ -41,7 +44,10 @@ export function ClienteArbitrosPage() {
     setFiltros,
     limpiarFiltros,
     recargar,
-  } = useArbitrosSearch();
+  } = useArbitrosSearch({
+    fecha: fechaParam,
+    hora: horaParam,
+  });
 
   return (
     <PageLayout title="Árbitros">
@@ -215,7 +221,7 @@ function ArbitrosList({ arbitros }: ArbitrosListProps) {
       </div>
 
       {/* Grid */}
-      <div className="grid gap-6 justify-items-center sm:grid-cols-2 lg:grid-cols-2">
+      <div className="grid gap-6 justify-items-center sm:grid-cols-2 lg:grid-cols-3">
         {arbitros.map((arbitro) => (
           <ArbitroCard key={arbitro.id} arbitro={arbitro} />
         ))}

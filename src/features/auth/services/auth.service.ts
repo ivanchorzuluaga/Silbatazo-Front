@@ -187,6 +187,23 @@ export const authService = {
   },
 
   /**
+   * Subir foto de perfil del usuario autenticado
+   */
+  async uploadProfilePhoto(file: File): Promise<User> {
+    const token = this.getAccessToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await authEndpoints.uploadProfilePhoto(token, file);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al subir la foto");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
    * Actualizar perfil de un usuario por ID (solo admin)
    */
   async updateUserById(userId: number, data: UserUpdateData): Promise<User> {

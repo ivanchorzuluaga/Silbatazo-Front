@@ -1,15 +1,16 @@
 /**
- * Página para que el cliente complete o edite su perfil (nombre y email)
+ * Página para que el cliente complete o edite su perfil (nombre, email, documento, foto)
  */
 
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Camera } from "lucide-react";
 
 import { PageLayout } from "@/components/layout";
 import { PerfilClienteForm } from "../components/PerfilClienteForm";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { useAuth } from "@/hooks/useAuth";
-import { ROUTES } from "@/lib/constants";
+import { ROUTES, MAX_FOTO_PERFIL_MB } from "@/lib/constants";
 import { authService } from "@/features/auth/services/auth.service";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,9 +35,12 @@ export function PerfilClientePage() {
     clearError,
   } = useUserProfile();
   const cargaHecha = useRef(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const confirmPhrase = "ELIMINAR CUENTA";
   const nombreCompleto =
     [user?.first_name, user?.last_name].filter(Boolean).join(" ") ||
@@ -47,20 +51,63 @@ export function PerfilClientePage() {
       .toUpperCase()
       .trim();
 
+  const apiBase = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+  const fotoPerfilSrc =
+    user?.foto_perfil &&
+    (user.foto_perfil.startsWith("http")
+      ? user.foto_perfil
+      : `${apiBase}${user.foto_perfil.startsWith("/") ? "" : "/"}${user.foto_perfil}`);
+
+  const [photoLoadError, setPhotoLoadError] = useState(false);
+
   useEffect(() => {
     if (cargaHecha.current) return;
     cargaHecha.current = true;
     obtenerPerfil().catch(() => {});
   }, [obtenerPerfil]);
 
+  useEffect(() => {
+    setPhotoLoadError(false);
+  }, [user?.foto_perfil]);
+
   const handleSubmit = async (data: {
     first_name?: string;
     last_name?: string;
     email?: string;
+    telefono?: string;
+    documento_identidad?: string;
   }) => {
     const actualizado = await actualizarPerfil(data);
     updateUser(actualizado);
     navigate(ROUTES.CLIENTE_DASHBOARD, { replace: true });
+  };
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setPhotoError(null);
+    const maxBytes = MAX_FOTO_PERFIL_MB * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setPhotoError(`La imagen no debe superar ${MAX_FOTO_PERFIL_MB} MB.`);
+      return;
+    }
+    const ct = file.type?.toLowerCase() || "";
+    if (!ct.startsWith("image/")) {
+      setPhotoError("El archivo debe ser una imagen (JPG, PNG o WebP).");
+      return;
+    }
+    setIsUploadingPhoto(true);
+    setPhotoLoadError(false);
+    try {
+      const updated = await authService.uploadProfilePhoto(file);
+      updateUser(updated);
+      await obtenerPerfil();
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : "Error al subir la foto.");
+    } finally {
+      setIsUploadingPhoto(false);
+    }
   };
 
   const handleDeactivate = async () => {
@@ -89,8 +136,37 @@ export function PerfilClientePage() {
           <div className="absolute -left-20 -bottom-20 h-40 w-40 rounded-full bg-secondary/20 blur-3xl" />
           <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-border/70 bg-background/80 text-lg font-semibold text-primary shadow-md">
-                {iniciales || "CL"}
+              <div className="relative shrink-0">
+                <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-border/70 bg-background/80 text-lg font-semibold text-primary shadow-md">
+                  {fotoPerfilSrc && !photoLoadError ? (
+                    <img
+                      src={fotoPerfilSrc}
+                      alt=""
+                      className="h-full w-full object-cover"
+                      onError={() => setPhotoLoadError(true)}
+                    />
+                  ) : (
+                    <span>{iniciales || "CL"}</span>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handlePhotoChange}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full border-2 border-background bg-background shadow"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploadingPhoto}
+                  aria-label="Subir foto de perfil"
+                >
+                  <Camera className="h-4 w-4" />
+                </Button>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -108,6 +184,14 @@ export function PerfilClientePage() {
               Información verificada por ti
             </div>
           </div>
+          {photoError && (
+            <p className="relative z-10 mt-2 text-sm text-destructive">{photoError}</p>
+          )}
+          {isUploadingPhoto && (
+            <p className="relative z-10 mt-2 text-sm text-muted-foreground">
+              Subiendo foto...
+            </p>
+          )}
         </div>
 
         <div className="rounded-2xl border border-border/60 bg-card/80 p-5 sm:p-8 shadow-lg backdrop-blur">

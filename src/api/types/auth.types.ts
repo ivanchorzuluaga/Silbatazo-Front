@@ -16,6 +16,7 @@ export interface RegisterCredentials {
   first_name?: string;
   last_name?: string;
   telefono: string;
+  documento_identidad: string;
   terminos_aceptados: boolean;
 }
 
@@ -37,6 +38,7 @@ export interface UserResponse {
   last_name?: string;
   telefono?: string;
   documento_identidad?: string;
+  foto_perfil?: string | null;
   role: "cliente" | "arbitro" | "admin";
   date_joined: string;
   is_active: boolean;

@@ -3,7 +3,7 @@
  * El usuario selecciona un tipo de partido (con precio fijo) según sus necesidades.
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FormField, DateField } from "@/components/forms";
 import { TimePicker24h } from "@/components/forms/TimePicker24h";
@@ -14,7 +14,7 @@ import { usePartido } from "../hooks/usePartido";
 import { useMunicipios } from "@/features/arbitro/hooks/useMunicipios";
 import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
 import { partidoService } from "../services/partido.service";
-import { ROUTES, CATEGORIAS_PARTIDO } from "@/lib/constants";
+import { ROUTES, CATEGORIAS_PARTIDO, getPartidoPagoRoute } from "@/lib/constants";
 import { getTodayLocalDate, compareDates } from "@/lib/utils";
 import { TipoPartidoCardGrid } from "./TipoPartidoCardGrid";
 import type { PartidoCreateData, TipoPartido } from "../types/partido.types";
@@ -73,6 +73,19 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
 
+  // Refs para hacer scroll al primer error
+  const fechaRef = useRef<HTMLDivElement | null>(null);
+  const horaRef = useRef<HTMLDivElement | null>(null);
+  const cantidadRef = useRef<HTMLDivElement | null>(null);
+  const municipioRef = useRef<HTMLDivElement | null>(null);
+  const tipoRef = useRef<HTMLDivElement | null>(null);
+  const lugarRef = useRef<HTMLDivElement | null>(null);
+  const barrioRef = useRef<HTMLDivElement | null>(null);
+  const direccionRef = useRef<HTMLDivElement | null>(null);
+  const mapsRef = useRef<HTMLDivElement | null>(null);
+  const servicioRef = useRef<HTMLDivElement | null>(null);
+  const comisionRef = useRef<HTMLDivElement | null>(null);
+
   // Cargar tipos de partido al montar (loadingTipos ya es true por defecto)
   useEffect(() => {
     partidoService
@@ -89,6 +102,55 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
     const total = parseInt(cantidadPartidos, 10) || 1;
     setTiposPorPartido((prev) => Array.from({ length: total }, (_, i) => prev[i] ?? ""));
   }, [cantidadPartidos]);
+
+  // Cuando haya errores de validación, hacer scroll al primero
+  useEffect(() => {
+    if (!fieldErrors || Object.keys(fieldErrors).length === 0) return;
+
+    const order = [
+      "fecha",
+      "hora",
+      "cantidad_partidos",
+      "municipio_id",
+      "tipo_partido_id",
+      "servicio_arbitro",
+      "comision_app",
+      "categoria_id",
+      "lugar",
+      "barrio",
+      "direccion",
+      "ubicacion_maps_url",
+    ];
+
+    const firstKey = order.find((key) => fieldErrors[key]);
+    if (!firstKey) return;
+
+    const refsMap: Record<string, React.RefObject<HTMLDivElement>> = {
+      fecha: fechaRef,
+      hora: horaRef,
+      cantidad_partidos: cantidadRef,
+      municipio_id: municipioRef,
+      tipo_partido_id: tipoRef,
+      categoria_id: tipoRef,
+      servicio_arbitro: servicioRef,
+      comision_app: comisionRef,
+      lugar: lugarRef,
+      barrio: barrioRef,
+      direccion: direccionRef,
+      ubicacion_maps_url: mapsRef,
+    };
+
+    const targetRef = refsMap[firstKey];
+    if (targetRef?.current) {
+      targetRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      const focusable = targetRef.current.querySelector<HTMLElement>(
+        "input, select, textarea, button",
+      );
+      if (focusable) {
+        focusable.focus();
+      }
+    }
+  }, [fieldErrors]);
 
   const generarCodigoGrupoPago = (): string => {
     // Código corto para referencia de pago grupal (ej: GP-8F2KQ7)
@@ -211,7 +273,19 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
         horaActual += duraciones[i] ?? 90;
       }
 
-      // Mostrar mensaje de éxito
+      // Para clientes: redirigir inmediatamente al flujo de pago del primer partido creado.
+      if (!modoAdmin && creados.length > 0) {
+        const primerId = creados[0].id;
+        const rutaPago = getPartidoPagoRoute(primerId);
+        setPartidosCreados(creados);
+        setShowSuccess(false);
+        setTipoPartidoId("");
+        setFieldErrors({});
+        navigate(rutaPago);
+        return;
+      }
+
+      // Para admin mantenemos el flujo con mensaje de éxito
       setPartidosCreados(creados);
       setShowSuccess(true);
       setTipoPartidoId("");
@@ -334,22 +408,24 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
 
           {/* Fecha y Hora */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <DateField
-              label="Fecha del Partido"
-              name="fecha"
-              value={fecha}
-              onChange={(value) => {
-                setFecha(value);
-                if (fieldErrors.fecha) {
-                  setFieldErrors((prev) => ({ ...prev, fecha: undefined }));
-                }
-              }}
-              error={fieldErrors.fecha}
-              disabled={isLoading}
-              required
-            />
+            <div ref={fechaRef}>
+              <DateField
+                label="Fecha del Partido"
+                name="fecha"
+                value={fecha}
+                onChange={(value) => {
+                  setFecha(value);
+                  if (fieldErrors.fecha) {
+                    setFieldErrors((prev) => ({ ...prev, fecha: undefined }));
+                  }
+                }}
+                error={fieldErrors.fecha}
+                disabled={isLoading}
+                required
+              />
+            </div>
 
-            <div className="space-y-2">
+            <div ref={horaRef} className="space-y-2">
               <label htmlFor="hora" className="text-sm font-medium">
                 Hora del Partido (24 horas) <span className="text-destructive">*</span>
               </label>
@@ -370,7 +446,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div ref={cantidadRef} className="space-y-2">
             <label htmlFor="cantidad_partidos" className="text-sm font-medium">
               Cantidad de partidos seguidos <span className="text-destructive">*</span>
             </label>
@@ -405,7 +481,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
           </div>
 
           {/* Municipio */}
-          <div className="space-y-2">
+          <div ref={municipioRef} className="space-y-2">
             <label htmlFor="municipio_id" className="text-sm font-medium">
               Municipio <span className="text-destructive">*</span>
             </label>
@@ -438,7 +514,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
           </div>
 
           {/* Tipo de partido: cards seleccionables */}
-          <div className="space-y-3">
+          <div ref={tipoRef} className="space-y-3">
             {modoAdmin && (
               <label className="flex items-center gap-2 text-sm font-medium">
                 <input
@@ -467,7 +543,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
               </label>
             )}
 
-            {!usarValoresPersonalizados ? (
+              {!usarValoresPersonalizados ? (
               <>
                 {partidosIguales || parseInt(cantidadPartidos, 10) === 1 ? (
                   <>
@@ -534,42 +610,46 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
               </>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  label="Valor del servicio árbitro"
-                  name="servicio_arbitro"
-                  type="number"
-                  min={0}
-                  step={1000}
-                  value={servicioArbitro}
-                  onChange={(e) => {
-                    setServicioArbitro(e.target.value);
-                    if (fieldErrors.servicio_arbitro) {
-                      setFieldErrors((prev) => ({ ...prev, servicio_arbitro: undefined }));
-                    }
-                  }}
-                  error={fieldErrors.servicio_arbitro}
-                  disabled={isLoading}
-                  placeholder="Ej: 90000"
-                  required
-                />
-                <FormField
-                  label="Comisión app"
-                  name="comision_app"
-                  type="number"
-                  min={0}
-                  step={1000}
-                  value={comisionApp}
-                  onChange={(e) => {
-                    setComisionApp(e.target.value);
-                    if (fieldErrors.comision_app) {
-                      setFieldErrors((prev) => ({ ...prev, comision_app: undefined }));
-                    }
-                  }}
-                  error={fieldErrors.comision_app}
-                  disabled={isLoading}
-                  placeholder="Ej: 15000"
-                  required
-                />
+                <div ref={servicioRef}>
+                  <FormField
+                    label="Valor del servicio árbitro"
+                    name="servicio_arbitro"
+                    type="number"
+                    min={0}
+                    step={1000}
+                    value={servicioArbitro}
+                    onChange={(e) => {
+                      setServicioArbitro(e.target.value);
+                      if (fieldErrors.servicio_arbitro) {
+                        setFieldErrors((prev) => ({ ...prev, servicio_arbitro: undefined }));
+                      }
+                    }}
+                    error={fieldErrors.servicio_arbitro}
+                    disabled={isLoading}
+                    placeholder="Ej: 90000"
+                    required
+                  />
+                </div>
+                <div ref={comisionRef}>
+                  <FormField
+                    label="Comisión app"
+                    name="comision_app"
+                    type="number"
+                    min={0}
+                    step={1000}
+                    value={comisionApp}
+                    onChange={(e) => {
+                      setComisionApp(e.target.value);
+                      if (fieldErrors.comision_app) {
+                        setFieldErrors((prev) => ({ ...prev, comision_app: undefined }));
+                      }
+                    }}
+                    error={fieldErrors.comision_app}
+                    disabled={isLoading}
+                    placeholder="Ej: 15000"
+                    required
+                  />
+                </div>
               </div>
             )}
             {fieldErrors.categoria_id && (
@@ -578,68 +658,76 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
           </div>
 
           {/* Cancha, barrio y dirección */}
-          <FormField
-            label="Nombre de la cancha"
-            name="lugar"
-            value={lugar}
-            onChange={(e) => {
-              setLugar(e.target.value);
-              if (fieldErrors.lugar) {
-                setFieldErrors((prev) => ({ ...prev, lugar: undefined }));
-              }
-            }}
-            error={fieldErrors.lugar}
-            disabled={isLoading}
-            placeholder="Ej: Cancha Los Olivos"
-            required
-          />
+          <div ref={lugarRef}>
+            <FormField
+              label="Nombre de la cancha"
+              name="lugar"
+              value={lugar}
+              onChange={(e) => {
+                setLugar(e.target.value);
+                if (fieldErrors.lugar) {
+                  setFieldErrors((prev) => ({ ...prev, lugar: undefined }));
+                }
+              }}
+              error={fieldErrors.lugar}
+              disabled={isLoading}
+              placeholder="Ej: Cancha Los Olivos"
+              required
+            />
+          </div>
 
-          <FormField
-            label="Barrio"
-            name="barrio"
-            value={barrio}
-            onChange={(e) => {
-              setBarrio(e.target.value);
-              if (fieldErrors.barrio) {
-                setFieldErrors((prev) => ({ ...prev, barrio: undefined }));
-              }
-            }}
-            error={fieldErrors.barrio}
-            disabled={isLoading}
-            placeholder="Ej: Belén Rosales"
-            required
-          />
+          <div ref={barrioRef}>
+            <FormField
+              label="Barrio"
+              name="barrio"
+              value={barrio}
+              onChange={(e) => {
+                setBarrio(e.target.value);
+                if (fieldErrors.barrio) {
+                  setFieldErrors((prev) => ({ ...prev, barrio: undefined }));
+                }
+              }}
+              error={fieldErrors.barrio}
+              disabled={isLoading}
+              placeholder="Ej: Belén Rosales"
+              required
+            />
+          </div>
 
-          <FormField
-            label="Dirección"
-            name="direccion"
-            value={direccion}
-            onChange={(e) => {
-              setDireccion(e.target.value);
-              if (fieldErrors.direccion) {
-                setFieldErrors((prev) => ({ ...prev, direccion: undefined }));
-              }
-            }}
-            error={fieldErrors.direccion}
-            disabled={isLoading}
-            placeholder="Calle 123 #45-67"
-            required
-          />
+          <div ref={direccionRef}>
+            <FormField
+              label="Dirección"
+              name="direccion"
+              value={direccion}
+              onChange={(e) => {
+                setDireccion(e.target.value);
+                if (fieldErrors.direccion) {
+                  setFieldErrors((prev) => ({ ...prev, direccion: undefined }));
+                }
+              }}
+              error={fieldErrors.direccion}
+              disabled={isLoading}
+              placeholder="Calle 123 #45-67"
+              required
+            />
+          </div>
 
-          <FormField
-            label="Enlace Google Maps (Opcional)"
-            name="ubicacion_maps_url"
-            value={ubicacionMapsUrl}
-            onChange={(e) => {
-              setUbicacionMapsUrl(e.target.value);
-              if (fieldErrors.ubicacion_maps_url) {
-                setFieldErrors((prev) => ({ ...prev, ubicacion_maps_url: undefined }));
-              }
-            }}
-            error={fieldErrors.ubicacion_maps_url}
-            disabled={isLoading}
-            placeholder="Pega aquí el enlace de Google Maps"
-          />
+          <div ref={mapsRef}>
+            <FormField
+              label="Enlace Google Maps (Opcional)"
+              name="ubicacion_maps_url"
+              value={ubicacionMapsUrl}
+              onChange={(e) => {
+                setUbicacionMapsUrl(e.target.value);
+                if (fieldErrors.ubicacion_maps_url) {
+                  setFieldErrors((prev) => ({ ...prev, ubicacion_maps_url: undefined }));
+                }
+              }}
+              error={fieldErrors.ubicacion_maps_url}
+              disabled={isLoading}
+              placeholder="Pega aquí el enlace de Google Maps"
+            />
+          </div>
 
           {/* Notas */}
           <FormField

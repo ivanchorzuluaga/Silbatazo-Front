@@ -570,25 +570,28 @@ function PaymentStatusCard({ estadoPago, notasPago }: PaymentStatusCardProps) {
         {isAprobado ? (
           <CheckCircle className="w-8 h-8 text-success shrink-0" />
         ) : isEnRevision ? (
-          <Loader2 className="w-8 h-8 text-warning animate-spin shrink-0" />
+          <CheckCircle2 className="w-8 h-8 text-warning shrink-0" />
         ) : (
           <XCircle className="w-8 h-8 text-destructive shrink-0" />
         )}
         <div>
           <p className="font-semibold text-foreground mb-1">
-            {isAprobado ? "Pago Aprobado" : isEnRevision ? "Pago en Revisión" : "Pago Rechazado"}
+            {isAprobado
+              ? "Pago Aprobado"
+              : isEnRevision
+              ? "Pago enviado correctamente"
+              : "Pago Rechazado"}
           </p>
           <p className="text-muted-foreground text-sm">
             {isAprobado
               ? "Tu pago ha sido verificado y aprobado."
               : isEnRevision
-              ? "Tu pago está siendo revisado por el administrador. Puedes continuar usando la app mientras tanto."
+              ? "Recibimos tu comprobante y tu pago quedó registrado correctamente. Ahora está en revisión por nuestro equipo, no necesitas hacer nada más."
               : notasPago || "El pago fue rechazado. Por favor, verifica la información."}
           </p>
           {isEnRevision && (
             <p className="text-muted-foreground text-xs mt-2">
-              La revisión es manual y puede tardar entre 15 y 30 minutos. Te avisaremos por correo
-              electrónico.
+              La revisión es manual y puede tardar entre 15 y 30 minutos. Te avisaremos por correo electrónico cuando el pago sea aprobado.
             </p>
           )}
         </div>
@@ -618,25 +621,28 @@ function PaymentCompletedView({ estadoPago }: PaymentCompletedViewProps) {
         {isAprobado ? (
           <CheckCircle className="w-10 h-10 text-success" />
         ) : isEnRevision ? (
-          <Loader2 className="w-10 h-10 text-warning animate-spin" />
+          <CheckCircle2 className="w-10 h-10 text-warning" />
         ) : (
           <XCircle className="w-10 h-10 text-destructive" />
         )}
       </div>
       <h2 className="text-2xl font-bold text-foreground mb-3">
-        {isAprobado ? "¡Pago Confirmado!" : isEnRevision ? "Pago en Revisión" : "Pago Rechazado"}
+        {isAprobado
+          ? "¡Pago Confirmado!"
+          : isEnRevision
+          ? "¡Pago enviado correctamente!"
+          : "Pago Rechazado"}
       </h2>
       <p className="text-muted-foreground max-w-md mx-auto mb-6">
         {isAprobado
           ? "Tu pago ha sido verificado exitosamente. El árbitro ha sido notificado y tu partido está confirmado."
           : isEnRevision
-          ? "Tu pago está siendo revisado por nuestro equipo. Puedes continuar usando la app mientras tanto."
+          ? "Tu pago fue enviado correctamente y está en revisión por nuestro equipo. No tienes que hacer nada más; solo esperar la confirmación."
           : "Hubo un problema con tu pago. Por favor, contacta a soporte o intenta nuevamente."}
       </p>
       {isEnRevision && (
         <p className="text-muted-foreground text-sm max-w-md mx-auto mb-6">
-          La revisión es manual y puede tardar entre 15 y 30 minutos. Te avisaremos por correo
-          electrónico.
+          La revisión es manual y puede tardar entre 15 y 30 minutos. Te avisaremos por correo electrónico cuando el pago sea aprobado.
         </p>
       )}
       {!isAprobado && !isEnRevision && (

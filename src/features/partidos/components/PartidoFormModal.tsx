@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import { FormField } from "@/components/forms";
 import { TimePicker } from "@/components/ui/time-picker";
 import { CalendarPicker } from "@/components/ui/calendar-picker";
@@ -27,6 +28,7 @@ import {
 } from "lucide-react";
 import { TipoPartidoCardGrid } from "./TipoPartidoCardGrid";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
+import { ROUTES } from "@/lib/constants";
 
 interface PartidoFormModalProps {
   arbitro: Arbitro;
@@ -36,12 +38,15 @@ interface PartidoFormModalProps {
 }
 
 export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalProps) {
+  const navigate = useNavigate();
   // Hook con toda la lógica del formulario
   const {
     formState,
     fieldErrors,
     showSuccess,
     partidoCreado,
+    disponibilidadMensaje,
+    disponibilidadEstado,
     isLoading,
     error,
     municipiosLoading,
@@ -65,6 +70,59 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
     handleClose,
     handleAceptar,
   } = usePartidoForm(arbitro, open, onClose);
+
+  // Refs para hacer scroll al primer error
+  const fechaRef = useRef<HTMLDivElement | null>(null);
+  const horaRef = useRef<HTMLDivElement | null>(null);
+  const municipioRef = useRef<HTMLDivElement | null>(null);
+  const tipoRef = useRef<HTMLDivElement | null>(null);
+  const lugarRef = useRef<HTMLDivElement | null>(null);
+  const barrioRef = useRef<HTMLDivElement | null>(null);
+  const direccionRef = useRef<HTMLDivElement | null>(null);
+  const mapsRef = useRef<HTMLDivElement | null>(null);
+
+  // Cuando haya errores de validación, hacer scroll al primero
+  useEffect(() => {
+    if (!fieldErrors || Object.keys(fieldErrors).length === 0) return;
+
+    const order = [
+      "fecha",
+      "hora",
+      "municipio_id",
+      "tipo_partido_id",
+      "categoria_id",
+      "lugar",
+      "barrio",
+      "direccion",
+      "ubicacion_maps_url",
+    ];
+
+    const firstKey = order.find((key) => fieldErrors[key]);
+    if (!firstKey) return;
+
+    const refsMap: Record<string, React.RefObject<HTMLDivElement>> = {
+      fecha: fechaRef,
+      hora: horaRef,
+      municipio_id: municipioRef,
+      tipo_partido_id: tipoRef,
+      categoria_id: tipoRef,
+      lugar: lugarRef,
+      barrio: barrioRef,
+      direccion: direccionRef,
+      ubicacion_maps_url: mapsRef,
+    };
+
+    const targetRef = refsMap[firstKey];
+    if (targetRef?.current) {
+      targetRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      const focusable = targetRef.current.querySelector<HTMLElement>(
+        "input, select, textarea, button",
+      );
+      if (focusable) {
+        focusable.focus();
+      }
+    }
+  }, [fieldErrors]);
 
   // Estado local para UI del calendario
   const [showCalendar, setShowCalendar] = useState(false);
@@ -183,11 +241,19 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
     return `${day} ${meses[parseInt(month) - 1]} ${year}`;
   };
 
+  const handleVerOtrosArbitros = () => {
+    if (!formState.fecha || !formState.hora) return;
+    const horaCorta = formState.hora.substring(0, 5);
+    const params = new URLSearchParams();
+    params.set("fecha", formState.fecha);
+    params.set("hora", horaCorta);
+    // Cerrar modal antes de navegar
+    handleClose();
+    navigate(`${ROUTES.CLIENTE_ARBITROS}?${params.toString()}`);
+  };
+
   const modalContent = (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-      onClick={handleClose}
-    >
+    <div className="fixed inset-0 z-9999 flex items-center justify-center p-4" onClick={handleClose}>
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70 dark:bg-black/70 backdrop-blur-sm" />
 
@@ -214,7 +280,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
               {/* Fecha y Hora */}
               <div className="grid gap-4 sm:grid-cols-2">
                 {/* Campo de Fecha con Calendario */}
-                <div className="space-y-2">
+                <div ref={fechaRef} className="space-y-2">
                   <label className="text-sm font-medium text-foreground flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-primary" />
                     Fecha del Partido
@@ -241,7 +307,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                 </div>
 
                 {/* Campo de Hora */}
-                <div className="space-y-2">
+                <div ref={horaRef} className="space-y-2">
                   <label className="text-sm font-medium text-foreground flex items-center gap-2">
                     <Clock className="w-4 h-4 text-primary" />
                     Hora (24h)
@@ -254,8 +320,30 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
                 </div>
               </div>
 
+              {/* Mensaje de disponibilidad a ancho completo */}
+              {!fieldErrors.hora && !fieldErrors.fecha && disponibilidadMensaje && (
+                disponibilidadEstado === "disponible" ? (
+                  <p className="text-xs text-success">
+                    {disponibilidadMensaje}
+                  </p>
+                ) : (
+                  <div className="mt-2 rounded-md border border-destructive/40 bg-destructive/5 px-4 py-3">
+                    <p className="text-xs text-destructive mb-1">
+                      Este árbitro no tiene disponibilidad para tu partido en este horario.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleVerOtrosArbitros}
+                      className="text-xs font-medium text-destructive underline underline-offset-2"
+                    >
+                      Haz clic aquí para ver otros árbitros disponibles en este mismo día y hora.
+                    </button>
+                  </div>
+                )
+              )}
+
               {/* Municipio */}
-              <div className="space-y-2">
+              <div ref={municipioRef} className="space-y-2">
                 <label className="text-sm font-medium text-foreground flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-primary" />
                   Municipio
@@ -288,7 +376,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
               </div>
 
               {/* Tipo de partido: cards seleccionables */}
-              <div className="space-y-3">
+              <div ref={tipoRef} className="space-y-3">
                 <h3 className="text-sm font-semibold text-foreground">
                   ¿Qué tipo de partido vas a jugar?
                 </h3>
@@ -313,7 +401,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
               </div>
 
               {/* Cancha */}
-              <div className="space-y-2">
+              <div ref={lugarRef} className="space-y-2">
                 <label className="text-sm font-medium text-foreground flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-primary" />
                   Nombre de la cancha
@@ -331,7 +419,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
               </div>
 
               {/* Barrio */}
-              <div className="space-y-2">
+              <div ref={barrioRef} className="space-y-2">
                 <label className="text-sm font-medium text-foreground flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-primary" />
                   Barrio
@@ -349,7 +437,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
               </div>
 
               {/* Dirección */}
-              <div className="space-y-2">
+              <div ref={direccionRef} className="space-y-2">
                 <label className="text-sm font-medium text-foreground flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
                   Dirección
@@ -367,7 +455,7 @@ export function PartidoFormModal({ arbitro, open, onClose }: PartidoFormModalPro
               </div>
 
               {/* Google Maps */}
-              <div className="space-y-2">
+              <div ref={mapsRef} className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
                   Enlace Google Maps (Opcional)

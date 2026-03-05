@@ -41,6 +41,10 @@ export interface UsePartidoFormReturn {
   showSuccess: boolean;
   partidoCreado: PartidoCreado | null;
 
+  // Feedback de disponibilidad en tiempo real
+  disponibilidadMensaje: string | null;
+  disponibilidadEstado: "idle" | "disponible" | "no_disponible" | "invalida";
+
   // Estados de carga y error
   isLoading: boolean;
   error: string | null;
@@ -108,6 +112,12 @@ export function usePartidoForm(
   const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
   const [showSuccess, setShowSuccess] = useState(false);
   const [partidoCreado, setPartidoCreado] = useState<PartidoCreado | null>(null);
+
+  // Estado de disponibilidad en tiempo real
+  const [disponibilidadMensaje, setDisponibilidadMensaje] = useState<string | null>(null);
+  const [disponibilidadEstado, setDisponibilidadEstado] = useState<
+    "idle" | "disponible" | "no_disponible" | "invalida"
+  >("idle");
 
   // Filtrar municipios y categorías según el árbitro; solo 4 categorías (Libre, Veteranos, Juvenil, Infantil)
   const municipiosDisponibles = municipios.filter((municipio) =>
@@ -258,6 +268,28 @@ export function usePartidoForm(
     [arbitro.disponibilidades]
   );
 
+  // Feedback inmediato de disponibilidad cuando el usuario selecciona fecha y hora
+  useEffect(() => {
+    const { fecha, hora } = formState;
+
+    // Si falta alguno, no mostramos mensaje
+    if (!fecha || !hora) {
+      setDisponibilidadEstado("idle");
+      setDisponibilidadMensaje(null);
+      return;
+    }
+
+    const { fechaError, horaError } = validarDisponibilidad(fecha, hora);
+
+    if (fechaError || horaError) {
+      setDisponibilidadEstado("no_disponible");
+      setDisponibilidadMensaje(fechaError || horaError || "Horario no disponible");
+    } else {
+      setDisponibilidadEstado("disponible");
+      setDisponibilidadMensaje("El árbitro está disponible en este horario.");
+    }
+  }, [formState.fecha, formState.hora, validarDisponibilidad]);
+
   // Submit del formulario
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -338,8 +370,15 @@ export function usePartidoForm(
 
         const nuevoPartido = await crearPartido(data);
         setPartidoCreado({ id: nuevoPartido.id, estado: nuevoPartido.estado });
-        setShowSuccess(true);
+        // Redirigir inmediatamente a la página de pago sin mostrar alerta intermedia
+        const partidoId = nuevoPartido.id;
+        setShowSuccess(false);
         resetForm();
+        clearError();
+        onClose();
+        if (partidoId) {
+          navigate(getPartidoPagoRoute(partidoId));
+        }
       } catch (err) {
         // Error manejado por el hook usePartido
       }
@@ -397,6 +436,10 @@ export function usePartidoForm(
     fieldErrors,
     showSuccess,
     partidoCreado,
+
+    // Feedback de disponibilidad
+    disponibilidadMensaje,
+    disponibilidadEstado,
 
     // Estados de carga y error
     isLoading,

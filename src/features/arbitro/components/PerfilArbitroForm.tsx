@@ -278,6 +278,10 @@ export function PerfilArbitroForm({
       errors.telefono = "El teléfono es requerido";
     }
 
+    if (showPersonal && !documentoIdentidad?.trim()) {
+      errors.documento_identidad = "El número de documento es requerido";
+    }
+
     if (isAdmin && identificadorPublico.trim()) {
       const idPublico = parseInt(identificadorPublico, 10);
       if (Number.isNaN(idPublico) || idPublico <= 0) {
@@ -388,7 +392,7 @@ export function PerfilArbitroForm({
       const data = {
         telefono: telefono.trim(),
         fecha_nacimiento: fechaNacimiento || undefined,
-        documento_identidad: documentoIdentidad || undefined,
+        documento_identidad: documentoIdentidad.trim() || undefined,
         biografia: biografia || undefined,
         nombre_publico: nombrePublico.trim() || undefined,
         ...(isAdmin && identificadorPublico.trim()
@@ -862,6 +866,7 @@ export function PerfilArbitroForm({
               error={fieldErrors.documento_identidad}
               disabled={isFormBusy}
               placeholder="1234567890"
+              required
             />
 
             <div className="space-y-2">

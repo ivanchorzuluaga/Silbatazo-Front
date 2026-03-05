@@ -11,6 +11,7 @@ export interface User {
   last_name?: string;
   telefono?: string;
   documento_identidad?: string;
+  foto_perfil?: string | null;
   full_name?: string;
   role?: "cliente" | "arbitro" | "admin";
 }
