@@ -56,9 +56,9 @@ export function AdminDashboardPage() {
           ? "…"
           : "$0",
       icon: CreditCard,
-      color: "from-emerald-50 to-teal-100 dark:from-emerald-950 dark:to-teal-900",
-      textColor: "text-emerald-600 dark:text-emerald-300",
-      iconColor: "text-emerald-500",
+      color: "from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900",
+      textColor: "text-slate-600 dark:text-slate-300",
+      iconColor: "text-slate-500",
       route: ROUTES.ADMIN_PAGOS_PENDIENTES,
     },
     {
@@ -250,7 +250,7 @@ export function AdminDashboardPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">Valor a pagar</p>
-            <p className="text-2xl font-semibold text-emerald-500">
+            <p className="text-2xl font-semibold text-slate-500">
               {stats?.total_cobrado != null ? formatCop(stats.total_cobrado) : "—"}
             </p>
             <p className="text-xs text-muted-foreground mt-1">Total acumulado a pagar por clientes</p>

@@ -39,12 +39,12 @@ export function Hero() {
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div className="space-y-10 sm:space-y-6 lg:space-y-8">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium text-primary backdrop-blur-sm">
-              <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-500/10 border border-slate-500/30 rounded-full text-sm font-medium text-slate-300 backdrop-blur-sm">
+              <span className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" />
               <span className="font-semibold">
                 {!isLoading && arbitrosTotal > 0 ? arbitrosTotal : "—"}
               </span>{" "}
-              árbitros certificados disponibles
+              árbitros garantizados disponibles
             </div>
 
             {/* Main title */}
@@ -60,10 +60,10 @@ export function Hero() {
               </h1>
 
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <CheckCircle className="h-4 w-4 text-gray-500" />
                 <span>Garantía de calidad</span>
                 <span className="w-1 h-1 bg-muted-foreground rounded-full" />
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <CheckCircle className="h-4 w-4 text-gray-500" />
                 <span>Puntualidad asegurada</span>
               </div>
             </div>
@@ -85,7 +85,7 @@ export function Hero() {
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src =
-                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro certificado%3C/text%3E%3C/svg%3E";
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro garantizado%3C/text%3E%3C/svg%3E";
                     }}
                   />
                 </picture>
@@ -104,7 +104,7 @@ export function Hero() {
               {/* Floating card móvil */}
               <div className="absolute -bottom-3 right-4 bg-card p-3 rounded-lg shadow-lg border border-border/50 backdrop-blur-sm z-20">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
                   <span className="text-sm font-medium">Disponible ahora</span>
                 </div>
               </div>
@@ -161,7 +161,7 @@ export function Hero() {
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <Users className="h-5 w-5 text-green-500" />
+                  <Users className="h-5 w-5 text-gray-500" />
                   <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
                     {isLoading ? "—" : arbitrosDisponiblesHoy}
                   </p>
@@ -199,7 +199,7 @@ export function Hero() {
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src =
-                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro certificado%3C/text%3E%3C/svg%3E";
+                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='20' fill='%239ca3af'%3EÁrbitro garantizado%3C/text%3E%3C/svg%3E";
                   }}
                 />
               </picture>
@@ -221,7 +221,7 @@ export function Hero() {
             {/* Floating cards - solo desktop */}
             <div className="absolute -top-4 -right-4 bg-card p-3 rounded-lg shadow-lg border border-border/50 backdrop-blur-sm z-20">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
                 <span className="text-sm font-medium">Disponible ahora</span>
               </div>
             </div>
@@ -231,7 +231,7 @@ export function Hero() {
               <p className="text-lg font-bold text-foreground tabular-nums">
                 {isLoading ? "—" : primeraHoraHoy ? `Desde ${primeraHoraHoy}` : "—"}
               </p>
-              <p className="text-xs text-primary">
+              <p className="text-xs text-slate-300">
                 {isLoading ? "—" : arbitrosDisponiblesHoy}{" "}
                 {arbitrosDisponiblesHoy === 1 ? "árbitro disponible" : "árbitros disponibles"}
               </p>

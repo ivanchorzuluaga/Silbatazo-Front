@@ -51,11 +51,11 @@ export function FinanzasPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Valor a pagar</p>
-              <p className="text-2xl font-semibold text-emerald-500">
+              <p className="text-2xl font-semibold text-slate-500">
                 {stats?.total_cobrado != null ? formatCop(stats.total_cobrado) : "—"}
               </p>
             </div>
-            <Wallet className="size-6 text-emerald-500" />
+            <Wallet className="size-6 text-slate-500" />
           </div>
           <p className="text-xs text-muted-foreground mt-2">Total acumulado a pagar por clientes.</p>
         </div>

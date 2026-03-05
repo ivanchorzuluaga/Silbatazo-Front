@@ -23,7 +23,7 @@ const features = [
     description:
       "Partidos amistosos, torneos, ligas amateur o eventos corporativos. Cubrimos todas tus necesidades.",
     highlight: "Todos los deportes",
-    color: "text-green-500",
+    color: "text-gray-500",
   },
   {
     icon: Award,
@@ -58,7 +58,7 @@ export function Features() {
       value: isLoading ? "—" : String(stats?.arbitros_disponibles_hoy ?? "—"),
       label: "Disponibles hoy",
       icon: Users,
-      color: "text-green-500",
+      color: "text-gray-500",
     },
     {
       value: isLoading ? "—" : stats?.primera_hora_hoy ?? "—",
@@ -179,12 +179,12 @@ export function Features() {
               <span className="text-xs sm:text-sm font-medium text-foreground tabular-nums">
                 {stats && stats.arbitros_total > 0
                   ? `${stats.arbitros_total} árbitros`
-                  : "Árbitros certificados"}
+                  : "Árbitros garantizados"}
               </span>
             </div>
             <div className="hidden sm:block w-px h-6 bg-border" />
             <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
               <span className="text-xs sm:text-sm font-medium text-foreground">Garantía</span>
             </div>
             <div className="hidden sm:block w-px h-6 bg-border" />

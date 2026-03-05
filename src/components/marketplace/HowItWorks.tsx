@@ -8,15 +8,15 @@ export function HowItWorks() {
   const { stats } = useLandingStats();
   const arbitrosLabel =
     stats && stats.arbitros_total > 0
-      ? `${stats.arbitros_total} árbitros certificados`
-      : "Árbitros certificados";
+      ? `${stats.arbitros_total} árbitros garantizados`
+      : "Árbitros garantizados";
 
   const steps = [
     {
       number: "01",
       title: "Busca y Elige",
       description:
-        "Explora nuestro catálogo de árbitros certificados y filtra por deporte, experiencia y ubicación.",
+        "Explora nuestro catálogo de árbitros garantizados y filtra por deporte, experiencia y ubicación.",
       icon: Search,
       action: "Explorar árbitros",
       to: ROUTES.ARBITROS,
@@ -205,7 +205,7 @@ export function HowItWorks() {
         {/* Trust badges */}
         <div className="mt-16 flex flex-wrap justify-center gap-8">
           <div className="flex items-center gap-2 text-black/70 text-sm">
-            <div className="w-2 h-2 bg-green-600 rounded-full" />
+            <div className="w-2 h-2 bg-gray-500 rounded-full" />
             Sin costo de registro
           </div>
           <div className="flex items-center gap-2 text-black/70 text-sm">

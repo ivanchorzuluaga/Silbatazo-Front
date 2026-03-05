@@ -45,7 +45,7 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
               <h2 className="text-3xl sm:text-4xl font-bold text-black">Árbitros Destacados</h2>
             </div>
             <p className="text-black/70 text-lg">
-              Árbitros certificados, de calidad y con excelente reputación
+              Árbitros garantizados, de calidad y con excelente reputación
             </p>
           </div>
           <Button
@@ -98,7 +98,7 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
         <div className="mt-12 sm:mt-16 flex justify-center">
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 p-4 sm:p-6 bg-card border border-border/50 rounded-xl shadow-sm">
             <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
+              <CheckCircle className="h-5 w-5 text-gray-500" />
               <span className="text-sm font-medium">Verificados</span>
             </div>
             <div className="hidden sm:block w-px h-6 bg-border" />
@@ -113,7 +113,7 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
             </div>
             <div className="hidden sm:block w-px h-6 bg-border" />
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-emerald-500" />
+              <Sparkles className="h-5 w-5 text-gray-500" />
               <span className="text-sm font-medium">Perfiles destacados</span>
             </div>
           </div>

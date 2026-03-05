@@ -145,12 +145,12 @@ export function ArbitrosListPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Badge */}
           <div className="flex justify-center mb-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium text-primary backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-500/10 border border-slate-500/30 rounded-full text-sm font-medium text-slate-300 backdrop-blur-sm">
               <Users className="w-4 h-4" />
               <span className="font-semibold tabular-nums">
                 {landingStats?.arbitros_total ?? "—"}
               </span>{" "}
-              árbitros certificados
+              árbitros garantizados
             </div>
           </div>
 
@@ -161,7 +161,7 @@ export function ArbitrosListPage() {
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
               Encuentra el árbitro perfecto para tu partido. Todos nuestros árbitros están
-              certificados, son de calidad y listos para garantizar un juego limpio.
+              garantizados, son de calidad y listos para garantizar un juego limpio.
             </p>
             <Button size="lg" className="shadow-lg hover:shadow-xl transition-all" asChild>
               <Link to={ROUTES.PARTIDOS_CREAR}>
