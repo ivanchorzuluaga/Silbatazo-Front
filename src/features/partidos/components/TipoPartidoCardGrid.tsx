@@ -84,7 +84,7 @@ export function TipoPartidoCardGrid({
                     textPrimary,
                   )}
                 >
-                  {tipo.nombre_display ?? tipo.nombre}
+                  {tipo.nombre}
                 </h3>
                 {isSelected && (
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">

@@ -149,9 +149,7 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
         partido.grupo_pago_codigo
           ? `Grupo ${referencia} (${Math.max(partidosGrupo.length, 1)} partidos)`
           : `Partido ${referencia}`,
-        partido.tipo_partido?.nombre_display ??
-          partido.tipo_partido?.nombre ??
-          partido.categoria?.nombre,
+        partido.tipo_partido?.nombre ?? partido.categoria?.nombre,
         partido.municipio?.nombre,
       ]
         .filter(Boolean)

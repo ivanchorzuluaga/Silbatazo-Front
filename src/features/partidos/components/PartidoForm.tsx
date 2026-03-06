@@ -598,7 +598,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
                           <option value="">Selecciona tipo</option>
                           {tiposPartido.map((tipo) => (
                             <option key={tipo.id} value={tipo.id}>
-                              {tipo.nombre_display ?? tipo.nombre}
+                              {tipo.nombre}
                             </option>
                           ))}
                         </Select>

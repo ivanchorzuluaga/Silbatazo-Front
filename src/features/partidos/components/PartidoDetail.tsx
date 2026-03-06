@@ -137,9 +137,7 @@ export function PartidoDetail({ partido }: PartidoDetailProps) {
           {partido.tipo_partido && (
             <div>
               <p className="text-xs sm:text-sm text-muted-foreground mb-1">Tipo de partido</p>
-              <p className="font-medium text-sm sm:text-base">
-                {partido.tipo_partido.nombre_display ?? partido.tipo_partido.nombre}
-              </p>
+              <p className="font-medium text-sm sm:text-base">{partido.tipo_partido.nombre}</p>
               {partido.tipo_partido.duracion_referencial && (
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {partido.tipo_partido.duracion_referencial}
