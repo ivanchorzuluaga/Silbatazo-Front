@@ -6,7 +6,7 @@ import { ROUTES, APP_NAME } from "@/lib/constants";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { prefetchRoute } from "@/router/prefetch";
-import { Menu, Users, Clock, Mail, Shield, User, ArrowRight, X } from "lucide-react";
+import { Menu, Users, Clock, Mail, Shield, User, ArrowRight, X, DollarSign } from "lucide-react";
 
 export function Header() {
   const { isAuthenticated } = useAuth();
@@ -16,6 +16,7 @@ export function Header() {
   const navigationItems = [
     { icon: Users, label: "Árbitros", href: "#arbitros-destacados", isScroll: true },
     { icon: Clock, label: "Cómo Funciona", href: "#como-funciona", isScroll: true },
+    { icon: DollarSign, label: "Precios", href: "#precios", isScroll: true },
     { icon: Mail, label: "Contacto", href: "#contacto", isScroll: true },
   ];
 
@@ -54,7 +55,7 @@ export function Header() {
               <button
                 key={item.label}
                 onClick={() => handleScrollTo(item.href)}
-                className="flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-foreground transition-all duration-200 hover:text-primary cursor-pointer select-none"
+                className="flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-primary transition-all duration-200 cursor-pointer select-none"
               >
                 <item.icon className="w-4 h-4" />
                 {item.label}
@@ -135,7 +136,7 @@ export function Header() {
             {/* Header del menú */}
             <div className="flex items-center justify-between p-4 border-b border-border/60">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 bg-linear-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center shadow-lg">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -205,6 +206,7 @@ export function Header() {
                       <p className="text-sm text-muted-foreground">
                         {item.label === "Árbitros" && "Ver árbitros destacados"}
                         {item.label === "Cómo Funciona" && "Aprende el proceso"}
+                        {item.label === "Precios" && "Conoce valores de referencia"}
                         {item.label === "Contacto" && "Habla con nosotros"}
                       </p>
                     </div>

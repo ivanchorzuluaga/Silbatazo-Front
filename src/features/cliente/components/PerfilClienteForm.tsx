@@ -157,9 +157,7 @@ export function PerfilClienteForm({
 
       <div className="space-y-2 pt-2 border-t border-border/60">
         <h3 className="text-base font-semibold">Documento</h3>
-        <p className="text-sm text-muted-foreground">
-          Necesario para validar pagos y soporte.
-        </p>
+        <p className="text-sm text-muted-foreground">Necesario para validar pagos y soporte.</p>
       </div>
 
       <FormField

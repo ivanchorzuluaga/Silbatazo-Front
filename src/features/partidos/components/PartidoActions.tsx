@@ -129,7 +129,7 @@ export function PartidoActions({
             {partido.estado_pago === "pendiente" ? "Realizar Pago" : "Reintentar Pago"}
           </Button>
         )}
-      
+
       {/* Botón para ver estado de pago - Cliente (si está en revisión o aprobado) */}
       {isCliente &&
         (partido.estado_pago === "en_revision" || partido.estado_pago === "aprobado") && (
@@ -148,26 +148,30 @@ export function PartidoActions({
         (partido.estado === "buscando_arbitro" ||
           partido.estado === "pendiente" ||
           partido.estado === "aceptado") && (
-          <Button
-            onClick={() => setShowCancelarModal(true)}
-            variant="outline"
-            disabled={isLoading}
-            className="w-full"
-          >
-            Cancelar Partido
-          </Button>
+          <div className="mt-4 pt-4 border-t border-border/60 w-full">
+            <Button
+              onClick={() => setShowCancelarModal(true)}
+              variant="outline"
+              disabled={isLoading}
+              className="w-full min-h-[48px] justify-center border-destructive/50 text-destructive hover:bg-destructive/10 hover:border-destructive/70"
+            >
+              Cancelar Partido
+            </Button>
+          </div>
         )}
 
       {/* Botón de Cancelar - Árbitro (solo si está aceptado) */}
       {isArbitro && partido.estado === "aceptado" && (
-        <Button
-          onClick={() => setShowCancelarModal(true)}
-          variant="outline"
-          disabled={isLoading}
-          className="w-full"
-        >
-          Cancelar Partido
-        </Button>
+        <div className="mt-4 pt-4 border-t border-border/60 w-full">
+          <Button
+            onClick={() => setShowCancelarModal(true)}
+            variant="outline"
+            disabled={isLoading}
+            className="w-full min-h-[48px] justify-center border-destructive/50 text-destructive hover:bg-destructive/10 hover:border-destructive/70"
+          >
+            Cancelar Partido
+          </Button>
+        </div>
       )}
 
       {/* Modal de Rechazo */}

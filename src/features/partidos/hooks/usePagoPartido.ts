@@ -104,7 +104,7 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
             estado_pago: p.estado_pago,
             monto_total: p.monto_total,
             tipo_partido: p.tipo_partido,
-          }))
+          })),
         );
       } catch {
         setPartidosGrupo([]);
@@ -128,8 +128,8 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
     partido?.monto_total != null
       ? Number(partido.monto_total)
       : partido?.tipo_partido?.monto_total != null
-      ? partido.tipo_partido.monto_total
-      : 0;
+        ? partido.tipo_partido.monto_total
+        : 0;
   const montoGrupo = partidosGrupo
     .filter((p) => p.estado_pago === "pendiente")
     .reduce((acc, p) => {
@@ -137,18 +137,21 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
         p.monto_total != null
           ? Number(p.monto_total)
           : p.tipo_partido?.monto_total != null
-          ? p.tipo_partido.monto_total
-          : 0;
+            ? p.tipo_partido.monto_total
+            : 0;
       return acc + monto;
     }, 0);
   const monto = montoGrupo > 0 ? montoGrupo : montoPartido;
-  const referencia = partido?.grupo_pago_codigo || partido?.codigo || `PARTIDO-${partido?.id || ""}`;
+  const referencia =
+    partido?.grupo_pago_codigo || partido?.codigo || `PARTIDO-${partido?.id || ""}`;
   const descripcion = partido
     ? [
         partido.grupo_pago_codigo
           ? `Grupo ${referencia} (${Math.max(partidosGrupo.length, 1)} partidos)`
           : `Partido ${referencia}`,
-        partido.tipo_partido?.nombre ?? partido.categoria?.nombre,
+        partido.tipo_partido?.nombre_display ??
+          partido.tipo_partido?.nombre ??
+          partido.categoria?.nombre,
         partido.municipio?.nombre,
       ]
         .filter(Boolean)

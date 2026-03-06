@@ -39,7 +39,7 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
   const [nombre, setNombre] = useState(tipo?.nombre || "");
   const [duracionReferencial, setDuracionReferencial] = useState(tipo?.duracion_referencial || "");
   const [duracionServicioMin, setDuracionServicioMin] = useState(
-    tipo?.duracion_servicio_minutos?.toString() ?? "90"
+    tipo?.duracion_servicio_minutos?.toString() ?? "90",
   );
   const [servicioArbitro, setServicioArbitro] = useState(tipo?.servicio_arbitro?.toString() ?? "");
   const [comisionApp, setComisionApp] = useState(tipo?.comision_app?.toString() ?? "");
@@ -48,20 +48,20 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const duracionMin = useMemo(
     () => Math.max(1, parseInt(duracionServicioMin || "0", 10) || 0),
-    [duracionServicioMin]
+    [duracionServicioMin],
   );
   const servicioArbitroNum = useMemo(
     () => parseInt(servicioArbitro || "0", 10) || 0,
-    [servicioArbitro]
+    [servicioArbitro],
   );
   const comisionAppNum = useMemo(() => parseInt(comisionApp || "0", 10) || 0, [comisionApp]);
   const montoTotalNum = useMemo(
     () => Math.max(servicioArbitroNum + comisionAppNum, 0),
-    [servicioArbitroNum, comisionAppNum]
+    [servicioArbitroNum, comisionAppNum],
   );
   const costoHora = useMemo(
     () => (duracionMin > 0 ? Math.round((montoTotalNum / duracionMin) * 60) : 0),
-    [duracionMin, montoTotalNum]
+    [duracionMin, montoTotalNum],
   );
 
   useEffect(() => {
@@ -101,7 +101,8 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
     }
     const servicioArbitroNum = parseInt(servicioArbitro, 10);
     if (servicioArbitro === "" || isNaN(servicioArbitroNum) || servicioArbitroNum < 0) {
-      errors.servicio_arbitro = "El valor del servicio árbitro debe ser un número mayor o igual a 0";
+      errors.servicio_arbitro =
+        "El valor del servicio árbitro debe ser un número mayor o igual a 0";
     }
     const comisionAppNum = parseInt(comisionApp, 10);
     if (comisionApp === "" || isNaN(comisionAppNum) || comisionAppNum < 0) {
@@ -339,18 +340,14 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
             </div>
             <div>
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Valor a pagar</p>
-              <p className="text-lg font-semibold text-primary">
-                {formatCop(montoTotalNum || 0)}
-              </p>
+              <p className="text-lg font-semibold text-primary">{formatCop(montoTotalNum || 0)}</p>
               <p className="text-xs text-muted-foreground">
                 Valor del servicio árbitro: {formatCop(servicioArbitroNum || 0)}
               </p>
               <p className="text-xs text-muted-foreground">
                 Comisión app: {formatCop(comisionAppNum || 0)}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {formatCop(costoHora)} aprox / hora
-              </p>
+              <p className="text-xs text-muted-foreground">{formatCop(costoHora)} aprox / hora</p>
             </div>
             <div className="flex flex-wrap gap-2 text-xs">
               <span

@@ -29,8 +29,8 @@ export function TipoPartidoCard({
     if (
       confirm(
         `¿Estás seguro de que quieres ${tipo.activo ? "desactivar" : "activar"} el tipo "${
-          tipo.nombre
-        }"?`
+          tipo.nombre_display ?? tipo.nombre
+        }"?`,
       )
     ) {
       onToggleActivo(tipo.id, !tipo.activo);
@@ -38,17 +38,23 @@ export function TipoPartidoCard({
   };
 
   const handleDelete = () => {
-    if (confirm(`¿Eliminar el tipo "${tipo.nombre}"? Solo es posible si ningún partido lo usa.`)) {
+    if (
+      confirm(
+        `¿Eliminar el tipo "${tipo.nombre_display ?? tipo.nombre}"? Solo es posible si ningún partido lo usa.`,
+      )
+    ) {
       onDelete(tipo.id);
     }
   };
 
   return (
     <div className="card-surface p-4">
-        <div className="space-y-4">
+      <div className="space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="text-base font-semibold truncate">{tipo.nombre}</h3>
+            <h3 className="text-base font-semibold truncate">
+              {tipo.nombre_display ?? tipo.nombre}
+            </h3>
             <p className="text-[11px] text-muted-foreground font-mono truncate">{tipo.slug}</p>
           </div>
           {tipo.activo ? (
@@ -65,7 +71,9 @@ export function TipoPartidoCard({
         <div className="grid gap-3">
           <div className="grid grid-cols-3 gap-2">
             <div className="rounded-xl bg-background/70 border border-border/60 px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Valor a pagar</p>
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                Valor a pagar
+              </p>
               <p className="text-sm font-semibold text-primary tabular-nums">
                 {formatCop(montoTotal)}
               </p>

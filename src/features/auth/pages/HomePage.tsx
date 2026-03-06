@@ -13,21 +13,24 @@ import { fetchArbitrosCached } from "@/api/utils/arbitros-cache";
 import { FAQ_ITEMS } from "@/components/marketplace/faqData";
 
 const Features = lazy(() =>
-  import("@/components/marketplace/Features").then((m) => ({ default: m.Features }))
+  import("@/components/marketplace/Features").then((m) => ({ default: m.Features })),
 );
 const HowItWorks = lazy(() =>
-  import("@/components/marketplace/HowItWorks").then((m) => ({ default: m.HowItWorks }))
+  import("@/components/marketplace/HowItWorks").then((m) => ({ default: m.HowItWorks })),
 );
 const RefereesPreview = lazy(() =>
   import("@/components/marketplace/RefereesPreview").then((m) => ({
     default: m.RefereesPreview,
-  }))
+  })),
+);
+const Pricing = lazy(() =>
+  import("@/components/marketplace/Pricing").then((m) => ({ default: m.Pricing })),
 );
 const FaqSection = lazy(() =>
-  import("@/components/marketplace/FaqSection").then((m) => ({ default: m.FaqSection }))
+  import("@/components/marketplace/FaqSection").then((m) => ({ default: m.FaqSection })),
 );
 const Footer = lazy(() =>
-  import("@/components/marketplace/Footer").then((m) => ({ default: m.Footer }))
+  import("@/components/marketplace/Footer").then((m) => ({ default: m.Footer })),
 );
 
 export function HomePage() {
@@ -43,14 +46,7 @@ export function HomePage() {
         name: "Silbatazo",
         url: `${baseUrl}/`,
         telephone: "+57 315 988 8384",
-        areaServed: [
-          "Medellín",
-          "Itagüí",
-          "Bello",
-          "Envigado",
-          "Sabaneta",
-          "Valle de Aburrá",
-        ],
+        areaServed: ["Medellín", "Itagüí", "Bello", "Envigado", "Sabaneta", "Valle de Aburrá"],
       },
       {
         "@type": "Organization",
@@ -130,6 +126,9 @@ export function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schemaJson }} />
       <Header />
       <Hero />
+      <Suspense fallback={<div className="min-h-[260px]" />}>
+        <Pricing />
+      </Suspense>
       <Suspense fallback={<div className="min-h-[200px]" />}>
         {!isLoadingArbitros && arbitrosDestacados.length > 0 && (
           <RefereesPreview arbitros={arbitrosDestacados} />

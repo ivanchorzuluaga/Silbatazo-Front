@@ -46,8 +46,7 @@ export function RegisterPage() {
   const [searchParams] = useSearchParams();
   const { login: setAuth } = useAuth();
   const roleParam = searchParams.get("role");
-  const defaultRole =
-    roleParam === "arbitro" ? USER_ROLES.ARBITRO : USER_ROLES.CLIENTE;
+  const defaultRole = roleParam === "arbitro" ? USER_ROLES.ARBITRO : USER_ROLES.CLIENTE;
 
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -172,9 +171,7 @@ export function RegisterPage() {
         authResponse.user.email_verificado,
       );
 
-      const dashboardRoute = getDashboardRoute(
-        authResponse.user.role as UserRole,
-      );
+      const dashboardRoute = getDashboardRoute(authResponse.user.role as UserRole);
       navigate(dashboardRoute, { replace: true });
     } catch (err) {
       console.error("Error en registro:", err);
@@ -223,11 +220,7 @@ export function RegisterPage() {
           <div className="relative rounded-3xl border border-border/60 bg-card/70 text-card-foreground shadow-2xl p-6 md:p-8 overflow-hidden">
             {/* Logo de fondo dentro de la card - Solo visible en móvil */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none md:hidden">
-              <img
-                src={logoImage}
-                alt=""
-                className="w-56 h-56 object-contain opacity-10"
-              />
+              <img src={logoImage} alt="" className="w-56 h-56 object-contain opacity-10" />
             </div>
 
             <div className="relative z-10">
@@ -395,11 +388,7 @@ export function RegisterPage() {
                         type="button"
                         onClick={() => setShowPassword((prev) => !prev)}
                         className="text-muted-foreground hover:text-foreground transition-colors"
-                        aria-label={
-                          showPassword
-                            ? "Ocultar contraseña"
-                            : "Mostrar contraseña"
-                        }
+                        aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       >
                         {showPassword ? (
                           <EyeOff className="h-4 w-4" />
@@ -436,9 +425,7 @@ export function RegisterPage() {
                         onClick={() => setShowPasswordConfirm((prev) => !prev)}
                         className="text-muted-foreground hover:text-foreground transition-colors"
                         aria-label={
-                          showPasswordConfirm
-                            ? "Ocultar contraseña"
-                            : "Mostrar contraseña"
+                          showPasswordConfirm ? "Ocultar contraseña" : "Mostrar contraseña"
                         }
                       >
                         {showPasswordConfirm ? (
@@ -610,19 +597,13 @@ export function RegisterPage() {
                   )}
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full h-12"
-                  disabled={isLoading}
-                >
+                <Button type="submit" className="w-full h-12" disabled={isLoading}>
                   {isLoading ? "Creando cuenta..." : "Crear cuenta"}
                 </Button>
 
                 {error && (
                   <Alert variant="destructive" className="border-2">
-                    <AlertDescription className="text-sm font-medium">
-                      {error}
-                    </AlertDescription>
+                    <AlertDescription className="text-sm font-medium">{error}</AlertDescription>
                   </Alert>
                 )}
               </form>
@@ -630,10 +611,7 @@ export function RegisterPage() {
               <div className="text-center mt-6">
                 <p className="text-sm text-muted-foreground">
                   ¿Ya tienes cuenta?{" "}
-                  <Link
-                    to={ROUTES.LOGIN}
-                    className="text-primary font-semibold hover:underline"
-                  >
+                  <Link to={ROUTES.LOGIN} className="text-primary font-semibold hover:underline">
                     Inicia sesión
                   </Link>
                 </p>
@@ -662,11 +640,7 @@ export function RegisterPage() {
             <TerminosModalContent />
           </div>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowTerminos(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => setShowTerminos(false)}>
               Cerrar
             </Button>
           </DialogFooter>
@@ -692,11 +666,7 @@ export function RegisterPage() {
             <PrivacidadModalContent />
           </div>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowPrivacidad(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => setShowPrivacidad(false)}>
               Cerrar
             </Button>
           </DialogFooter>

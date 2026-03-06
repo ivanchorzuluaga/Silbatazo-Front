@@ -72,7 +72,7 @@ export function TipoPartidoCardGrid({
               "flex min-h-40 cursor-pointer flex-col transition-all duration-200",
               "border-border bg-card hover:border-primary/50",
               isSelected && "ring-2 ring-primary border-primary bg-primary/10",
-              disabled && "pointer-events-none opacity-60"
+              disabled && "pointer-events-none opacity-60",
             )}
           >
             <CardContent className="flex flex-1 flex-col p-4">
@@ -81,10 +81,10 @@ export function TipoPartidoCardGrid({
                 <h3
                   className={cn(
                     "line-clamp-2 min-h-10 flex-1 text-sm font-semibold leading-snug",
-                    textPrimary
+                    textPrimary,
                   )}
                 >
-                  {tipo.nombre}
+                  {tipo.nombre_display ?? tipo.nombre}
                 </h3>
                 {isSelected && (
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">

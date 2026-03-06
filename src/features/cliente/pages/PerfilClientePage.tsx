@@ -26,14 +26,7 @@ import { Input } from "@/components/ui/input";
 export function PerfilClientePage() {
   const navigate = useNavigate();
   const { updateUser, logout } = useAuth();
-  const {
-    user,
-    isLoading,
-    error,
-    obtenerPerfil,
-    actualizarPerfil,
-    clearError,
-  } = useUserProfile();
+  const { user, isLoading, error, obtenerPerfil, actualizarPerfil, clearError } = useUserProfile();
   const cargaHecha = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -43,13 +36,10 @@ export function PerfilClientePage() {
   const [photoError, setPhotoError] = useState<string | null>(null);
   const confirmPhrase = "ELIMINAR CUENTA";
   const nombreCompleto =
-    [user?.first_name, user?.last_name].filter(Boolean).join(" ") ||
-    user?.username ||
-    "Cliente";
-  const iniciales =
-    `${user?.first_name?.[0] ?? ""}${user?.last_name?.[0] ?? ""}`
-      .toUpperCase()
-      .trim();
+    [user?.first_name, user?.last_name].filter(Boolean).join(" ") || user?.username || "Cliente";
+  const iniciales = `${user?.first_name?.[0] ?? ""}${user?.last_name?.[0] ?? ""}`
+    .toUpperCase()
+    .trim();
 
   const apiBase = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
   const fotoPerfilSrc =
@@ -172,12 +162,8 @@ export function PerfilClientePage() {
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                   Perfil de cliente
                 </p>
-                <h1 className="text-2xl sm:text-3xl font-semibold">
-                  {nombreCompleto}
-                </h1>
-                {user?.email && (
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
-                )}
+                <h1 className="text-2xl sm:text-3xl font-semibold">{nombreCompleto}</h1>
+                {user?.email && <p className="text-sm text-muted-foreground">{user.email}</p>}
               </div>
             </div>
             <div className="rounded-full bg-primary/10 text-primary px-4 py-2 text-xs font-semibold">
@@ -188,21 +174,16 @@ export function PerfilClientePage() {
             <p className="relative z-10 mt-2 text-sm text-destructive">{photoError}</p>
           )}
           {isUploadingPhoto && (
-            <p className="relative z-10 mt-2 text-sm text-muted-foreground">
-              Subiendo foto...
-            </p>
+            <p className="relative z-10 mt-2 text-sm text-muted-foreground">Subiendo foto...</p>
           )}
         </div>
 
         <div className="rounded-2xl border border-border/60 bg-card/80 p-5 sm:p-8 shadow-lg backdrop-blur">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg sm:text-xl font-semibold">
-                Datos personales
-              </h2>
+              <h2 className="text-lg sm:text-xl font-semibold">Datos personales</h2>
               <p className="text-sm text-muted-foreground">
-                Mantén tu información actualizada para recibir novedades y
-                soporte.
+                Mantén tu información actualizada para recibir novedades y soporte.
               </p>
             </div>
           </div>
@@ -225,18 +206,13 @@ export function PerfilClientePage() {
         <div className="rounded-2xl border border-destructive/40 bg-destructive/5 p-4 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-base font-semibold text-destructive">
-                Eliminar cuenta
-              </h3>
+              <h3 className="text-base font-semibold text-destructive">Eliminar cuenta</h3>
               <p className="text-sm text-muted-foreground">
-                Se desactivará tu cuenta y se anonimizarán tus datos sensibles.
-                El historial de partidos se conserva.
+                Se desactivará tu cuenta y se anonimizarán tus datos sensibles. El historial de
+                partidos se conserva.
               </p>
             </div>
-            <Button
-              variant="destructive"
-              onClick={() => setShowDeleteModal(true)}
-            >
+            <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
               Eliminar cuenta
             </Button>
           </div>
@@ -248,9 +224,8 @@ export function PerfilClientePage() {
           <DialogHeader>
             <DialogTitle>Confirmar eliminación de cuenta</DialogTitle>
             <DialogDescription>
-              Escribe <strong>{confirmPhrase}</strong> para confirmar. Luego
-              podrás reactivar la cuenta con tu usuario y contraseña, pero
-              deberás completar los datos nuevamente.
+              Escribe <strong>{confirmPhrase}</strong> para confirmar. Luego podrás reactivar la
+              cuenta con tu usuario y contraseña, pero deberás completar los datos nuevamente.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">

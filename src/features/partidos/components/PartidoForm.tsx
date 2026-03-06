@@ -31,7 +31,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
   const { municipios, isLoading: municipiosLoading } = useMunicipios();
   const { categorias } = useCategorias();
   const categoriasPartido = categorias.filter((c) =>
-    (CATEGORIAS_PARTIDO as readonly string[]).includes(c.nombre)
+    (CATEGORIAS_PARTIDO as readonly string[]).includes(c.nombre),
   );
 
   // Estados del formulario
@@ -50,9 +50,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
   const [partidosIguales, setPartidosIguales] = useState(true);
   const [tiposPorPartido, setTiposPorPartido] = useState<string[]>([""]);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [partidosCreados, setPartidosCreados] = useState<Array<{ id: number; estado: string }>>(
-    []
-  );
+  const [partidosCreados, setPartidosCreados] = useState<Array<{ id: number; estado: string }>>([]);
 
   // Tipo de partido (selector único con precio fijo)
   const [tiposPartido, setTiposPartido] = useState<TipoPartido[]>([]);
@@ -224,7 +222,8 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
       });
       const duraciones = tiposSeleccionados.map((tipo) => tipo?.duracion_servicio_minutos ?? 90);
       const totalMinutos = duraciones.reduce((acc, cur) => acc + cur, 0);
-      const finUltimo = inicioMinutos + Math.max(totalMinutos - (duraciones[duraciones.length - 1] ?? 90), 0);
+      const finUltimo =
+        inicioMinutos + Math.max(totalMinutos - (duraciones[duraciones.length - 1] ?? 90), 0);
       if (finUltimo >= 24 * 60) {
         setFieldErrors({
           hora: "Con la cantidad de partidos seleccionada, el horario supera las 23:59.",
@@ -543,7 +542,7 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
               </label>
             )}
 
-              {!usarValoresPersonalizados ? (
+            {!usarValoresPersonalizados ? (
               <>
                 {partidosIguales || parseInt(cantidadPartidos, 10) === 1 ? (
                   <>
@@ -588,7 +587,10 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
                               return next;
                             });
                             if (fieldErrors[`tipo_partido_${idx}`]) {
-                              setFieldErrors((prev) => ({ ...prev, [`tipo_partido_${idx}`]: undefined }));
+                              setFieldErrors((prev) => ({
+                                ...prev,
+                                [`tipo_partido_${idx}`]: undefined,
+                              }));
                             }
                           }}
                           disabled={isLoading || loadingTipos}
@@ -596,12 +598,14 @@ export function PartidoForm({ onSuccess, modoAdmin = false, onCreate }: PartidoF
                           <option value="">Selecciona tipo</option>
                           {tiposPartido.map((tipo) => (
                             <option key={tipo.id} value={tipo.id}>
-                              {tipo.nombre}
+                              {tipo.nombre_display ?? tipo.nombre}
                             </option>
                           ))}
                         </Select>
                         {fieldErrors[`tipo_partido_${idx}`] && (
-                          <p className="text-sm text-destructive">{fieldErrors[`tipo_partido_${idx}`]}</p>
+                          <p className="text-sm text-destructive">
+                            {fieldErrors[`tipo_partido_${idx}`]}
+                          </p>
                         )}
                       </div>
                     ))}
