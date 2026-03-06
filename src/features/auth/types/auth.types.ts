@@ -11,6 +11,7 @@ export interface User {
   last_name?: string;
   telefono?: string;
   documento_identidad?: string;
+   fecha_nacimiento?: string | null;
   foto_perfil?: string | null;
   full_name?: string;
   role?: "cliente" | "arbitro" | "admin";
@@ -22,6 +23,7 @@ export interface UserUpdateData {
   last_name?: string;
   telefono?: string;
   documento_identidad?: string;
+  fecha_nacimiento?: string;
 }
 
 export interface AuthState {
