@@ -39,9 +39,9 @@ export function Hero() {
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div className="space-y-10 sm:space-y-6 lg:space-y-8">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-500/10 border border-slate-500/30 rounded-full text-sm font-medium text-slate-300 backdrop-blur-sm">
-              <span className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" />
-              <span className="font-semibold">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 border border-white/80 rounded-full text-sm font-semibold text-emerald-800 shadow-sm backdrop-blur-sm">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+              <span className="font-bold">
                 {!isLoading && arbitrosTotal > 0 ? arbitrosTotal : "—"}
               </span>{" "}
               árbitros garantizados disponibles
@@ -54,16 +54,16 @@ export function Hero() {
                   ÁRBITROS PARA PARTIDOS Y TORNEOS
                 </span>
                 <br />
-                <span className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-muted-foreground">
+                <span className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-foreground/85">
                   EN COLOMBIA, FÁCIL Y CONFIABLE
                 </span>
               </h1>
 
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle className="h-4 w-4 text-gray-500" />
+              <div className="flex items-center gap-2 text-sm text-foreground/85">
+                <CheckCircle className="h-4 w-4 text-emerald-400" />
                 <span>Garantía de calidad</span>
-                <span className="w-1 h-1 bg-muted-foreground rounded-full" />
-                <CheckCircle className="h-4 w-4 text-gray-500" />
+                <span className="w-1 h-1 bg-emerald-400 rounded-full" />
+                <CheckCircle className="h-4 w-4 text-emerald-400" />
                 <span>Puntualidad asegurada</span>
               </div>
             </div>

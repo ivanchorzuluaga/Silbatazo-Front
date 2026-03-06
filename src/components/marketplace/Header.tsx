@@ -41,7 +41,7 @@ export function Header() {
             <img
               src={isDark ? "/Logo-completo-480.png" : "/Logo-completo-Negro-480.png"}
               alt={`${APP_NAME} - Árbitro de confianza`}
-              className="h-12 sm:h-16 md:h-20 w-auto object-contain transition-opacity duration-200"
+              className="h-10 sm:h-14 md:h-16 w-auto object-contain transition-opacity duration-200"
               loading="eager"
               decoding="async"
               width={480}
@@ -50,12 +50,12 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-8">
             {navigationItems.map((item) => (
               <button
                 key={item.label}
                 onClick={() => handleScrollTo(item.href)}
-                className="flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-primary transition-all duration-200 cursor-pointer select-none"
+                className="flex items-center gap-1.5 text-[13px] xl:text-sm font-medium text-foreground/70 hover:text-primary transition-all duration-200 cursor-pointer select-none"
               >
                 <item.icon className="w-4 h-4" />
                 {item.label}
