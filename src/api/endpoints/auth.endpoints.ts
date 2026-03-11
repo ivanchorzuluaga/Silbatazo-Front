@@ -191,6 +191,23 @@ export const authEndpoints = {
   },
 
   /**
+   * Reenviar mensaje de bienvenida (email si aplica + WhatsApp)
+   */
+  async resendWelcome(accessToken: string): Promise<{
+    message: string;
+    email_enviado: boolean;
+    whatsapp_enviado: boolean;
+  }> {
+    return authenticatedApiClient<{
+      message: string;
+      email_enviado: boolean;
+      whatsapp_enviado: boolean;
+    }>("/api/users/welcome/resend/", accessToken, {
+      method: "POST",
+    });
+  },
+
+  /**
    * Desactivar cuenta (anonimiza datos sensibles)
    */
   async deactivateAccount(accessToken: string): Promise<{ message: string }> {

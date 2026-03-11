@@ -41,6 +41,8 @@ export function PerfilArbitroPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSendingWelcome, setIsSendingWelcome] = useState(false);
+  const [welcomeMessage, setWelcomeMessage] = useState<string | null>(null);
   const confirmPhrase = "ELIMINAR CUENTA";
   const rolesVisibles = (arbitro?.roles ?? [])
     .map((rol) => rol.nombre)
@@ -89,6 +91,26 @@ export function PerfilArbitroPage() {
       setIsDeleting(false);
       setShowDeleteModal(false);
       setConfirmText("");
+    }
+  };
+
+  const handleResendWelcome = async () => {
+    setIsSendingWelcome(true);
+    setWelcomeMessage(null);
+    try {
+      const response = await authService.resendWelcome();
+      const partes = [];
+      if (response.whatsapp_enviado) partes.push("WhatsApp");
+      if (response.email_enviado) partes.push("correo");
+      setWelcomeMessage(
+        partes.length > 0
+          ? `Mensaje reenviado por ${partes.join(" y ")}.`
+          : "No se pudo reenviar el mensaje. Intenta más tarde."
+      );
+    } catch (err) {
+      setWelcomeMessage(err instanceof Error ? err.message : "No se pudo reenviar el mensaje.");
+    } finally {
+      setIsSendingWelcome(false);
     }
   };
 
@@ -169,17 +191,30 @@ export function PerfilArbitroPage() {
                     Tu perfil público y datos de contacto
                   </p>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setFocusSection("personal");
-                    setIsEditMode(true);
-                  }}
-                >
-                  Editar
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setFocusSection("personal");
+                      setIsEditMode(true);
+                    }}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleResendWelcome}
+                    disabled={isSendingWelcome}
+                  >
+                    {isSendingWelcome ? "Enviando..." : "Reenviar bienvenida"}
+                  </Button>
+                </div>
               </div>
+              {welcomeMessage && (
+                <p className="mb-4 text-sm text-muted-foreground">{welcomeMessage}</p>
+              )}
 
               <div className="grid gap-4 lg:grid-cols-[180px_1fr]">
                 <div className="flex flex-col items-start gap-4">

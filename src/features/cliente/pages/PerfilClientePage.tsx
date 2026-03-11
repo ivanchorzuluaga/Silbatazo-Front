@@ -34,6 +34,8 @@ export function PerfilClientePage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  const [isSendingWelcome, setIsSendingWelcome] = useState(false);
+  const [welcomeMessage, setWelcomeMessage] = useState<string | null>(null);
   const confirmPhrase = "ELIMINAR CUENTA";
   const nombreCompleto =
     [user?.first_name, user?.last_name].filter(Boolean).join(" ") || user?.username || "Cliente";
@@ -114,6 +116,26 @@ export function PerfilClientePage() {
     }
   };
 
+  const handleResendWelcome = async () => {
+    setIsSendingWelcome(true);
+    setWelcomeMessage(null);
+    try {
+      const response = await authService.resendWelcome();
+      const partes = [];
+      if (response.whatsapp_enviado) partes.push("WhatsApp");
+      if (response.email_enviado) partes.push("correo");
+      setWelcomeMessage(
+        partes.length > 0
+          ? `Mensaje reenviado por ${partes.join(" y ")}.`
+          : "No se pudo reenviar el mensaje. Intenta más tarde."
+      );
+    } catch (err) {
+      setWelcomeMessage(err instanceof Error ? err.message : "No se pudo reenviar el mensaje.");
+    } finally {
+      setIsSendingWelcome(false);
+    }
+  };
+
   return (
     <PageLayout
       title="Mi perfil"
@@ -166,8 +188,19 @@ export function PerfilClientePage() {
                 {user?.email && <p className="text-sm text-muted-foreground">{user.email}</p>}
               </div>
             </div>
-            <div className="rounded-full bg-primary/10 text-primary px-4 py-2 text-xs font-semibold">
-              Información verificada por ti
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="rounded-full bg-primary/10 text-primary px-4 py-2 text-xs font-semibold">
+                Información verificada por ti
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleResendWelcome}
+                disabled={isSendingWelcome}
+              >
+                {isSendingWelcome ? "Enviando..." : "Reenviar bienvenida"}
+              </Button>
             </div>
           </div>
           {photoError && (
@@ -175,6 +208,9 @@ export function PerfilClientePage() {
           )}
           {isUploadingPhoto && (
             <p className="relative z-10 mt-2 text-sm text-muted-foreground">Subiendo foto...</p>
+          )}
+          {welcomeMessage && (
+            <p className="relative z-10 mt-2 text-sm text-muted-foreground">{welcomeMessage}</p>
           )}
         </div>
 

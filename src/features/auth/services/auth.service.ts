@@ -187,6 +187,27 @@ export const authService = {
   },
 
   /**
+   * Reenviar mensaje de bienvenida (WhatsApp + correo si aplica)
+   */
+  async resendWelcome(): Promise<{
+    message: string;
+    email_enviado: boolean;
+    whatsapp_enviado: boolean;
+  }> {
+    const token = this.getAccessToken();
+    if (!token) throw new Error("No estás autenticado");
+
+    try {
+      return await authEndpoints.resendWelcome(token);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw new Error(extractErrorMessage(error.data) || "Error al reenviar bienvenida");
+      }
+      throw new Error("Error de conexión. Intenta nuevamente.");
+    }
+  },
+
+  /**
    * Subir foto de perfil del usuario autenticado
    */
   async uploadProfilePhoto(file: File): Promise<User> {
