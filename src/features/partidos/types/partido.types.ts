@@ -87,6 +87,7 @@ export interface TipoPartido {
   id: number;
   slug: string;
   nombre: string;
+  codigo_corto?: string | null;
   duracion_referencial: string;
   /** Duración total del servicio en minutos (para brecha 30 min entre partidos) */
   duracion_servicio_minutos?: number;
@@ -104,6 +105,7 @@ export interface TipoPartidoAdmin extends TipoPartido {
 export interface TipoPartidoCreateData {
   slug: string;
   nombre: string;
+  codigo_corto?: string | null;
   duracion_referencial?: string;
   servicio_arbitro: number;
   comision_app: number;
@@ -114,6 +116,7 @@ export interface TipoPartidoCreateData {
 export interface TipoPartidoUpdateData {
   slug?: string;
   nombre?: string;
+  codigo_corto?: string | null;
   duracion_referencial?: string;
   duracion_servicio_minutos?: number;
   servicio_arbitro?: number;

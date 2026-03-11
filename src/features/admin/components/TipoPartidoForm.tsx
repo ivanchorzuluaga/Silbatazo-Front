@@ -37,6 +37,7 @@ function nombreToSlug(nombre: string): string {
 export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPartidoFormProps) {
   const [slug, setSlug] = useState(tipo?.slug || "");
   const [nombre, setNombre] = useState(tipo?.nombre || "");
+  const [codigoCorto, setCodigoCorto] = useState(tipo?.codigo_corto || "");
   const [duracionReferencial, setDuracionReferencial] = useState(tipo?.duracion_referencial || "");
   const [duracionServicioMin, setDuracionServicioMin] = useState(
     tipo?.duracion_servicio_minutos?.toString() ?? "90",
@@ -68,6 +69,7 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
     if (tipo) {
       setSlug(tipo.slug);
       setNombre(tipo.nombre);
+      setCodigoCorto(tipo.codigo_corto || "");
       setDuracionReferencial(tipo.duracion_referencial || "");
       setDuracionServicioMin(tipo.duracion_servicio_minutos?.toString() ?? "90");
       setServicioArbitro(tipo.servicio_arbitro?.toString() ?? "");
@@ -98,6 +100,11 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
     }
     if (!nombre.trim()) {
       errors.nombre = "El nombre es requerido";
+    }
+    if (!codigoCorto.trim()) {
+      errors.codigo_corto = "El código corto es requerido";
+    } else if (!/^[A-Z0-9]+$/.test(codigoCorto.trim())) {
+      errors.codigo_corto = "Usa solo letras y números en mayúscula (sin espacios)";
     }
     const servicioArbitroNum = parseInt(servicioArbitro, 10);
     if (servicioArbitro === "" || isNaN(servicioArbitroNum) || servicioArbitroNum < 0) {
@@ -131,6 +138,7 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
     const data = {
       slug: slug.trim(),
       nombre: nombre.trim(),
+      codigo_corto: codigoCorto.trim().toUpperCase(),
       duracion_referencial: duracionReferencial.trim() || undefined,
       duracion_servicio_minutos: parseInt(duracionServicioMin, 10) || 90,
       servicio_arbitro: parseInt(servicioArbitro, 10),
@@ -147,17 +155,17 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="mx-auto grid w-full max-w-5xl gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="card-surface p-4 space-y-4">
-          <div className="space-y-1">
+    <form onSubmit={handleSubmit} className="space-y-2 mt-2">
+      <div className="mx-auto grid w-full max-w-7xl gap-4 lg:grid-cols-[1.45fr_0.75fr]">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <section className="card-surface p-4 space-y-3">
             <div>
               <h3 className="text-sm font-semibold">Información principal</h3>
               <p className="text-xs text-muted-foreground">
                 Esto es lo que verán los clientes al crear un partido.
               </p>
             </div>
-            <div className="grid gap-3 lg:grid-cols-2">
+            <div className="grid gap-3">
               <FormField
                 label="Nombre *"
                 name="nombre"
@@ -192,6 +200,27 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
             </div>
 
             <FormField
+              label="Código corto *"
+              name="codigo_corto"
+              type="text"
+              value={codigoCorto}
+              onChange={(e) => {
+                setCodigoCorto(e.target.value.toUpperCase().replace(/\\s+/g, ""));
+                if (fieldErrors.codigo_corto) {
+                  setFieldErrors((prev) => {
+                    const { codigo_corto: _, ...rest } = prev;
+                    return rest;
+                  });
+                }
+              }}
+              error={fieldErrors.codigo_corto}
+              disabled={isLoading}
+              required
+              placeholder="Ej: FUT11"
+              helperText="Se usa para el código del partido (FUT11-2603-001)"
+            />
+
+            <FormField
               label="Duración referencial"
               name="duracion_referencial"
               type="text"
@@ -200,9 +229,9 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
               disabled={isLoading}
               placeholder="Ej: 40–45 min x tiempo"
             />
-          </div>
+          </section>
 
-          <div className="space-y-1 border-t border-border/60 pt-4">
+          <section className="card-surface p-4 space-y-3">
             <div>
               <h3 className="text-sm font-semibold">Valores y duración</h3>
               <p className="text-xs text-muted-foreground">
@@ -271,9 +300,9 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
                 required
               />
             </div>
-          </div>
+          </section>
 
-          <div className="space-y-1 border-t border-border/60 pt-4">
+          <section className="card-surface p-4 space-y-3 lg:col-span-2">
             <div>
               <h3 className="text-sm font-semibold">Visibilidad y orden</h3>
               <p className="text-xs text-muted-foreground">
@@ -314,7 +343,7 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
                 </label>
               </div>
             </div>
-          </div>
+          </section>
         </div>
 
         <aside className="card-surface p-4 h-fit lg:sticky lg:top-4">
@@ -326,6 +355,9 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
             <div>
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Tipo</p>
               <p className="text-base font-semibold">{nombre || "Nombre del tipo"}</p>
+              {codigoCorto && (
+                <p className="text-xs text-muted-foreground">Código corto: {codigoCorto}</p>
+              )}
             </div>
             {duracionReferencial && (
               <p className="text-sm text-muted-foreground">{duracionReferencial}</p>
@@ -367,7 +399,7 @@ export function TipoPartidoForm({ tipo, onSubmit, onCancel, isLoading }: TipoPar
         </aside>
       </div>
 
-      <div className="flex gap-3 pt-2 sticky bottom-0 bg-card/95 backdrop-blur border-t border-border/60 py-3 px-1">
+      <div className="flex gap-3 pt-2 border-t border-border/60 pt-3">
         <Button type="submit" disabled={isLoading} className="flex-1">
           {isLoading ? "Guardando..." : tipo ? "Actualizar" : "Crear"}
         </Button>

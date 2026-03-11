@@ -144,7 +144,7 @@ export function TiposPartidoPage() {
         )}
 
         <Dialog open={showForm} onOpenChange={setShowForm}>
-          <DialogContent className="max-w-6xl max-h-[94dvh] overflow-y-auto pb-6 sm:pb-4 ios-scroll">
+          <DialogContent className="w-[min(96vw,80rem)] max-w-7xl self-center max-h-[calc(100dvh-10rem)] sm:max-h-[calc(100dvh-12rem)] p-4 sm:p-5">
             <DialogHeader>
               <DialogTitle>
                 {tipoEditando ? "Editar tipo de partido" : "Crear tipo de partido"}

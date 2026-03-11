@@ -50,6 +50,11 @@ export function TipoPartidoCard({
           <div className="min-w-0">
             <h3 className="text-base font-semibold truncate">{tipo.nombre}</h3>
             <p className="text-[11px] text-muted-foreground font-mono truncate">{tipo.slug}</p>
+            {tipo.codigo_corto && (
+              <p className="text-[11px] text-muted-foreground font-mono truncate">
+                Código: {tipo.codigo_corto}
+              </p>
+            )}
           </div>
           {tipo.activo ? (
             <span className="inline-flex items-center rounded-full bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20 px-2.5 py-0.5 text-xs font-medium">
