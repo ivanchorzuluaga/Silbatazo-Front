@@ -3,7 +3,7 @@
  * Checkout con Wompi y estados de pago automáticos
  */
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
@@ -33,6 +33,7 @@ export function PagoPartidoPage() {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const vieneDeCheckout = searchParams.get("checkout") === "1";
+  const [intentoAbrirWidget, setIntentoAbrirWidget] = useState(false);
 
   const {
     partido,
@@ -54,6 +55,20 @@ export function PagoPartidoPage() {
     formatCurrency,
     navigateToDashboard,
   } = usePagoPartido(id);
+
+  const { widgetReady, widgetError, openWidget } = useWompiWidget();
+
+  const handleIniciarPago = useCallback(async () => {
+    setIntentoAbrirWidget(true);
+    await handleCrearCheckout();
+  }, [handleCrearCheckout]);
+
+  useEffect(() => {
+    if (intentoAbrirWidget && checkoutData && widgetReady) {
+      openWidget(checkoutData);
+      setIntentoAbrirWidget(false);
+    }
+  }, [intentoAbrirWidget, checkoutData, widgetReady, openWidget]);
 
   // Estado de carga
   if (isLoading) {
@@ -238,7 +253,7 @@ export function PagoPartidoPage() {
                 <div className="mt-6 space-y-4">
                   {!checkoutData ? (
                     <Button
-                      onClick={handleCrearCheckout}
+                      onClick={handleIniciarPago}
                       disabled={isCheckoutLoading}
                       size="lg"
                       className="h-14 px-8 text-lg shadow-lg shadow-primary/25"
@@ -260,13 +275,20 @@ export function PagoPartidoPage() {
                       <p className="text-sm text-muted-foreground">
                         Abre el widget y elige tu método de pago.
                       </p>
-                      <WompiWidget data={checkoutData} />
+                      <Button
+                        onClick={() => openWidget(checkoutData)}
+                        disabled={!widgetReady}
+                        size="lg"
+                        className="h-12 px-6"
+                      >
+                        {widgetReady ? "Abrir widget" : "Cargando widget..."}
+                      </Button>
                     </div>
                   )}
-                  {checkoutError && (
+                  {(checkoutError || widgetError) && (
                     <p className="text-destructive text-sm flex items-center gap-2">
                       <AlertCircle className="w-4 h-4" />
-                      {checkoutError}
+                      {checkoutError || widgetError}
                     </p>
                   )}
                 </div>
@@ -371,41 +393,64 @@ function InfoRow({ icon: Icon, label, value }: InfoRowProps) {
   );
 }
 
-interface WompiWidgetProps {
-  data: WompiCheckoutResponse;
+declare global {
+  interface Window {
+    WidgetCheckout?: new (config: Record<string, unknown>) => { open: () => void };
+  }
 }
 
-function WompiWidget({ data }: WompiWidgetProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+function useWompiWidget() {
+  const [widgetReady, setWidgetReady] = useState(false);
+  const [widgetError, setWidgetError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    containerRef.current.innerHTML = "";
+    if (window.WidgetCheckout) {
+      setWidgetReady(true);
+      return;
+    }
+
+    const existing = document.getElementById("wompi-widget-script");
+    if (existing) {
+      existing.addEventListener("load", () => setWidgetReady(true));
+      existing.addEventListener("error", () =>
+        setWidgetError("No pudimos cargar el widget de Wompi.")
+      );
+      return;
+    }
 
     const script = document.createElement("script");
+    script.id = "wompi-widget-script";
     script.src = "https://checkout.wompi.co/widget.js";
     script.async = true;
-    script.setAttribute("data-render", "button");
-    script.setAttribute("data-public-key", data.public_key);
-    script.setAttribute("data-currency", data.currency);
-    script.setAttribute("data-amount-in-cents", String(data.amount_in_cents));
-    script.setAttribute("data-reference", data.reference);
-    script.setAttribute("data-signature:integrity", data.signature);
-    script.setAttribute("data-redirect-url", data.redirect_url);
-    if (data.customer_email) {
-      script.setAttribute("data-customer-data:email", data.customer_email);
-    }
-    if (data.customer_name) {
-      script.setAttribute("data-customer-data:full-name", data.customer_name);
-    }
-    if (data.customer_phone) {
-      script.setAttribute("data-customer-data:phone-number", data.customer_phone);
+    script.onload = () => setWidgetReady(true);
+    script.onerror = () => setWidgetError("No pudimos cargar el widget de Wompi.");
+    document.body.appendChild(script);
+  }, []);
+
+  const openWidget = useCallback((data: WompiCheckoutResponse) => {
+    if (!window.WidgetCheckout) {
+      setWidgetError("El widget de Wompi aún no está listo.");
+      return;
     }
 
-    containerRef.current.appendChild(script);
-  }, [data]);
+    const checkout = new window.WidgetCheckout({
+      currency: data.currency,
+      amountInCents: data.amount_in_cents,
+      reference: data.reference,
+      publicKey: data.public_key,
+      signature: { integrity: data.signature },
+      redirectUrl: data.redirect_url,
+      customerData: {
+        email: data.customer_email || undefined,
+        fullName: data.customer_name || undefined,
+        phoneNumber: data.customer_phone || undefined,
+        phoneNumberPrefix: "+57",
+      },
+    });
+    checkout.open();
+  }, []);
 
-  return <div ref={containerRef} />;
+  return { widgetReady, widgetError, openWidget };
 }
 
 interface CopyFieldProps {
