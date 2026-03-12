@@ -1,5 +1,5 @@
 /**
- * Página para que el admin revise y apruebe/rechace pagos (historial por estado en tabs)
+ * Página para que el admin revise pagos (historial por estado en tabs)
  */
 
 import { useState, useCallback } from "react";
@@ -73,6 +73,9 @@ interface PagoCardProps {
 
 function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar, onPreview }: PagoCardProps) {
   const comprobanteUrl = partido.comprobante_pago_url ?? "";
+  const esPagoWompi = Boolean(
+    partido.wompi_reference || partido.wompi_status || partido.wompi_transaction_id
+  );
 
   return (
     <div className="rounded-xl border bg-card p-5 shadow-sm hover:shadow-md transition-shadow">
@@ -187,6 +190,40 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar, onPreview }: P
           </div>
         )}
 
+        {esPagoWompi && (
+          <div className="pt-3 border-t">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2 font-medium">
+              Pago automático (Wompi)
+            </p>
+            <div className="grid sm:grid-cols-2 gap-2 text-xs sm:text-sm text-muted-foreground">
+              <div>
+                Estado Wompi:{" "}
+                <span className="text-foreground font-medium">
+                  {partido.wompi_status || "—"}
+                </span>
+              </div>
+              <div>
+                Método:{" "}
+                <span className="text-foreground font-medium">
+                  {partido.wompi_payment_method || "—"}
+                </span>
+              </div>
+              <div className="sm:col-span-2">
+                Referencia:{" "}
+                <span className="text-foreground font-mono text-xs break-all">
+                  {partido.wompi_reference || "—"}
+                </span>
+              </div>
+              <div className="sm:col-span-2">
+                Transacción:{" "}
+                <span className="text-foreground font-mono text-xs break-all">
+                  {partido.wompi_transaction_id || "—"}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t">
           <Button
             variant="outline"
@@ -197,7 +234,7 @@ function PagoCard({ partido, onVerDetalle, onAprobar, onRechazar, onPreview }: P
             <Eye className="mr-2 h-4 w-4" />
             Ver Detalle
           </Button>
-          {partido.estado_pago === "en_revision" && (
+          {partido.estado_pago === "en_revision" && !esPagoWompi && (
             <>
               <Button
                 variant="default"

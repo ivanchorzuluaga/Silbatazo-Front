@@ -1,84 +1,59 @@
 /**
  * Página para realizar el pago de un partido
- * Diseño moderno con glassmorphism y subida de comprobante
+ * Checkout con Wompi y estados de pago automáticos
  */
 
-import { useRef } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { PageLayout } from "@/components/layout";
 import { usePagoPartido } from "../hooks/usePagoPartido";
 import { ROUTES } from "@/lib/constants";
 import logoImage from "@/assets/Logo.png";
+import type { WompiCheckoutResponse } from "@/api/endpoints/partido.endpoints";
 import {
   Loader2,
   CheckCircle,
   XCircle,
   Copy,
-  ExternalLink,
   ArrowLeft,
   Calendar,
   MapPin,
   Trophy,
   Clock,
   CreditCard,
-  Smartphone,
   CheckCircle2,
   AlertCircle,
   Banknote,
-  Upload,
-  Image as ImageIcon,
-  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function PagoPartidoPage() {
   const { id } = useParams<{ id: string }>();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [searchParams] = useSearchParams();
+  const vieneDeCheckout = searchParams.get("checkout") === "1";
 
   const {
     partido,
     isLoading,
     error,
-    isMarkingAsPaid,
     yaPagado,
     estadoPago,
-    comprobante,
-    comprobantePreview,
-    comprobanteError,
     monto,
     referencia,
     esPagoGrupal,
     referenciasGrupo,
     partidosPendientesGrupo,
-    nequiConfig,
+    checkoutData,
+    isCheckoutLoading,
+    checkoutError,
     tienePermiso,
-    handleMarcarComoPagado,
-    handleComprobanteChange,
+    handleCrearCheckout,
     handleCopy,
     formatCurrency,
     navigateToDashboard,
   } = usePagoPartido(id);
-
-  // Manejar click en el área de subida
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  // Manejar archivo seleccionado
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    handleComprobanteChange(file);
-  };
-
-  // Eliminar comprobante
-  const handleRemoveComprobante = () => {
-    handleComprobanteChange(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
 
   // Estado de carga
   if (isLoading) {
@@ -161,6 +136,21 @@ export function PagoPartidoPage() {
         <p className="text-muted-foreground">Completa el pago para confirmar tu solicitud</p>
       </header>
 
+      {vieneDeCheckout && (
+        <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/10 p-4">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-foreground">Pago recibido</p>
+              <p className="text-sm text-muted-foreground">
+                Estamos confirmando el estado con Wompi. Si no cambia en unos segundos,
+                refresca la página.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Columna izquierda - Info del partido y estado */}
         <div className="lg:col-span-1 space-y-6">
@@ -195,7 +185,9 @@ export function PagoPartidoPage() {
           </InfoCard>
 
           {/* Estado del pago */}
-          {yaPagado && <PaymentStatusCard estadoPago={estadoPago} notasPago={partido.notas_pago} />}
+          {estadoPago !== "pendiente" && (
+            <PaymentStatusCard estadoPago={estadoPago} notasPago={partido.notas_pago} />
+          )}
 
           {/* Valor a pagar */}
           <div className="bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20 p-6">
@@ -214,53 +206,26 @@ export function PagoPartidoPage() {
         <div className="lg:col-span-2">
           {!yaPagado ? (
             <div className="space-y-8">
-              {/* Sección de pago con Nequi */}
+              {/* Sección de pago con Wompi */}
               <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-[#E61D73]/20 rounded-lg">
-                    <Smartphone className="w-5 h-5 text-[#E61D73]" />
+                  <div className="p-2 bg-primary/20 rounded-lg">
+                    <CreditCard className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-foreground">Pagar con Nequi</h2>
-                    <p className="text-muted-foreground text-sm">Transferencia rápida y segura</p>
+                    <h2 className="text-xl font-bold text-foreground">Pagar con Wompi</h2>
+                    <p className="text-muted-foreground text-sm">
+                      Tarjeta, PSE, Nequi y Botón Bancolombia
+                    </p>
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6 items-center">
-                  {/* QR Code */}
-                  <div className="flex flex-col items-center">
-                    <div className="w-full max-w-xs sm:max-w-sm md:max-w-md aspect-square rounded-2xl border-2 border-[#E61D73]/30 shadow-lg mb-4 flex items-center justify-center overflow-hidden">
-                      <img
-                        src={nequiConfig.qrUrl}
-                        alt="QR Code Nequi"
-                        className="w-full h-full object-contain"
-                        onError={(e) => {
-                          const img = e.target as HTMLImageElement;
-                          if (img.src.includes("/nequi_qr.jpeg")) {
-                            img.style.display = "none";
-                            return;
-                          }
-                          img.src = "/nequi_qr.jpeg";
-                        }}
-                      />
-                    </div>
-                    <p className="text-muted-foreground text-sm text-center">
-                      Escanea el código QR con la app de Nequi
-                    </p>
-                  </div>
-
-                  {/* Datos de transferencia */}
-                  <div className="space-y-4">
-                    <div className="rounded-xl border border-dashed border-border/70 bg-muted/30 px-4 py-3">
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                        Número Nequi
-                      </p>
-                      <p className="text-sm font-semibold text-foreground">{nequiConfig.phone}</p>
-                      <p className="text-[11px] text-muted-foreground">
-                        Nombre: {nequiConfig.name}
-                      </p>
-                    </div>
-                    <CopyField label="Número Nequi" value={nequiConfig.phone} onCopy={handleCopy} />
+                <div className="rounded-xl border border-dashed border-border/70 bg-muted/30 px-4 py-4">
+                  <p className="text-sm text-muted-foreground">
+                    El pago se procesa de forma segura con Wompi. Puedes elegir el método que
+                    prefieras y volverás automáticamente a esta pantalla al finalizar.
+                  </p>
+                  <div className="grid sm:grid-cols-2 gap-4 mt-4">
                     <CopyField
                       label="Valor a pagar"
                       value={formatCurrency(monto)}
@@ -270,24 +235,40 @@ export function PagoPartidoPage() {
                   </div>
                 </div>
 
-                {/* Soporte por WhatsApp para dudas o problemas con el pago */}
-                <div className="mt-6 rounded-xl border border-dashed border-border/70 bg-muted/20 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-foreground">
-                      ¿Tienes dudas para hacer tu pago?
+                <div className="mt-6 space-y-4">
+                  {!checkoutData ? (
+                    <Button
+                      onClick={handleCrearCheckout}
+                      disabled={isCheckoutLoading}
+                      size="lg"
+                      className="h-14 px-8 text-lg shadow-lg shadow-primary/25"
+                    >
+                      {isCheckoutLoading ? (
+                        <>
+                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                          Preparando pago...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="w-5 h-5 mr-2" />
+                          Continuar con Wompi
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        Abre el widget y elige tu método de pago.
+                      </p>
+                      <WompiWidget data={checkoutData} />
+                    </div>
+                  )}
+                  {checkoutError && (
+                    <p className="text-destructive text-sm flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" />
+                      {checkoutError}
                     </p>
-                    <p className="text-xs text-muted-foreground max-w-md">
-                      Si el QR no funciona o prefieres coordinar el pago directamente por WhatsApp,
-                      escríbenos y te ayudamos paso a paso.
-                    </p>
-                  </div>
-                  <WhatsAppButton
-                    size="sm"
-                    className="w-full sm:w-auto justify-center"
-                    message={`Hola, tengo dudas para hacer el pago del partido con referencia ${referencia}. ¿Me pueden ayudar?`}
-                  >
-                    Hablar por WhatsApp
-                  </WhatsAppButton>
+                  )}
                 </div>
               </div>
 
@@ -295,20 +276,16 @@ export function PagoPartidoPage() {
               <div className="bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20 p-6">
                 <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                   <CreditCard className="w-5 h-5 text-primary" />
-                  Instrucciones para pagar
+                  Qué pasa después del pago
                 </h3>
                 <ol className="space-y-3">
                   {[
-                    "Abre la app de Nequi en tu celular",
-                    'Ve a "Enviar" o "Transferir"',
-                    `Ingresa el valor a pagar: ${formatCurrency(monto)}`,
-                    `En la referencia, escribe: ${referencia}`,
+                    "Al finalizar en Wompi, serás redirigido automáticamente a esta página.",
+                    "Confirmaremos el pago en segundos con Wompi y actualizaremos el estado.",
                     esPagoGrupal
                       ? `Este pago cubre ${partidosPendientesGrupo} partidos (${referenciasGrupo.join(", ")})`
                       : "Este pago cubre 1 partido",
-                    "Confirma y realiza la transferencia",
-                    "Toma una captura de pantalla del comprobante",
-                    "Sube la captura y confirma tu pago",
+                    "Si el estado no cambia de inmediato, espera un momento y refresca la página.",
                   ].map((step, index) => (
                     <li key={index} className="flex items-start gap-3">
                       <span className="shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-sm font-medium">
@@ -319,120 +296,6 @@ export function PagoPartidoPage() {
                   ))}
                 </ol>
               </div>
-
-              {/* Subir comprobante */}
-              <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-primary/20 rounded-lg">
-                    <Upload className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Subir Comprobante de Pago</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Sube una captura de pantalla de la transferencia
-                    </p>
-                  </div>
-                </div>
-
-                {/* Input oculto */}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-
-                {/* Área de subida o preview */}
-                {comprobantePreview ? (
-                  <div className="relative">
-                    <div className="relative rounded-xl overflow-hidden border-2 border-primary/30">
-                      <img
-                        src={comprobantePreview}
-                        alt="Comprobante"
-                        className="w-full max-h-80 object-contain bg-black/20"
-                      />
-                      <button
-                        onClick={handleRemoveComprobante}
-                        className="absolute top-2 right-2 p-2 bg-destructive hover:bg-destructive/90 rounded-full transition-colors"
-                      >
-                        <X className="w-4 h-4 text-destructive-foreground" />
-                      </button>
-                    </div>
-                    <p className="text-center text-muted-foreground text-sm mt-3">
-                      <CheckCircle className="w-4 h-4 inline-block mr-1 text-success" />
-                      Comprobante cargado: {comprobante?.name}
-                    </p>
-                  </div>
-                ) : (
-                  <button
-                    onClick={handleUploadClick}
-                    className={cn(
-                      "w-full p-8 border-2 border-dashed rounded-xl transition-all",
-                      "hover:border-primary/50 hover:bg-primary/5",
-                      comprobanteError
-                        ? "border-destructive/50 bg-destructive/5"
-                        : "border-border bg-muted/50"
-                    )}
-                  >
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="p-4 bg-muted rounded-full">
-                        <ImageIcon className="w-8 h-8 text-muted-foreground" />
-                      </div>
-                      <div className="text-center">
-                        <p className="text-foreground font-medium">
-                          Haz clic para seleccionar la captura
-                        </p>
-                        <p className="text-muted-foreground text-sm mt-1">
-                          JPG, PNG, WebP o GIF (máx. 5MB)
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-                )}
-
-                {/* Error del comprobante */}
-                {comprobanteError && (
-                  <p className="text-destructive text-sm mt-3 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" />
-                    {comprobanteError}
-                  </p>
-                )}
-              </div>
-
-              {/* Botón de confirmación */}
-              <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-6 text-center">
-                <p className="text-muted-foreground text-sm mb-6 max-w-md mx-auto">
-                  Una vez que hayas subido el comprobante, confirma tu pago para que podamos
-                  verificarlo.
-                </p>
-                <Button
-                  onClick={handleMarcarComoPagado}
-                  disabled={isMarkingAsPaid || !comprobante}
-                  size="lg"
-                  className={cn(
-                    "h-14 px-8 text-lg shadow-lg shadow-primary/25",
-                    !comprobante && "opacity-50 cursor-not-allowed"
-                  )}
-                >
-                  {isMarkingAsPaid ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-5 h-5 mr-2" />
-                      Confirmar Pago
-                    </>
-                  )}
-                </Button>
-                {!comprobante && (
-                  <p className="text-warning text-xs mt-3">
-                    Debes subir el comprobante para confirmar
-                  </p>
-                )}
-              </div>
             </div>
           ) : (
             <PaymentCompletedView estadoPago={estadoPago} />
@@ -440,18 +303,6 @@ export function PagoPartidoPage() {
         </div>
       </div>
 
-      {/* Link a Nequi */}
-      <div className="text-center mt-8">
-        <a
-          href="https://www.nequi.com.co"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-        >
-          ¿No tienes Nequi? Descárgalo aquí
-          <ExternalLink className="w-4 h-4" />
-        </a>
-      </div>
       </PageContainer>
     </PageLayout>
   );
@@ -520,6 +371,43 @@ function InfoRow({ icon: Icon, label, value }: InfoRowProps) {
   );
 }
 
+interface WompiWidgetProps {
+  data: WompiCheckoutResponse;
+}
+
+function WompiWidget({ data }: WompiWidgetProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    containerRef.current.innerHTML = "";
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.wompi.co/widget.js";
+    script.async = true;
+    script.setAttribute("data-render", "button");
+    script.setAttribute("data-public-key", data.public_key);
+    script.setAttribute("data-currency", data.currency);
+    script.setAttribute("data-amount-in-cents", String(data.amount_in_cents));
+    script.setAttribute("data-reference", data.reference);
+    script.setAttribute("data-signature:integrity", data.signature);
+    script.setAttribute("data-redirect-url", data.redirect_url);
+    if (data.customer_email) {
+      script.setAttribute("data-customer-data:email", data.customer_email);
+    }
+    if (data.customer_name) {
+      script.setAttribute("data-customer-data:full-name", data.customer_name);
+    }
+    if (data.customer_phone) {
+      script.setAttribute("data-customer-data:phone-number", data.customer_phone);
+    }
+
+    containerRef.current.appendChild(script);
+  }, [data]);
+
+  return <div ref={containerRef} />;
+}
+
 interface CopyFieldProps {
   label: string;
   value: string;
@@ -586,12 +474,12 @@ function PaymentStatusCard({ estadoPago, notasPago }: PaymentStatusCardProps) {
             {isAprobado
               ? "Tu pago ha sido verificado y aprobado."
               : isEnRevision
-              ? "Recibimos tu comprobante y tu pago quedó registrado correctamente. Ahora está en revisión por nuestro equipo, no necesitas hacer nada más."
-              : notasPago || "El pago fue rechazado. Por favor, verifica la información."}
+              ? "Estamos confirmando el pago con Wompi. No necesitas hacer nada más."
+              : notasPago || "El pago fue rechazado. Por favor, intenta nuevamente."}
           </p>
           {isEnRevision && (
             <p className="text-muted-foreground text-xs mt-2">
-              La revisión es manual y puede tardar entre 15 y 30 minutos. Te avisaremos por correo electrónico cuando el pago sea aprobado.
+              La confirmación suele tardar unos segundos. Si no cambia el estado, refresca la página.
             </p>
           )}
         </div>
@@ -637,12 +525,12 @@ function PaymentCompletedView({ estadoPago }: PaymentCompletedViewProps) {
         {isAprobado
           ? "Tu pago ha sido verificado exitosamente. El árbitro ha sido notificado y tu partido está confirmado."
           : isEnRevision
-          ? "Tu pago fue enviado correctamente y está en revisión por nuestro equipo. No tienes que hacer nada más; solo esperar la confirmación."
-          : "Hubo un problema con tu pago. Por favor, contacta a soporte o intenta nuevamente."}
+          ? "Tu pago fue enviado correctamente. Estamos confirmando con Wompi."
+          : "Hubo un problema con tu pago. Por favor, intenta nuevamente."}
       </p>
       {isEnRevision && (
         <p className="text-muted-foreground text-sm max-w-md mx-auto mb-6">
-          La revisión es manual y puede tardar entre 15 y 30 minutos. Te avisaremos por correo electrónico cuando el pago sea aprobado.
+          La confirmación suele tardar unos segundos. Si no cambia el estado, refresca la página.
         </p>
       )}
       {!isAprobado && !isEnRevision && (

@@ -406,6 +406,15 @@ export const partidoEndpoints = {
   },
 
   /**
+   * Crear checkout de Wompi para un partido
+   */
+  async crearWompiCheckout(token: string, id: number): Promise<WompiCheckoutResponse> {
+    return authenticatedApiClient<WompiCheckoutResponse>(`/api/partidos/${id}/wompi/checkout/`, token, {
+      method: "POST",
+    });
+  },
+
+  /**
    * Aprobar un pago (solo admin)
    */
   async aprobarPago(
@@ -493,6 +502,20 @@ export interface AdminDashboardStats {
   comision_plataforma?: number;
   saldo_arbitros?: number;
   verificaciones: number;
+}
+
+export interface WompiCheckoutResponse {
+  public_key: string;
+  currency: string;
+  amount_in_cents: number;
+  reference: string;
+  signature: string;
+  redirect_url: string;
+  customer_email: string;
+  customer_name: string;
+  customer_phone: string;
+  es_pago_grupal: boolean;
+  partidos_pendientes: number;
 }
 
 export interface LandingStats {

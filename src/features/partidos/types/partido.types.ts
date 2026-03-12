@@ -53,6 +53,10 @@ export interface Partido {
   fecha_pago?: string;
   /** URL del comprobante de pago (captura de transferencia) subido por el cliente */
   comprobante_pago_url?: string | null;
+  wompi_status?: string | null;
+  wompi_reference?: string | null;
+  wompi_transaction_id?: string | null;
+  wompi_payment_method?: string | null;
   tiene_conflicto_horario?: boolean;
   notas_pago?: string;
   notas_cliente?: string;
