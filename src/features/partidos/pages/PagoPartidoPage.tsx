@@ -56,7 +56,7 @@ export function PagoPartidoPage() {
     navigateToDashboard,
   } = usePagoPartido(id);
 
-  const { widgetReady, widgetError, openWidget } = useWompiWidget();
+  const { widgetReady, widgetError, widgetStatus, openWidget } = useWompiWidget();
 
   const handleIniciarPago = useCallback(async () => {
     setIntentoAbrirWidget(true);
@@ -289,10 +289,30 @@ export function PagoPartidoPage() {
                     </div>
                   )}
                   {(checkoutError || widgetError) && (
-                    <p className="text-destructive text-sm flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4" />
-                      {checkoutError || widgetError}
-                    </p>
+                    <div className="space-y-2">
+                      <p className="text-destructive text-sm flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4" />
+                        {checkoutError || widgetError}
+                      </p>
+                      <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-[11px] text-muted-foreground">
+                        <p className="font-medium text-foreground mb-1">Diagnóstico rápido</p>
+                        <p>Widget listo: {widgetStatus.ready ? "sí" : "no"}</p>
+                        <p>Script cargado: {widgetStatus.scriptLoaded ? "sí" : "no"}</p>
+                        <p>Constructor: {widgetStatus.hasConstructor ? "sí" : "no"}</p>
+                        {checkoutData && (
+                          <>
+                            <p>
+                              Llave pública:{" "}
+                              {checkoutData.public_key
+                                ? `${checkoutData.public_key.slice(0, 6)}...${checkoutData.public_key.slice(-4)}`
+                                : "vacía"}
+                            </p>
+                            <p>Monto: {checkoutData.amount_in_cents}</p>
+                            <p>Referencia: {checkoutData.reference}</p>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
@@ -402,19 +422,35 @@ declare global {
   }
 }
 
+interface WompiWidgetStatus {
+  ready: boolean;
+  scriptLoaded: boolean;
+  hasConstructor: boolean;
+}
+
 function useWompiWidget() {
   const [widgetReady, setWidgetReady] = useState(false);
   const [widgetError, setWidgetError] = useState<string | null>(null);
+  const [widgetStatus, setWidgetStatus] = useState<WompiWidgetStatus>({
+    ready: false,
+    scriptLoaded: false,
+    hasConstructor: false,
+  });
 
   useEffect(() => {
     if (window.WidgetCheckout) {
       setWidgetReady(true);
+      setWidgetStatus({ ready: true, scriptLoaded: true, hasConstructor: true });
       return;
     }
 
     const existing = document.getElementById("wompi-widget-script");
     if (existing) {
-      existing.addEventListener("load", () => setWidgetReady(true));
+      existing.addEventListener("load", () => {
+        const hasConstructor = Boolean(window.WidgetCheckout);
+        setWidgetReady(true);
+        setWidgetStatus({ ready: true, scriptLoaded: true, hasConstructor });
+      });
       existing.addEventListener("error", () =>
         setWidgetError("No pudimos cargar el widget de Wompi.")
       );
@@ -425,14 +461,25 @@ function useWompiWidget() {
     script.id = "wompi-widget-script";
     script.src = "https://checkout.wompi.co/widget.js";
     script.async = true;
-    script.onload = () => setWidgetReady(true);
-    script.onerror = () => setWidgetError("No pudimos cargar el widget de Wompi.");
+    script.onload = () => {
+      const hasConstructor = Boolean(window.WidgetCheckout);
+      setWidgetReady(true);
+      setWidgetStatus({ ready: true, scriptLoaded: true, hasConstructor });
+    };
+    script.onerror = () => {
+      setWidgetError("No pudimos cargar el widget de Wompi.");
+      setWidgetStatus({ ready: false, scriptLoaded: false, hasConstructor: false });
+    };
     document.body.appendChild(script);
   }, []);
 
   const openWidget = useCallback((data: WompiCheckoutResponse) => {
     if (!window.WidgetCheckout || typeof window.WidgetCheckout !== "function") {
       setWidgetError("El widget de Wompi aún no está listo.");
+      setWidgetStatus((prev) => ({
+        ...prev,
+        hasConstructor: Boolean(window.WidgetCheckout),
+      }));
       return;
     }
 
@@ -469,7 +516,7 @@ function useWompiWidget() {
     }
   }, []);
 
-  return { widgetReady, widgetError, openWidget };
+  return { widgetReady, widgetError, widgetStatus, openWidget };
 }
 
 interface CopyFieldProps {
