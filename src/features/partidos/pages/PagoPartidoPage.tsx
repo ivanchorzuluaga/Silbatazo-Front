@@ -418,7 +418,9 @@ function InfoRow({ icon: Icon, label, value }: InfoRowProps) {
 
 declare global {
   interface Window {
-    WidgetCheckout?: new (config: Record<string, unknown>) => { open: () => void };
+    WidgetCheckout?: new (config: Record<string, unknown>) => {
+      open: (response?: (result: unknown) => void) => void;
+    };
   }
 }
 
