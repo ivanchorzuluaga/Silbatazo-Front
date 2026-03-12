@@ -501,12 +501,11 @@ function useWompiWidget() {
         publicKey: data.public_key,
         signature: { integrity: data.signature },
         redirectUrl: data.redirect_url,
-        onResponse: () => {
-          // Wompi exige un callback; el webhook confirma el estado real.
-        },
         ...(customerData ? { customerData } : {}),
       });
-      checkout.open();
+      checkout.open(() => {
+        // Wompi exige un callback; el webhook confirma el estado real.
+      });
     } catch (err) {
       // Mostrar detalle real del error para diagnóstico
       console.error("Wompi Widget Error:", err);
