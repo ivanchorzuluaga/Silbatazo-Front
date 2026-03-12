@@ -65,8 +65,11 @@ export function PagoPartidoPage() {
 
   useEffect(() => {
     if (intentoAbrirWidget && checkoutData && widgetReady) {
-      openWidget(checkoutData);
-      setIntentoAbrirWidget(false);
+      try {
+        openWidget(checkoutData);
+      } finally {
+        setIntentoAbrirWidget(false);
+      }
     }
   }, [intentoAbrirWidget, checkoutData, widgetReady, openWidget]);
 
@@ -428,26 +431,42 @@ function useWompiWidget() {
   }, []);
 
   const openWidget = useCallback((data: WompiCheckoutResponse) => {
-    if (!window.WidgetCheckout) {
+    if (!window.WidgetCheckout || typeof window.WidgetCheckout !== "function") {
       setWidgetError("El widget de Wompi aún no está listo.");
       return;
     }
 
-    const checkout = new window.WidgetCheckout({
-      currency: data.currency,
-      amountInCents: data.amount_in_cents,
-      reference: data.reference,
-      publicKey: data.public_key,
-      signature: { integrity: data.signature },
-      redirectUrl: data.redirect_url,
-      customerData: {
-        email: data.customer_email || undefined,
-        fullName: data.customer_name || undefined,
-        phoneNumber: data.customer_phone || undefined,
-        phoneNumberPrefix: "+57",
-      },
-    });
-    checkout.open();
+    try {
+      const customerData =
+        data.customer_email || data.customer_name || data.customer_phone
+          ? {
+              email: data.customer_email || undefined,
+              fullName: data.customer_name || undefined,
+              phoneNumber: data.customer_phone || undefined,
+              phoneNumberPrefix: "+57",
+            }
+          : undefined;
+
+      const checkout = new window.WidgetCheckout({
+        currency: data.currency,
+        amountInCents: data.amount_in_cents,
+        reference: data.reference,
+        publicKey: data.public_key,
+        signature: { integrity: data.signature },
+        redirectUrl: data.redirect_url,
+        onResponse: () => {
+          // Wompi exige un callback; el webhook confirma el estado real.
+        },
+        ...(customerData ? { customerData } : {}),
+      });
+      checkout.open();
+    } catch (err) {
+      setWidgetError(
+        err instanceof Error
+          ? err.message
+          : "No pudimos abrir el widget de Wompi.",
+      );
+    }
   }, []);
 
   return { widgetReady, widgetError, openWidget };
