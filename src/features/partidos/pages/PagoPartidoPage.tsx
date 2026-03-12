@@ -508,11 +508,15 @@ function useWompiWidget() {
       });
       checkout.open();
     } catch (err) {
-      setWidgetError(
+      // Mostrar detalle real del error para diagnóstico
+      console.error("Wompi Widget Error:", err);
+      const mensaje =
         err instanceof Error
           ? err.message
-          : "No pudimos abrir el widget de Wompi.",
-      );
+          : typeof err === "string"
+            ? err
+            : JSON.stringify(err);
+      setWidgetError(mensaje || "No pudimos abrir el widget de Wompi.");
     }
   }, []);
 
