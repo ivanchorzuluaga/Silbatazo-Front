@@ -1,75 +1,70 @@
-# React + TypeScript + Vite
+# ⚽ Silbatazo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Plataforma web diseñada para conectar árbitros con organizadores de partidos deportivos, permitiendo gestionar solicitudes de arbitraje de manera rápida y eficiente.
 
-Currently, two official plugins are available:
+Silbatazo automatiza la asignación de árbitros, la gestión de partidos y las notificaciones entre usuarios, mejorando la coordinación y reduciendo procesos manuales en la organización de eventos deportivos.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
+📌 Estado del proyecto
 
-## React Compiler
+🚧 En fase de lanzamiento.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+---
+## 🚀 Características
 
-Note: This will impact Vite dev & build performances.
+- Registro y gestión de usuarios (administradores, árbitros y clientes)
+- Creación y administración de partidos
+- Sistema de asignación de árbitros
+- Notificaciones automáticas por correo electrónico
+- Integración con **WhatsApp mediante API de Meta**
+- Panel administrativo con gestión de usuarios y partidos
+- Arquitectura basada en **API REST**
+- Optimización SEO
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠️ Tecnologías
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Frontend
+React  
+Tailwind CSS  
+JavaScript
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Backend
+Python  
+Django  
+Django REST Framework
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Base de datos
+PostgreSQL
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Infraestructura
+Docker (entorno de desarrollo)  
+Vercel (frontend)  
+Render (backend)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Integraciones
+Meta API (WhatsApp)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## 📊 Proyección del proyecto
+
+- 21 árbitros registrados actualmente
+- Plataforma diseñada para gestionar aproximadamente **200 partidos mensuales**
+- Sistema escalable para múltiples ligas y organizadores
+
+## 🔌 Arquitectura
+
+El proyecto está estructurado bajo una arquitectura basada en API REST, separando frontend y backend para facilitar escalabilidad y mantenimiento.
+	•	Frontend: React
+	•	Backend: Django + Django REST Framework
+	•	Base de datos: PostgreSQL
+
+
+## 👨‍💻 Autor
+
+Ivan Zuluaga
+
+Full Stack Developer
+Python · Django · React · PostgreSQL
