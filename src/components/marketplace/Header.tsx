@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
@@ -12,22 +12,31 @@ import { Menu, Users, Clock, Mail, ArrowRight, X, DollarSign } from "lucide-reac
 export function Header() {
   const { isAuthenticated, user } = useAuth();
   const { isDark } = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isAdmin = isAuthenticated && user?.role === USER_ROLES.ADMIN;
+  const isHome = location.pathname === ROUTES.HOME || location.pathname === "/";
 
   const navigationItems = [
-    { icon: Users, label: "Árbitros", href: "#arbitros-destacados", isScroll: true },
-    { icon: Clock, label: "Cómo Funciona", href: "#como-funciona", isScroll: true },
-    { icon: DollarSign, label: "Precios", href: "#precios", isScroll: true },
-    { icon: Mail, label: "Contacto", href: "#contacto", isScroll: true },
+    { icon: Users, label: "Árbitros", href: "#arbitros-destacados" },
+    { icon: Clock, label: "Cómo Funciona", href: "#como-funciona" },
+    { icon: DollarSign, label: "Precios", href: "#precios" },
+    { icon: Mail, label: "Contacto", href: "#contacto" },
   ];
 
   const handleScrollTo = (sectionId: string) => {
-    const element = document.querySelector(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-      setMobileMenuOpen(false);
+    setMobileMenuOpen(false);
+
+    if (isHome) {
+      const element = document.querySelector(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      return;
     }
+
+    navigate(`${ROUTES.HOME}${sectionId}`);
   };
 
   return (

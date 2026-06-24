@@ -84,19 +84,30 @@ export function HomePage() {
     ],
   });
 
-  // Manejar scroll: si hay hash ir a esa sección, si no ir al inicio
   useEffect(() => {
-    if (location.hash) {
-      // Esperar un momento para que la página cargue completamente
-      setTimeout(() => {
-        const element = document.querySelector(location.hash);
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }, 100);
-    } else {
+    if (!location.hash) {
       window.scrollTo(0, 0);
+      return;
     }
+
+    const scrollToHash = () => {
+      const element = document.querySelector(location.hash);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+        return true;
+      }
+      return false;
+    };
+
+    if (scrollToHash()) return;
+
+    const timeouts = [150, 400, 800].map((delay) =>
+      window.setTimeout(() => scrollToHash(), delay),
+    );
+
+    return () => {
+      timeouts.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    };
   }, [location.hash]);
 
   // Cargar árbitros destacados
