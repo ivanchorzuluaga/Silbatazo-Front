@@ -1,5 +1,6 @@
 const FOTO_ANONIMA = "/arbitro-anonimo.png";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
+import { ARBITRO_CALIFICACION_PUBLICA } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 interface FotoArbitroCardProps {
@@ -35,10 +36,6 @@ function formatearId(arbitro: Arbitro): string {
   return `#${String(idMostrar).padStart(3, "0")}`;
 }
 
-function clampCalificacion(valor: number): number {
-  return Math.max(0, Math.min(5, valor));
-}
-
 function Estrella({ variante }: { variante: "llena" | "media" | "vacia" }) {
   const baseOpacity = variante === "llena" ? "opacity-100" : "opacity-25";
   return (
@@ -68,10 +65,7 @@ export function FotoArbitroCard({
   const nombre = obtenerNombre(arbitro);
   const nombreMostrar = nombreOverride ?? nombre;
   const foto = fotoOverrideSrc || obtenerFoto(arbitro);
-  const calificacion = clampCalificacion(arbitro.calificacion_promedio ?? 0);
-  const estrellasLlenas = Math.floor(calificacion);
-  const tieneMedia = calificacion - estrellasLlenas >= 0.5;
-  const estrellasVacias = 5 - estrellasLlenas - (tieneMedia ? 1 : 0);
+  const estrellasLlenas = ARBITRO_CALIFICACION_PUBLICA;
 
   return (
     <article
@@ -106,14 +100,10 @@ export function FotoArbitroCard({
               </span>
               <div
                 className="flex items-center gap-1"
-                aria-label={`Calificación ${calificacion} de 5`}
+                aria-label={`Calificación ${ARBITRO_CALIFICACION_PUBLICA} de 5`}
               >
                 {Array.from({ length: estrellasLlenas }).map((_, index) => (
                   <Estrella key={`llena-${index}`} variante="llena" />
-                ))}
-                {tieneMedia && <Estrella variante="media" />}
-                {Array.from({ length: estrellasVacias }).map((_, index) => (
-                  <Estrella key={`vacia-${index}`} variante="vacia" />
                 ))}
               </div>
             </>

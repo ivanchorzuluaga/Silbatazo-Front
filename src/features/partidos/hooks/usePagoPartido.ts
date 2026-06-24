@@ -42,6 +42,7 @@ export interface UsePagoPartidoReturn {
   // Acciones
   handleCopy: (text: string) => void;
   handleCrearCheckout: () => Promise<void>;
+  refreshPartido: () => Promise<void>;
   formatCurrency: (value: string | number) => string;
   navigateToDetail: () => void;
   navigateToDashboard: () => void;
@@ -50,7 +51,7 @@ export interface UsePagoPartidoReturn {
 export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoReturn {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { partido, isLoading, error, obtenerPartido } = usePartido();
+  const { partido, isLoading, error, obtenerPartido, refresh } = usePartido();
 
   const [partidosGrupo, setPartidosGrupo] = useState<
     Array<{
@@ -218,6 +219,7 @@ export function usePagoPartido(partidoId: string | undefined): UsePagoPartidoRet
     user,
     handleCopy,
     handleCrearCheckout,
+    refreshPartido: refresh,
     formatCurrency: formatCop,
     navigateToDetail,
     navigateToDashboard,

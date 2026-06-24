@@ -1,5 +1,6 @@
-import { Star, MapPin, Award, Calendar, Users } from "lucide-react";
+import { Star, MapPin, Award, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ARBITRO_CALIFICACION_PUBLICA } from "@/lib/constants";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 import { FotoArbitroCard } from "@/components/arbitro/FotoArbitroCard";
 
@@ -8,21 +9,17 @@ interface RefereeDetailProps {
 }
 
 export function RefereeDetail({ arbitro }: RefereeDetailProps) {
-  const rating = arbitro.calificacion_promedio || 0;
   const nombre = arbitro.full_name || arbitro.username;
   const experiencia = arbitro.experiencia_anos ? `${arbitro.experiencia_anos} años` : "Experiencia";
   const especialidad =
     arbitro.categorias.length > 0 ? arbitro.categorias.map((c) => c.nombre).join(", ") : "Árbitro";
-  const partidos = arbitro.total_partidos || 0;
   const municipio =
     arbitro.municipios.length > 0
       ? arbitro.municipios.map((m) => m.nombre).join(", ")
       : "Ubicación no especificada";
 
-  // Certificaciones (simuladas basadas en categorías)
   const certificaciones = arbitro.categorias.map((c) => c.nombre);
 
-  // Disponibilidad
   const disponibilidad =
     arbitro.disponibilidades && arbitro.disponibilidades.length > 0
       ? arbitro.disponibilidades.map((d) => d.dia_semana_display)
@@ -44,14 +41,12 @@ export function RefereeDetail({ arbitro }: RefereeDetailProps) {
 
         <div className="flex-1 space-y-4">
           <div>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
               <h1 className="text-3xl sm:text-4xl font-bold">{nombre}</h1>
-              {rating > 0 && (
-                <Badge className="bg-accent text-accent-foreground">
-                  <Star className="w-3 h-3 fill-current mr-1" />
-                  {rating.toFixed(1)}
-                </Badge>
-              )}
+              <Badge className="bg-accent text-accent-foreground">
+                <Star className="w-3 h-3 fill-current mr-1" />
+                {ARBITRO_CALIFICACION_PUBLICA.toFixed(1)}
+              </Badge>
             </div>
             <p className="text-lg text-muted-foreground">{especialidad}</p>
           </div>
@@ -64,10 +59,6 @@ export function RefereeDetail({ arbitro }: RefereeDetailProps) {
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Calendar className="w-4 h-4" />
               {experiencia} de experiencia
-            </div>
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <Users className="w-4 h-4" />
-              {partidos} partidos arbitrados
             </div>
           </div>
         </div>

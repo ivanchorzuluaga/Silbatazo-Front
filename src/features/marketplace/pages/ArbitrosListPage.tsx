@@ -4,7 +4,6 @@
  */
 
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import { useMunicipios } from "@/features/arbitro/hooks/useMunicipios";
 import { useCategorias } from "@/features/arbitro/hooks/useCategorias";
 import { useLandingStats } from "../hooks/useLandingStats";
@@ -13,9 +12,10 @@ import { FiltrosArbitros, type FiltrosArbitrosType } from "../components/Filtros
 import { Header } from "@/components/marketplace/Header";
 import { Footer } from "@/components/marketplace/Footer";
 import { Button } from "@/components/ui/button";
-import { CATEGORIAS_PARTIDO, ROUTES } from "@/lib/constants";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
+import { CATEGORIAS_PARTIDO, WHATSAPP_RESERVA_MESSAGE } from "@/lib/constants";
 import logoImage from "@/assets/Logo.png";
-import { Users, RefreshCw, SearchX, Loader2, CalendarPlus, ArrowRight } from "lucide-react";
+import { Users, RefreshCw, SearchX, Loader2 } from "lucide-react";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 import { fetchArbitrosPaginatedCached } from "@/api/utils/arbitros-cache";
 
@@ -163,13 +163,13 @@ export function ArbitrosListPage() {
               Encuentra el árbitro perfecto para tu partido. Todos nuestros árbitros están
               garantizados, son de calidad y listos para garantizar un juego limpio.
             </p>
-            <Button size="lg" className="shadow-lg hover:shadow-xl transition-all" asChild>
-              <Link to={ROUTES.PARTIDOS_CREAR}>
-                <CalendarPlus className="w-5 h-5 mr-2" />
-                Solicitar árbitro para mi partido
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
+            <WhatsAppButton
+              size="lg"
+              className="shadow-lg hover:shadow-xl"
+              message={WHATSAPP_RESERVA_MESSAGE}
+            >
+              Reservar por WhatsApp
+            </WhatsAppButton>
           </div>
 
           {/* Filtros con glassmorphism */}

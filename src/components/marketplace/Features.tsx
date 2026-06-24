@@ -1,5 +1,10 @@
-import { Shield, Clock, Users, Award, Star, Zap, TrendingUp } from "lucide-react";
-import { useLandingStats } from "@/features/marketplace/hooks/useLandingStats";
+import { Shield, Clock, Users, Award, Star, Zap } from "lucide-react";
+import { ARBITRO_CALIFICACION_PUBLICA } from "@/lib/constants";
+import {
+  useLandingStats,
+  getArbitrosVerificadosDisplay,
+  LANDING_DISPONIBILIDAD_TEXTO,
+} from "@/features/marketplace/hooks/useLandingStats";
 
 const features = [
   {
@@ -39,30 +44,20 @@ export function Features() {
 
   const statsDisplay = [
     {
-      value: isLoading ? "—" : String(stats?.partidos_pitados ?? "—"),
-      label: "Partidos arbitrados",
-      icon: TrendingUp,
-      color: "text-purple-500",
-    },
-    {
-      value: isLoading
-        ? "—"
-        : stats?.calificacion_promedio != null
-        ? String(stats.calificacion_promedio)
-        : "—",
-      label: "Calificación promedio",
+      value: String(ARBITRO_CALIFICACION_PUBLICA),
+      label: "Calificación garantizada",
       icon: Star,
       color: "text-yellow-500",
     },
     {
-      value: isLoading ? "—" : String(stats?.arbitros_disponibles_hoy ?? "—"),
-      label: "Disponibles hoy",
+      value: getArbitrosVerificadosDisplay(stats, isLoading),
+      label: "Árbitros verificados",
       icon: Users,
       color: "text-gray-500",
     },
     {
-      value: isLoading ? "—" : stats?.primera_hora_hoy ?? "—",
-      label: "Primera hora hoy",
+      value: LANDING_DISPONIBILIDAD_TEXTO,
+      label: "Disponibilidad coordinada",
       icon: Clock,
       color: "text-blue-500",
     },
@@ -135,7 +130,7 @@ export function Features() {
             <p className="text-muted-foreground">La confianza de nuestros clientes en cifras</p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {statsDisplay.map((stat, index) => (
               <div key={index} className="text-center space-y-3">
                 <div className="flex justify-center">

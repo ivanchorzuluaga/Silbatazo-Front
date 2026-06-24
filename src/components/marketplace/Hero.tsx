@@ -1,16 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle, Star, Clock, Users, Trophy } from "lucide-react";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
+import { WHATSAPP_RESERVA_MESSAGE } from "@/lib/constants";
+import { ArrowRight, CheckCircle, Clock, Users, Trophy } from "lucide-react";
 import posterWeb from "@/assets/Poster-1-Web.png";
 import posterMovil from "@/assets/Poster-1-movil.png";
-import { useLandingStats } from "@/features/marketplace/hooks/useLandingStats";
-
-/** Formatea "HH:MM" a "H:MM" o "HH:MM" para mostrar (ej. "08:00" → "8:00") */
-function formatHoraCorta(hora: string | null): string {
-  if (!hora) return "";
-  const [h, m] = hora.split(":");
-  const hNum = parseInt(h, 10);
-  return `${hNum}:${m}`;
-}
+import { useLandingStats, getArbitrosVerificadosDisplay, LANDING_DISPONIBILIDAD_TEXTO } from "@/features/marketplace/hooks/useLandingStats";
 
 export function Hero() {
   const { stats, isLoading } = useLandingStats();
@@ -22,10 +16,7 @@ export function Hero() {
     }
   };
 
-  const partidosPitados = stats?.partidos_pitados ?? null;
-  const calificacionPromedio = stats?.calificacion_promedio ?? null;
-  const arbitrosDisponiblesHoy = stats?.arbitros_disponibles_hoy ?? 0;
-  const primeraHoraHoy = stats?.primera_hora_hoy ? formatHoraCorta(stats.primera_hora_hoy) : null;
+  const arbitrosVerificados = getArbitrosVerificadosDisplay(stats, isLoading);
   const arbitrosTotal = stats?.arbitros_total ?? 0;
 
   return (
@@ -55,7 +46,7 @@ export function Hero() {
                 </span>
                 <br />
                 <span className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-foreground/85">
-                  EN COLOMBIA, FÁCIL Y CONFIABLE
+                  EN MEDELLÍN, FÁCIL Y CONFIABLE
                 </span>
               </h1>
 
@@ -104,7 +95,7 @@ export function Hero() {
               {/* Floating card móvil */}
               <div className="absolute -bottom-3 right-4 bg-card p-3 rounded-lg shadow-lg border border-border/50 backdrop-blur-sm z-20">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                   <span className="text-sm font-medium">Disponible ahora</span>
                 </div>
               </div>
@@ -112,70 +103,50 @@ export function Hero() {
 
             {/* Description */}
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-              Conecta con árbitros verificados para partidos, amistosos y torneos en el Área
-              Metropolitana de Medellín. Arbitraje fácil y de confianza.
-              <span className="font-semibold text-foreground"> Rápido, seguro y sin enredos.</span>
+              Explora árbitros verificados para partidos y torneos en el Área Metropolitana de
+              Medellín. Reserva por WhatsApp y nosotros coordinamos disponibilidad, pago y
+              confirmación.
             </p>
 
-            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button
+              <WhatsAppButton
                 size="lg"
-                className="group shadow-lg hover:shadow-xl transition-all duration-300"
-                onClick={() => handleScrollTo("#arbitros-destacados")}
+                className="shadow-lg hover:shadow-xl"
+                message={WHATSAPP_RESERVA_MESSAGE}
               >
-                <Users className="h-5 w-5 mr-2" />
-                Explorar Árbitros
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
+                Reservar por WhatsApp
+              </WhatsAppButton>
               <Button
                 size="lg"
                 variant="outline"
                 className="group border-2 hover:bg-primary/5"
-                onClick={() => handleScrollTo("#como-funciona")}
+                onClick={() => handleScrollTo("#arbitros-destacados")}
               >
-                <Clock className="h-5 w-5 mr-2" />
-                Cómo Funciona
+                <Users className="h-5 w-5 mr-2" />
+                Ver Árbitros
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
 
-            {/* Stats (datos reales) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-4 lg:pt-8">
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Trophy className="h-5 w-5 text-yellow-500" />
-                  <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
-                    {isLoading ? "—" : partidosPitados}
-                  </p>
-                </div>
-                <p className="text-sm font-medium text-foreground">Partidos arbitrados</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Star className="h-5 w-5 text-yellow-500" />
-                  <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
-                    {isLoading ? "—" : calificacionPromedio ?? "—"}
-                  </p>
-                </div>
-                <p className="text-sm font-medium text-foreground">Calificación promedio</p>
-              </div>
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-6 pt-4 lg:pt-8">
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Users className="h-5 w-5 text-gray-500" />
                   <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
-                    {isLoading ? "—" : arbitrosDisponiblesHoy}
+                    {arbitrosVerificados}
                   </p>
                 </div>
-                <p className="text-sm font-medium text-foreground">Disponibles hoy</p>
+                <p className="text-sm font-medium text-foreground">Árbitros verificados</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Clock className="h-5 w-5 text-blue-500" />
-                  <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
-                    {isLoading ? "—" : primeraHoraHoy ? `Desde ${primeraHoraHoy}` : "—"}
+                  <p className="text-2xl sm:text-3xl font-bold text-foreground">
+                    {LANDING_DISPONIBILIDAD_TEXTO}
                   </p>
                 </div>
-                <p className="text-sm font-medium text-foreground">Primera hora hoy</p>
+                <p className="text-sm font-medium text-foreground">Disponibilidad coordinada</p>
               </div>
             </div>
 
@@ -221,19 +192,18 @@ export function Hero() {
             {/* Floating cards - solo desktop */}
             <div className="absolute -top-4 -right-4 bg-card p-3 rounded-lg shadow-lg border border-border/50 backdrop-blur-sm z-20">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                 <span className="text-sm font-medium">Disponible ahora</span>
               </div>
             </div>
 
             <div className="absolute -bottom-4 -left-4 bg-card p-4 rounded-lg shadow-lg border border-border/50 backdrop-blur-sm z-20">
-              <p className="text-xs font-medium text-muted-foreground mb-1">Hoy</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Red Silbatazo</p>
               <p className="text-lg font-bold text-foreground tabular-nums">
-                {isLoading ? "—" : primeraHoraHoy ? `Desde ${primeraHoraHoy}` : "—"}
+                {isLoading ? "—" : arbitrosTotal > 0 ? `${arbitrosTotal} árbitros` : "—"}
               </p>
-              <p className="text-xs text-slate-300">
-                {isLoading ? "—" : arbitrosDisponiblesHoy}{" "}
-                {arbitrosDisponiblesHoy === 1 ? "árbitro disponible" : "árbitros disponibles"}
+              <p className="text-xs text-muted-foreground">
+                Disponibilidad coordinada todos los días
               </p>
             </div>
 

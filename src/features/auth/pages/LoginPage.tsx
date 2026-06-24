@@ -7,8 +7,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLogin } from "../hooks/useLogin";
-import { ROUTES, APP_NAME } from "@/lib/constants";
-import { getDashboardRoute } from "@/lib/routing";
+import { ROUTES, APP_NAME, USER_ROLES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { validations } from "@/lib/validations";
 import logoImage from "@/assets/Logo.png";
@@ -50,13 +49,13 @@ export function LoginPage() {
   }, []);
 
   useEffect(() => {
-    // Si el usuario ya está autenticado, redirigir
     if (isAuthenticated && user?.role) {
-      if (redirectTo) {
-        navigate(redirectTo, { replace: true });
+      if (user.role === USER_ROLES.ADMIN) {
+        const destino =
+          redirectTo && redirectTo.startsWith("/admin") ? redirectTo : ROUTES.ADMIN_DASHBOARD;
+        navigate(destino, { replace: true });
       } else {
-        const dashboardRoute = getDashboardRoute(user.role);
-        navigate(dashboardRoute, { replace: true });
+        navigate(ROUTES.HOME, { replace: true });
       }
     }
   }, [isAuthenticated, user, redirectTo, navigate]);
@@ -100,13 +99,13 @@ export function LoginPage() {
         authResponse.user.email_verificado,
       );
 
-      // Redirigir
       setTimeout(() => {
-        if (redirectTo) {
-          navigate(redirectTo);
+        if (authResponse.user.role === USER_ROLES.ADMIN) {
+          const destino =
+            redirectTo && redirectTo.startsWith("/admin") ? redirectTo : ROUTES.ADMIN_DASHBOARD;
+          navigate(destino, { replace: true });
         } else {
-          const dashboardRoute = getDashboardRoute(authResponse.user.role);
-          navigate(dashboardRoute);
+          navigate(ROUTES.HOME, { replace: true });
         }
       }, 100);
     } catch (err) {
@@ -132,10 +131,10 @@ export function LoginPage() {
         authResponse.user.id,
         authResponse.user.email_verificado,
       );
-      if (authResponse.user.role === "arbitro") {
-        navigate(ROUTES.ARBITRO_ONBOARDING, { replace: true });
+      if (authResponse.user.role === USER_ROLES.ADMIN) {
+        navigate(ROUTES.ADMIN_DASHBOARD, { replace: true });
       } else {
-        navigate(ROUTES.CLIENTE_PERFIL, { replace: true });
+        navigate(ROUTES.HOME, { replace: true });
       }
     } catch (err) {
       console.error("Error al reactivar cuenta:", err);
@@ -348,28 +347,10 @@ export function LoginPage() {
                 </Button>
               </form>
 
-              {/* Divider */}
-              <div className="relative my-4 md:my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-border/60" />
-                </div>
-                <div className="relative flex justify-center text-xs">
-                  <span className="bg-card/80 px-3 text-muted-foreground font-medium rounded">
-                    ¿No tienes cuenta?
-                  </span>
-                </div>
-              </div>
-
-              {/* Register Link */}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate(ROUTES.REGISTER)}
-                className="w-full h-11 md:h-12 bg-card/40 border-2 border-border/60 text-foreground font-semibold hover:bg-card/70 hover:border-border rounded-xl transition-all duration-200"
-                size="lg"
-              >
-                Crear una cuenta nueva
-              </Button>
+              <p className="text-center text-xs text-muted-foreground mt-4">
+                Acceso reservado al equipo administrativo. Para reservar un árbitro, usa WhatsApp
+                desde la página principal.
+              </p>
             </div>
           </div>
 

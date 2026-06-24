@@ -7,7 +7,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Cómo reservo un árbitro?",
     answer:
-      "Eliges la fecha, hora y lugar, ves disponibilidad y confirmas la solicitud. El proceso es rápido y sin enredos.",
+      "Exploras los perfiles en la web y nos escribes por WhatsApp con la fecha, hora, municipio y tipo de partido. Nuestro equipo confirma disponibilidad y coordina el resto.",
   },
   {
     question: "¿En qué ciudades funciona?",
@@ -22,7 +22,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Cómo se paga el servicio?",
     answer:
-      "El pago se realiza dentro de la plataforma con métodos disponibles en Colombia, de forma segura.",
+      "Te indicamos las opciones de pago por WhatsApp una vez confirmemos el árbitro y el valor del servicio.",
   },
   {
     question: "¿Los árbitros son verificados?",

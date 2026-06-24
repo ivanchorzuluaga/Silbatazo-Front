@@ -4,14 +4,12 @@
  */
 
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useAuth } from "@/hooks/useAuth";
-import { ROUTES, getArbitroDetailRoute } from "@/lib/constants";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
+import { ROUTES, WHATSAPP_RESERVA_MESSAGE, ARBITRO_CALIFICACION_PUBLICA } from "@/lib/constants";
 import { DisponibilidadDisplay } from "@/features/arbitro/components/DisponibilidadDisplay";
-import { PartidoFormModal } from "@/features/partidos/components/PartidoFormModal";
-import { useCalificaciones } from "@/features/partidos/hooks/useCalificaciones";
 import logoImage from "@/assets/Logo.png";
 import { FotoArbitroCard } from "@/components/arbitro/FotoArbitroCard";
 import {
@@ -27,24 +25,14 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { Arbitro } from "@/features/arbitro/types/arbitro.types";
 
 export function ArbitroDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
   const [arbitro, setArbitro] = useState<Arbitro | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showSolicitarModal, setShowSolicitarModal] = useState(false);
-  const {
-    calificaciones,
-    promedio,
-    isLoading: isLoadingCalificaciones,
-    listarCalificacionesArbitro,
-    obtenerPromedio,
-  } = useCalificaciones();
 
   // Scroll al inicio al cargar la página
   useEffect(() => {
@@ -79,11 +67,6 @@ export function ArbitroDetailPage() {
 
         const data = await response.json();
         setArbitro(data);
-
-        if (data.id) {
-          listarCalificacionesArbitro(data.id);
-          obtenerPromedio(data.id);
-        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error al cargar árbitro");
       } finally {
@@ -92,24 +75,7 @@ export function ArbitroDetailPage() {
     };
 
     cargarArbitro();
-  }, [id, listarCalificacionesArbitro, obtenerPromedio]);
-
-  const handleSolicitar = () => {
-    if (!isAuthenticated) {
-      if (id) {
-        navigate(`${ROUTES.LOGIN}?redirect=${encodeURIComponent(getArbitroDetailRoute(id))}`);
-      } else {
-        navigate(ROUTES.LOGIN);
-      }
-      return;
-    }
-
-    if (user?.role === "arbitro" || user?.role === "admin") {
-      return;
-    }
-
-    setShowSolicitarModal(true);
-  };
+  }, [id]);
 
   // Estados de carga y error
   if (isLoading) {
@@ -140,8 +106,6 @@ export function ArbitroDetailPage() {
   }
 
   const nombre = arbitro.full_name || arbitro.username;
-  const rating = promedio?.promedio || arbitro.calificacion_promedio || 0;
-  const totalCalificaciones = promedio?.total_calificaciones || 0;
 
   return (
     <div className="min-h-screen relative">
@@ -178,15 +142,6 @@ export function ArbitroDetailPage() {
               <span>Tema</span>
               <ThemeToggle size="sm" />
             </div>
-            {isAuthenticated ? (
-              <Button variant="ghost" size="sm" asChild className="text-foreground hover:bg-muted">
-                <Link to={ROUTES.DASHBOARD}>Mi Dashboard</Link>
-              </Button>
-            ) : (
-              <Button variant="ghost" size="sm" asChild className="text-foreground hover:bg-muted">
-                <Link to={ROUTES.LOGIN}>Iniciar Sesión</Link>
-              </Button>
-            )}
           </div>
         </div>
       </header>
@@ -205,27 +160,23 @@ export function ArbitroDetailPage() {
                   className="w-full"
                   backgroundSrc="/Fondo-Limpio-Diseño-2.png"
                   fotoOverrideSrc={arbitro.foto_detalle || undefined}
-                  mostrarCalificacion={false}
                   nombreOverride="Árbitro Silbatazo"
                   nombreClassName="text-3xl whitespace-nowrap"
                   nombreWrapperClassName="bottom-12"
                 />
               </div>
 
-              {/* Botón de solicitar - Desktop */}
-              <div className="hidden lg:block">
-                <Button
-                  onClick={handleSolicitar}
+              <div className="hidden lg:block space-y-3">
+                <WhatsAppButton
                   size="lg"
-                  className="w-full h-14 text-lg shadow-lg shadow-primary/25"
+                  className="w-full h-14 text-lg shadow-lg"
+                  message={WHATSAPP_RESERVA_MESSAGE}
                 >
-                  {isAuthenticated ? "Solicitar Árbitro" : "Registrarse para Solicitar"}
-                </Button>
-                {!isAuthenticated && (
-                  <p className="text-center text-muted-foreground text-sm mt-2">
-                    Necesitas una cuenta para solicitar
-                  </p>
-                )}
+                  Reservar por WhatsApp
+                </WhatsAppButton>
+                <p className="text-center text-muted-foreground text-xs">
+                  Te atendemos por el mismo canal para confirmar fecha, lugar y pago.
+                </p>
               </div>
             </div>
           </div>
@@ -236,17 +187,14 @@ export function ArbitroDetailPage() {
             <div className="bg-card backdrop-blur-md rounded-2xl border border-border p-6">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
-                  <div className="flex items-start gap-3 mb-2">
+                  <div className="flex items-start gap-3 mb-2 flex-wrap">
                     <h1 className="text-3xl sm:text-4xl font-bold text-foreground">{nombre}</h1>
-                    {totalCalificaciones > 0 && rating > 0 && (
-                      <div className="flex items-center gap-1 px-3 py-1 bg-primary/20 border border-primary/30 rounded-full">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-foreground font-semibold">{rating.toFixed(1)}</span>
-                        <span className="text-muted-foreground text-xs">
-                          ({totalCalificaciones})
-                        </span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-1 px-3 py-1 bg-primary/20 border border-primary/30 rounded-full">
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <span className="text-foreground font-semibold">
+                        {ARBITRO_CALIFICACION_PUBLICA.toFixed(1)}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
                     {arbitro.experiencia_anos > 0 && (
@@ -255,18 +203,15 @@ export function ArbitroDetailPage() {
                         {arbitro.experiencia_anos} años exp.
                       </span>
                     )}
-                    {totalCalificaciones > 0 ? (
-                      <span className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        {totalCalificaciones}{" "}
-                        {totalCalificaciones === 1 ? "calificación" : "calificaciones"}
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 text-muted-foreground">
-                        <Star className="w-4 h-4" />
-                        Sin calificaciones aún
-                      </span>
-                    )}
+                    <span className="flex items-center gap-1">
+                      {Array.from({ length: ARBITRO_CALIFICACION_PUBLICA }, (_, i) => (
+                        <Star
+                          key={i}
+                          className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                        />
+                      ))}
+                      <span className="ml-1">Árbitro garantizado</span>
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1 px-3 py-1 bg-success/20 text-success rounded-full text-sm font-medium border border-success/30">
@@ -326,98 +271,6 @@ export function ArbitroDetailPage() {
               </InfoCard>
             )}
 
-            {/* Calificaciones */}
-            <InfoCard icon={Star} title="Calificaciones y Reseñas">
-              {isLoadingCalificaciones ? (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Cargando calificaciones...
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Promedio */}
-                  {totalCalificaciones > 0 && rating > 0 ? (
-                    <div className="flex items-center gap-6 pb-4 border-b border-border">
-                      <div className="text-center">
-                        <p className="text-4xl font-bold text-primary">{rating.toFixed(1)}</p>
-                        <div className="flex items-center justify-center gap-0.5 mt-1">
-                          {Array.from({ length: 5 }, (_, i) => (
-                            <Star
-                              key={i}
-                              className={cn(
-                                "w-4 h-4",
-                                i < Math.round(rating)
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "text-muted-foreground/30"
-                              )}
-                            />
-                          ))}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {totalCalificaciones} {totalCalificaciones === 1 ? "reseña" : "reseñas"}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="pb-4 border-b border-border">
-                      <p className="text-muted-foreground text-sm text-center">
-                        Este árbitro aún no tiene calificaciones. Sé el primero en calificarlo
-                        después de un partido.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Lista de calificaciones */}
-                  {calificaciones.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">
-                      Aún no hay calificaciones para este árbitro.
-                    </p>
-                  ) : (
-                    <div className="space-y-3">
-                      {calificaciones.slice(0, 5).map((cal) => (
-                        <div
-                          key={cal.id}
-                          className="p-4 bg-muted/50 rounded-xl border border-border"
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <p className="font-medium text-foreground">
-                                {cal.calificador_full_name}
-                              </p>
-                              <div className="flex items-center gap-0.5 mt-1">
-                                {Array.from({ length: 5 }, (_, i) => (
-                                  <Star
-                                    key={i}
-                                    className={cn(
-                                      "w-3 h-3",
-                                      i < cal.puntuacion
-                                        ? "fill-yellow-400 text-yellow-400"
-                                        : "text-muted-foreground/30"
-                                    )}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(cal.created_at).toLocaleDateString("es-CO")}
-                            </span>
-                          </div>
-                          {cal.comentario && (
-                            <p className="text-muted-foreground text-sm">{cal.comentario}</p>
-                          )}
-                        </div>
-                      ))}
-                      {calificaciones.length > 5 && (
-                        <p className="text-xs text-muted-foreground text-center">
-                          Mostrando las 5 más recientes de {calificaciones.length}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </InfoCard>
-
             {/* Certificaciones */}
             {arbitro.documentos && arbitro.documentos.length > 0 && (
               <InfoCard icon={FileCheck} title="Certificaciones">
@@ -459,26 +312,18 @@ export function ArbitroDetailPage() {
           </div>
         </div>
 
-        {/* Botón de solicitar - Mobile (sticky) */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur-xl border-t border-border/60 z-50">
-          <Button onClick={handleSolicitar} size="lg" className="w-full h-14 text-lg shadow-lg">
-            {isAuthenticated ? "Solicitar Árbitro" : "Registrarse para Solicitar"}
-          </Button>
+          <WhatsAppButton
+            size="lg"
+            className="w-full h-14 text-lg shadow-lg"
+            message={WHATSAPP_RESERVA_MESSAGE}
+          >
+            Reservar por WhatsApp
+          </WhatsAppButton>
         </div>
 
-        {/* Espaciado extra para el botón sticky en móvil */}
         <div className="lg:hidden h-24" />
       </main>
-
-      {/* Modal de solicitar */}
-      {arbitro && (
-        <PartidoFormModal
-          arbitro={arbitro}
-          open={showSolicitarModal}
-          onClose={() => setShowSolicitarModal(false)}
-          onSuccess={() => setShowSolicitarModal(false)}
-        />
-      )}
     </div>
   );
 }

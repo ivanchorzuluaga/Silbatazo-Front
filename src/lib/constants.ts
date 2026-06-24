@@ -5,9 +5,16 @@
 export const APP_NAME = "Silbatazo";
 export const APP_SLOGAN = "Árbitros de Confianza";
 
+/** Calificación pública fija mientras no hay sistema de reseñas en la app */
+export const ARBITRO_CALIFICACION_PUBLICA = 5;
+
 /** Número de WhatsApp para contacto (código país + número sin + ni espacios). Ej: 573001234567 */
 export const CONTACT_WHATSAPP_NUMBER =
   (import.meta.env.VITE_WHATSAPP_NUMBER as string) || "573159888384";
+
+/** Mensaje inicial único para reservas y contacto por WhatsApp */
+export const WHATSAPP_RESERVA_MESSAGE =
+  "Hola Silbatazo, quiero reservar un árbitro para mi partido. ¿Me pueden ayudar con la gestión?";
 
 /** Categorías base que se usan en partidos y tarifas */
 export const CATEGORIAS_PARTIDO = [

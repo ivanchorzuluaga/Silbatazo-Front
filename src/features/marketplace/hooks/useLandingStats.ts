@@ -1,11 +1,22 @@
 /**
- * Hook para cargar estadísticas públicas de la landing (partidos pitados,
- * calificación promedio, árbitros disponibles hoy, primera hora hoy).
+ * Hook para cargar estadísticas públicas de la landing.
  */
 
 import { useState, useEffect, useCallback } from "react";
 import { partidoEndpoints } from "@/api/endpoints/partido.endpoints";
 import type { LandingStats } from "@/api/endpoints/partido.endpoints";
+
+/** Texto fijo para comunicar disponibilidad coordinada por el equipo */
+export const LANDING_DISPONIBILIDAD_TEXTO = "Siempre";
+
+export function getArbitrosVerificadosDisplay(
+  stats: LandingStats | null,
+  isLoading: boolean,
+): string {
+  if (isLoading) return "—";
+  const total = stats?.arbitros_total ?? 0;
+  return total > 0 ? String(total) : "—";
+}
 
 interface UseLandingStatsReturn {
   stats: LandingStats | null;

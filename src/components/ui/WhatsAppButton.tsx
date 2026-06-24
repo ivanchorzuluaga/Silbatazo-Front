@@ -1,12 +1,10 @@
 /**
  * Botón/link reutilizable para abrir WhatsApp con un número de contacto.
- * No es flotante: se usa inline donde se necesite (footer, contacto, soporte).
  */
 
 import { cn } from "@/lib/utils";
 import { CONTACT_WHATSAPP_NUMBER } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
 
 const WHATSAPP_BASE = "https://wa.me";
 
@@ -22,7 +20,7 @@ export function getWhatsAppUrl(number: string = CONTACT_WHATSAPP_NUMBER, message
   return url.toString();
 }
 
-/** Icono SVG de WhatsApp para usar en navbar, etc. */
+/** Icono SVG de WhatsApp */
 export function WhatsAppIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -30,6 +28,12 @@ export function WhatsAppIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
+const logoSizeByButtonSize = {
+  sm: "w-5 h-5",
+  default: "w-6 h-6",
+  lg: "w-7 h-7",
+} as const;
 
 interface WhatsAppButtonProps {
   /** Número en formato 573001234567 (opcional, usa constante por defecto) */
@@ -65,12 +69,12 @@ export function WhatsAppButton({
         target="_blank"
         rel="noopener noreferrer"
         className={cn(
-          "inline-flex items-center justify-center text-foreground/70 hover:text-[#25D366] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/50 rounded-lg",
+          "inline-flex items-center justify-center text-[#25D366] hover:text-[#20BD5A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/50 rounded-lg",
           className
         )}
         aria-label={defaultLabel}
       >
-        <WhatsAppIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+        <WhatsAppIcon className="w-7 h-7 sm:w-8 sm:h-8" />
       </a>
     );
   }
@@ -88,7 +92,7 @@ export function WhatsAppButton({
           className
         )}
       >
-        <WhatsAppIcon className="size-4 shrink-0 text-[#25D366]" />
+        <WhatsAppIcon className="size-5 shrink-0 text-[#25D366]" />
         <span>WhatsApp</span>
       </a>
     );
@@ -105,7 +109,7 @@ export function WhatsAppButton({
           className
         )}
       >
-        <MessageCircle className="w-4 h-4 shrink-0" />
+        <WhatsAppIcon className="w-5 h-5 shrink-0" />
         {label}
       </a>
     );
@@ -126,7 +130,7 @@ export function WhatsAppButton({
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2"
       >
-        <MessageCircle className="w-4 h-4 shrink-0" />
+        <WhatsAppIcon className={cn(logoSizeByButtonSize[size], "shrink-0 text-white")} />
         {label}
       </a>
     </Button>

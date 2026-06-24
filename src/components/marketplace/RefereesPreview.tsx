@@ -104,7 +104,7 @@ export function RefereesPreview({ arbitros }: RefereesPreviewProps) {
             <div className="hidden sm:block w-px h-6 bg-border" />
             <div className="flex items-center gap-2">
               <Star className="h-5 w-5 text-yellow-500" />
-              <span className="text-sm font-medium">Calificados</span>
+              <span className="text-sm font-medium">5 estrellas</span>
             </div>
             <div className="hidden sm:block w-px h-6 bg-border" />
             <div className="flex items-center gap-2">

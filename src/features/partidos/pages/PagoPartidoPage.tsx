@@ -51,12 +51,15 @@ export function PagoPartidoPage() {
     checkoutError,
     tienePermiso,
     handleCrearCheckout,
+    refreshPartido,
     handleCopy,
     formatCurrency,
     navigateToDashboard,
   } = usePagoPartido(id);
 
   const { widgetReady, widgetError, widgetStatus, openWidget } = useWompiWidget();
+  const [ultimoResultado, setUltimoResultado] = useState<string | null>(null);
+  const [pollingActivo, setPollingActivo] = useState(false);
 
   const handleIniciarPago = useCallback(async () => {
     setIntentoAbrirWidget(true);
@@ -66,12 +69,38 @@ export function PagoPartidoPage() {
   useEffect(() => {
     if (intentoAbrirWidget && checkoutData && widgetReady) {
       try {
-        openWidget(checkoutData);
+        openWidget(checkoutData, (resultado) => {
+          if (resultado) {
+            setUltimoResultado(JSON.stringify(resultado));
+          }
+          setPollingActivo(true);
+        });
       } finally {
         setIntentoAbrirWidget(false);
       }
     }
   }, [intentoAbrirWidget, checkoutData, widgetReady, openWidget]);
+
+  useEffect(() => {
+    if (vieneDeCheckout) {
+      setPollingActivo(true);
+    }
+  }, [vieneDeCheckout]);
+
+  useEffect(() => {
+    if (!pollingActivo) return;
+    const interval = window.setInterval(() => {
+      refreshPartido();
+    }, 3000);
+    return () => window.clearInterval(interval);
+  }, [pollingActivo, refreshPartido]);
+
+  useEffect(() => {
+    if (!pollingActivo) return;
+    if (estadoPago !== "pendiente" && estadoPago !== "rechazado") {
+      setPollingActivo(false);
+    }
+  }, [pollingActivo, estadoPago]);
 
   // Estado de carga
   if (isLoading) {
@@ -314,6 +343,19 @@ export function PagoPartidoPage() {
                       </div>
                     </div>
                   )}
+                  {pollingActivo && (
+                    <div className="rounded-lg border border-primary/20 bg-primary/10 p-3 text-xs text-muted-foreground">
+                      Verificando el pago con Wompi... Actualizaremos el estado automáticamente.
+                    </div>
+                  )}
+                  {ultimoResultado && (
+                    <details className="rounded-lg border border-border/60 bg-muted/20 p-3 text-[11px] text-muted-foreground">
+                      <summary className="cursor-pointer text-foreground font-medium">
+                        Respuesta del widget
+                      </summary>
+                      <pre className="mt-2 whitespace-pre-wrap break-all">{ultimoResultado}</pre>
+                    </details>
+                  )}
                 </div>
               </div>
 
@@ -475,7 +517,8 @@ function useWompiWidget() {
     document.body.appendChild(script);
   }, []);
 
-  const openWidget = useCallback((data: WompiCheckoutResponse) => {
+  const openWidget = useCallback(
+    (data: WompiCheckoutResponse, onResponse?: (result: unknown) => void) => {
     if (!window.WidgetCheckout || typeof window.WidgetCheckout !== "function") {
       setWidgetError("El widget de Wompi aún no está listo.");
       setWidgetStatus((prev) => ({
@@ -505,8 +548,8 @@ function useWompiWidget() {
         redirectUrl: data.redirect_url,
         ...(customerData ? { customerData } : {}),
       });
-      checkout.open(() => {
-        // Wompi exige un callback; el webhook confirma el estado real.
+      checkout.open((result: unknown) => {
+        onResponse?.(result);
       });
     } catch (err) {
       // Mostrar detalle real del error para diagnóstico

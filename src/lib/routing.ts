@@ -10,17 +10,10 @@ import { ROUTES, USER_ROLES, type UserRole } from "./constants";
  * @returns Ruta del dashboard correspondiente al rol
  */
 export function getDashboardRoute(role?: UserRole): string {
-  switch (role) {
-    case USER_ROLES.CLIENTE:
-      return ROUTES.CLIENTE_DASHBOARD;
-    case USER_ROLES.ARBITRO:
-      return ROUTES.ARBITRO_DASHBOARD;
-    case USER_ROLES.ADMIN:
-      return ROUTES.ADMIN_DASHBOARD;
-    default:
-      // Si no hay rol o es desconocido, redirigir al dashboard genérico
-      return ROUTES.DASHBOARD;
+  if (role === USER_ROLES.ADMIN) {
+    return ROUTES.ADMIN_DASHBOARD;
   }
+  return ROUTES.HOME;
 }
 
 /**
